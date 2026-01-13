@@ -1,0 +1,444 @@
+@page "/register"
+@using LaPrimitiva.Application.Services
+@using LaPrimitiva.Domain.Entities
+@using LaPrimitiva.Infrastructure.Persistence
+@using Microsoft.EntityFrameworkCore
+@inject PrimitivaDbContext Db
+@inject GlobalState GlobalState
+@implements IDisposable
+
+<PageTitle>Registro - La Primitiva Audit</PageTitle>
+
+<div class="space-y-6">
+    <div class="flex justify-between items-end">
+        <div>
+            <h2 class="text-3xl font-extrabold text-slate-900 text-transparent bg-clip-text bg-gradient-to-r from-slate-900 to-slate-500">Registro de Sorteos</h2>
+            <p class="text-slate-500">Listado de sorteos para el año @GlobalState.SelectedYear.</p>
+        </div>
+        <div class="flex gap-4 items-end">
+            <button @onclick="ShowRegisterModal" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-2xl text-sm font-bold shadow-lg shadow-blue-200 transition-all flex items-center gap-2 transform hover:scale-105 active:scale-95">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
+                </svg>
+                Alta Nuevo Sorteo
+            </button>
+            <div class="bg-white/80 backdrop-blur-md px-4 py-3 rounded-2xl border border-slate-200 shadow-sm h-full flex items-center gap-3">
+                <div class="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></div>
+                <span class="text-slate-500 text-xs font-bold uppercase tracking-wider">Plan:</span>
+                <span class="text-slate-900 text-sm font-bold">@activePlanName</span>
+            </div>
+        </div>
+    </div>
+
+    @if (drawsWithCumulative == null)
+    {
+        <div class="flex justify-center p-24">
+            <div class="relative">
+                <div class="h-24 w-24 rounded-full border-4 border-slate-100 border-t-blue-600 animate-spin"></div>
+                <div class="absolute inset-0 flex items-center justify-center text-blue-600 font-bold text-xs">Cargando</div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="bg-white rounded-3xl border border-slate-200 shadow-2xl shadow-slate-200/50 overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-separate border-spacing-0 min-w-max">
+                    <thead class="bg-slate-50 border-b border-slate-200">
+                        <tr>
+                            <th class="sticky left-0 z-20 bg-slate-50/90 backdrop-blur-sm px-4 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest border-r border-slate-200">Semana</th>
+                            <th class="sticky left-[72px] z-20 bg-slate-50/90 backdrop-blur-sm px-4 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest border-r border-slate-200">Sorteo</th>
+                            <th class="sticky left-[142px] z-20 bg-slate-50/90 backdrop-blur-sm px-4 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest border-r border-slate-200">Fecha</th>
+                            <th class="px-3 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">J.</th>
+                            
+                            <!-- Detailed Audit Headers -->
+                            <th class="px-3 py-4 text-[10px] font-black text-slate-500 uppercase tracking-widest text-right bg-slate-100/30">C. Fija</th>
+                            <th class="px-3 py-4 text-[10px] font-black text-slate-500 uppercase tracking-widest text-right bg-slate-100/30">C. Auto</th>
+                            <th class="px-4 py-4 text-[10px] font-black text-slate-900 uppercase tracking-widest text-right bg-slate-100/50">Total C.</th>
+                            
+                            <th class="px-3 py-4 text-[10px] font-black text-blue-600/70 uppercase tracking-widest text-right bg-blue-50/30">P. Fija</th>
+                            <th class="px-3 py-4 text-[10px] font-black text-blue-600/70 uppercase tracking-widest text-right bg-blue-50/30">P. Auto</th>
+                            <th class="px-4 py-4 text-[10px] font-black text-blue-900 uppercase tracking-widest text-right bg-blue-100/30">Total P.</th>
+                            
+                            <th class="px-4 py-4 text-[10px] font-black text-slate-900 uppercase tracking-widest text-right border-l border-slate-200">Neto</th>
+                            <th class="px-4 py-4 text-[10px] font-black text-white uppercase tracking-widest text-right bg-slate-900">Acumulado</th>
+                            <th class="px-4 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Notas</th>
+                            <th class="px-4 py-4"></th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100 font-mono text-[11px]">
+                        @foreach (var item in drawsWithCumulative)
+                        {
+                            var draw = item.Draw;
+                            <tr class="hover:bg-blue-50/30 transition-colors group">
+                                <td class="sticky left-0 z-10 bg-white group-hover:bg-blue-50/30 px-4 py-3 font-bold text-slate-500 border-r border-slate-100 text-center">@draw.WeekNumber</td>
+                                <td class="sticky left-[72px] z-10 bg-white group-hover:bg-blue-50/30 px-4 py-3 border-r border-slate-100 italic">@draw.DrawType</td>
+                                <td class="sticky left-[142px] z-10 bg-white group-hover:bg-blue-50/30 px-4 py-3 border-r border-slate-100">@draw.DrawDate.ToString("dd/MM/yy")</td>
+                                <td class="px-3 py-3 text-center">
+                                    <div class="flex justify-center">
+                                        <div class="h-4 w-4 rounded-full @(draw.Played ? "bg-blue-500" : "bg-slate-200") flex items-center justify-center text-[8px] text-white">
+                                            @(draw.Played ? "✓" : "")
+                                        </div>
+                                    </div>
+                                </td>
+                                
+                                <td class="px-3 py-3 text-right text-slate-400">@draw.CosteFija.ToString("N2")€</td>
+                                <td class="px-3 py-3 text-right text-slate-400">@draw.CosteAuto.ToString("N2")€</td>
+                                <td class="px-4 py-3 text-right font-bold text-slate-700 bg-slate-50/30">@draw.TotalCoste.ToString("N2")€</td>
+
+                                <td class="px-3 py-3 text-right text-blue-500">@draw.FixedPrize.ToString("N2")€</td>
+                                <td class="px-3 py-3 text-right text-blue-500">@draw.AutoPrize.ToString("N2")€</td>
+                                <td class="px-4 py-3 text-right font-bold text-blue-700 bg-blue-50/20">@draw.TotalPremios.ToString("N2")€</td>
+
+                                <td class="px-4 py-3 text-right font-bold border-l border-slate-100 @(draw.Neto >= 0 ? "text-emerald-600" : "text-rose-600")">
+                                    @draw.Neto.ToString("N2")€
+                                </td>
+                                <td class="px-4 py-3 text-right font-black bg-slate-900/5 @(draw.Acumulado >= 0 ? "text-emerald-700" : "text-rose-700")">
+                                    @draw.Acumulado.ToString("N2")€
+                                </td>
+                                
+                                <td class="px-4 py-3 max-w-[150px] truncate text-slate-400 italic">@draw.Notes</td>
+                                
+                                <td class="px-4 py-3">
+                                    <button @onclick="() => EditDraw(draw)" class="p-1.5 rounded-lg text-slate-300 hover:text-blue-600 hover:bg-blue-50 transition-all">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                        </svg>
+                                    </button>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
+</div>
+
+<!-- Modal Refined to match requirement list -->
+@if (showModal)
+{
+    <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/70 backdrop-blur-md transition-all">
+        <div class="bg-white rounded-[2.5rem] shadow-2xl w-full max-w-6xl max-h-[92vh] overflow-hidden flex flex-col animate-in fade-in zoom-in duration-300">
+            <!-- Modal Header -->
+            <div class="px-10 py-8 border-b border-slate-100 flex justify-between items-center bg-white">
+                <div class="flex items-center gap-6">
+                    <div class="h-14 w-14 rounded-2xl bg-blue-600 flex items-center justify-center text-white shadow-xl shadow-blue-200">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM6.293 6.707a1 1 0 010-1.414l3-3a1 1 0 011.414 0l3 3a1 1 0 01-1.414 1.414L11 5.414V13a1 1 0 11-2 0V5.414L7.707 6.707a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="text-2xl font-black text-slate-900">Alta Nuevo Sorteo Semanal</h3>
+                        <p class="text-slate-400 font-medium">Auditoría completa de resultados y costes.</p>
+                    </div>
+                </div>
+                <button @onclick="CloseModal" class="h-12 w-12 hover:bg-slate-100 rounded-2xl flex items-center justify-center transition-all text-slate-300 hover:text-slate-900">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Modal Content -->
+            <div class="flex-1 overflow-auto p-10 bg-slate-50/50">
+                <!-- Week & Plan Info -->
+                <div class="flex flex-wrap gap-8 mb-10">
+                    <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 flex-1 min-w-[200px]">
+                        <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3">Número de Semana</label>
+                        <div class="flex items-center gap-4">
+                            <input type="number" @bind="modalWeek" class="w-24 text-3xl font-black text-blue-600 bg-transparent border-none p-0 focus:ring-0" />
+                            <button @onclick="LoadWeekDataInModal" class="text-xs font-bold text-blue-600 hover:text-blue-700 flex items-center gap-1">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                                </svg>
+                                Cargar Datos
+                            </button>
+                        </div>
+                    </div>
+                    <div class="bg-blue-600 p-6 rounded-3xl shadow-xl shadow-blue-200 flex-[2] min-w-[300px] text-white overflow-hidden relative">
+                        <div class="relative z-10">
+                            <label class="block text-[10px] font-black text-blue-200 uppercase tracking-widest mb-2">Plan Activo Detectado</label>
+                            <div class="text-2xl font-black">@activePlanName</div>
+                            <div class="mt-2 text-[10px] font-bold text-blue-100">
+                                @(modalPlan?.BetsPerDraw ?? 0) Apuestas/Sorteo • Joker @(modalPlan?.EnableJoker == true ? "SÍ" : "NO")
+                            </div>
+                        </div>
+                        <svg class="absolute -right-4 -bottom-4 h-32 w-32 text-blue-500 opacity-20" fill="currentColor" viewBox="0 0 20 20"><path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z"/></svg>
+                    </div>
+                </div>
+
+                @if (isModalLoading)
+                {
+                    <div class="flex justify-center p-20">
+                        <div class="h-12 w-12 rounded-full border-4 border-slate-100 border-t-blue-600 animate-spin"></div>
+                    </div>
+                }
+                else if (modalDraws != null && modalDraws.Any())
+                {
+                    <div class="space-y-6">
+                        @foreach (var draw in modalDraws.OrderBy(d => d.DrawDate))
+                        {
+                            <div class="bg-white rounded-[2rem] border border-slate-100 shadow-sm overflow-hidden p-8 flex flex-col lg:flex-row gap-8 items-start lg:items-center">
+                                <!-- Draw Identity -->
+                                <div class="w-full lg:w-48 space-y-2">
+                                    <div class="text-xs font-black text-slate-400 uppercase tracking-widest">Sorteo</div>
+                                    <div class="text-2xl font-black text-slate-900">@draw.DrawType</div>
+                                    <div class="text-sm font-bold text-slate-500 font-mono">@draw.DrawDate.ToString("dd/MM/yyyy")</div>
+                                    <label class="flex items-center gap-3 mt-4 p-3 rounded-2xl cursor-pointer transition-all @(draw.Played ? "bg-blue-50 text-blue-600" : "bg-slate-50 text-slate-400 hover:bg-slate-100")">
+                                        <input type="checkbox" @bind="draw.Played" @bind:after="() => RecalculateDraw(draw)" class="h-5 w-5 rounded-lg border-current focus:ring-0" />
+                                        <span class="text-sm font-black uppercase tracking-wider">Jugado</span>
+                                    </label>
+                                </div>
+
+                                <!-- Forms -->
+                                <div class="flex-1 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                                    <!-- Costs Summary -->
+                                    <div class="space-y-4">
+                                        <div class="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Costes Auditados</div>
+                                        <div class="space-y-3">
+                                            <div class="group">
+                                                <label class="text-[9px] font-bold text-slate-400 uppercase ml-1">Fija (€)</label>
+                                                <input type="number" step="0.01" @bind="draw.CosteFija" class="w-full bg-slate-50 border-none rounded-xl p-3 text-sm font-bold focus:ring-2 focus:ring-blue-500/20" />
+                                            </div>
+                                            <div class="group">
+                                                <label class="text-[9px] font-bold text-slate-400 uppercase ml-1">Auto (€)</label>
+                                                <input type="number" step="0.01" @bind="draw.CosteAuto" class="w-full bg-slate-50 border-none rounded-xl p-3 text-sm font-bold focus:ring-2 focus:ring-blue-500/20" />
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Prizes Entry -->
+                                    <div class="space-y-4">
+                                        <div class="text-[10px] font-black text-blue-400 uppercase tracking-widest px-1">Premios Registrados</div>
+                                        <div class="space-y-3">
+                                            <div class="group">
+                                                <label class="text-[9px] font-bold text-blue-400 uppercase ml-1">Premio Fija (€)</label>
+                                                <input type="number" step="0.01" @bind="draw.FixedPrize" @bind:after="() => RecalculateDraw(draw)" class="w-full bg-blue-50/50 border-none rounded-xl p-3 text-sm font-bold text-blue-700 focus:ring-2 focus:ring-blue-500/20" />
+                                            </div>
+                                            <div class="group">
+                                                <label class="text-[9px] font-bold text-blue-400 uppercase ml-1">Premio Auto (€)</label>
+                                                <input type="number" step="0.01" @bind="draw.AutoPrize" @bind:after="() => RecalculateDraw(draw)" class="w-full bg-blue-50/50 border-none rounded-xl p-3 text-sm font-bold text-blue-700 focus:ring-2 focus:ring-blue-500/20" />
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Results (Computed persistence) -->
+                                    <div class="space-y-4 md:col-span-2 lg:col-span-1">
+                                        <div class="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Resultados Finales</div>
+                                        <div class="bg-slate-50/80 rounded-2xl p-4 space-y-4">
+                                            <div class="flex justify-between items-center text-[10px] font-bold">
+                                                <span class="text-slate-400">TOTAL COSTE:</span>
+                                                <span class="text-slate-900">@draw.TotalCoste.ToString("N2")€</span>
+                                            </div>
+                                            <div class="flex justify-between items-center text-[10px] font-bold">
+                                                <span class="text-blue-500">TOTAL PREMIOS:</span>
+                                                <span class="text-blue-700">@draw.TotalPremios.ToString("N2")€</span>
+                                            </div>
+                                            <div class="pt-2 border-t border-slate-200 flex justify-between items-center">
+                                                <span class="text-[10px] font-black text-slate-500">NETO SORTEO:</span>
+                                                <span class="text-lg font-black @(draw.Neto >= 0 ? "text-emerald-600" : "text-rose-600")">@draw.Neto.ToString("N2")€</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Notes -->
+                                    <div class="space-y-4">
+                                        <div class="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1 text-right">Observaciones</div>
+                                        <textarea @bind="draw.Notes" class="w-full bg-slate-50 border-none rounded-2xl p-4 text-[11px] font-medium text-slate-600 focus:ring-2 focus:ring-blue-500/20 h-28 resize-none" placeholder="Añade notas de auditoría aquí..."></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <div class="text-center py-20 bg-slate-100/50 rounded-[3rem] border-4 border-dashed border-slate-100 flex flex-col items-center">
+                        <div class="h-24 w-24 rounded-full bg-white flex items-center justify-center text-slate-200 mb-6 shadow-sm">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+                            </svg>
+                        </div>
+                        <p class="text-lg font-black text-slate-300 uppercase tracking-widest">Introduce un número de semana</p>
+                        <p class="text-slate-400 mt-2 font-medium">Pulsa en "Cargar Datos" para auditar los sorteos.</p>
+                    </div>
+                }
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="px-10 py-8 border-t border-slate-100 bg-white flex justify-end gap-5">
+                <button @onclick="CloseModal" class="px-8 py-4 rounded-2xl text-sm font-black text-slate-500 hover:bg-slate-100 transition-all uppercase tracking-widest">
+                    Cancelar
+                </button>
+                <button @onclick="SaveModalChanges" disabled="@(modalDraws == null || !modalDraws.Any())" class="px-12 py-4 rounded-[1.5rem] text-sm font-black bg-slate-900 text-white hover:bg-black shadow-2xl shadow-slate-200 transition-all disabled:opacity-30 uppercase tracking-widest">
+                    Guardar Semana Auditada
+                </button>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    private List<DrawWithCumulative>? drawsWithCumulative;
+    private string activePlanName = "Sin Plan";
+    private Plan? modalPlan;
+
+    // Modal State
+    private bool showModal = false;
+    private int modalWeek = 0;
+    private List<DrawRecord>? modalDraws;
+    private bool isModalLoading = false;
+
+    private class DrawWithCumulative
+    {
+        public DrawRecord Draw { get; set; } = null!;
+        // Note: Field mapping is now direct to Entity Properties (Neto, Acumulado)
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        GlobalState.OnChange += HandleStateChange;
+        
+        // Try to identify current week if possible
+        modalWeek = GetCurrentWeekNumber();
+        
+        await LoadData();
+    }
+
+    private int GetCurrentWeekNumber()
+    {
+        // Simple week calc for 2026 or current year
+        var now = DateTime.Now;
+        var start = new DateTime(now.Year, 1, 1);
+        while (start.DayOfWeek != DayOfWeek.Monday) start = start.AddDays(1);
+        if (now < start) return 1;
+        return ((now - start).Days / 7) + 1;
+    }
+
+    private async void HandleStateChange()
+    {
+        await LoadData();
+        StateHasChanged();
+    }
+
+    private async Task LoadData()
+    {
+        var year = GlobalState.SelectedYear;
+        var rawDraws = await Db.DrawRecords
+            .Include(d => d.Plan)
+            .Where(d => d.DrawDate.Year == year)
+            .OrderBy(d => d.DrawDate) 
+            .ToListAsync();
+
+        // Recalculate Acumulado if missing or mismatch (ensure view consistency)
+        decimal runningNet = 0;
+        foreach (var d in rawDraws)
+        {
+            runningNet += d.Neto;
+            d.Acumulado = runningNet;
+        }
+
+        drawsWithCumulative = rawDraws.Select(d => new DrawWithCumulative { Draw = d }).Reverse().ToList();
+
+        if (rawDraws.Any())
+        {
+            activePlanName = rawDraws.Last().Plan.Name;
+        }
+    }
+
+    private async Task SaveDraw(DrawRecord draw)
+    {
+        RecalculateDraw(draw);
+        draw.UpdatedAt = DateTime.UtcNow;
+        Db.DrawRecords.Update(draw);
+        await Db.SaveChangesAsync();
+        await LoadData();
+        StateHasChanged();
+    }
+
+    private void RecalculateDraw(DrawRecord draw)
+    {
+        // Snapshot audit fields
+        draw.CosteFija = draw.Played ? draw.Plan.CostPerBet : 0;
+        draw.CosteAuto = draw.Played ? draw.Plan.CostPerBet : 0;
+        draw.CosteJokerFija = (draw.Played && draw.Plan.EnableJoker) ? draw.Plan.JokerCostPerBet : 0;
+        draw.CosteJokerAuto = (draw.Played && draw.Plan.EnableJoker) ? draw.Plan.JokerCostPerBet : 0;
+        
+        draw.TotalCoste = draw.CosteFija + draw.CosteAuto + draw.CosteJokerFija + draw.CosteJokerAuto;
+        draw.TotalPremios = draw.FixedPrize + draw.AutoPrize + draw.JokerFixedPrize + draw.JokerAutoPrize;
+        draw.Neto = draw.TotalPremios - draw.TotalCoste;
+    }
+
+    private async Task ShowRegisterModal()
+    {
+        modalWeek = GetCurrentWeekNumber();
+        modalDraws = null;
+        showModal = true;
+        await LoadWeekDataInModal();
+    }
+
+    private async Task EditDraw(DrawRecord draw)
+    {
+        modalWeek = draw.WeekNumber;
+        showModal = true;
+        await LoadWeekDataInModal();
+    }
+
+    private async Task LoadWeekDataInModal()
+    {
+        if (modalWeek <= 0) return;
+        
+        isModalLoading = true;
+        StateHasChanged();
+
+        var year = GlobalState.SelectedYear;
+        modalDraws = await Db.DrawRecords
+            .Include(d => d.Plan)
+            .Where(d => d.DrawDate.Year == year && d.WeekNumber == modalWeek)
+            .ToListAsync();
+
+        if (modalDraws.Any())
+        {
+            modalPlan = modalDraws.First().Plan;
+            // Pre-calculate to show potential values
+            foreach (var d in modalDraws)
+            {
+                if (d.Played && d.TotalCoste == 0) // Default calc if not yet set
+                {
+                    RecalculateDraw(d);
+                }
+            }
+        }
+
+        isModalLoading = false;
+        StateHasChanged();
+    }
+
+    private void CloseModal()
+    {
+        showModal = false;
+    }
+
+    private async Task SaveModalChanges()
+    {
+        if (modalDraws == null) return;
+
+        foreach (var draw in modalDraws)
+        {
+            RecalculateDraw(draw);
+            draw.UpdatedAt = DateTime.UtcNow;
+            Db.DrawRecords.Update(draw);
+        }
+
+        await Db.SaveChangesAsync();
+        showModal = false;
+        await LoadData();
+        StateHasChanged();
+    }
+
+    public void Dispose()
+    {
+        GlobalState.OnChange -= HandleStateChange;
+    }
+}

@@ -1,0 +1,121 @@
+﻿@page "/"
+@using LaPrimitiva.Application.Services
+@using LaPrimitiva.Infrastructure.Persistence
+@using LaPrimitiva.App.Components.Shared
+@using Microsoft.EntityFrameworkCore
+@inject PrimitivaDbContext Db
+@inject SummaryService SummaryService
+@inject GlobalState GlobalState
+@implements IDisposable
+
+<PageTitle>Dashboard - La Primitiva Audit</PageTitle>
+
+<div class="space-y-8">
+    <div class="flex flex-col gap-2">
+        <h2 class="text-3xl font-extrabold text-slate-900">Dashboard</h2>
+        <p class="text-slate-500">Resumen y KPIs para el año @GlobalState.SelectedYear.</p>
+    </div>
+
+    @if (summary == null)
+    {
+        <div class="flex justify-center p-12">
+            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        </div>
+    }
+    else
+    {
+        <!-- KPI Row -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <KpiCard Title="Total Gastado" Value="@($"{summary.TotalSpent:N2}€")" SubValue="@($"{summary.PlayedDraws} sorteos jugados")" />
+            <KpiCard Title="Total Ganado" Value="@($"{summary.TotalWon:N2}€")" SubValue="@($"{summary.WinningDraws} con premio")" IsPositive="true" />
+            <KpiCard Title="Neto" Value="@($"{summary.NetResult:N2}€")" SubValue="@($"{summary.ROI:N1}% ROI")" IsPositive="@(summary.NetResult >= 0)" />
+            <KpiCard Title="Efectividad" Value="@($"{summary.WinningPercentage:N1}%")" SubValue="Sorteos con premio" IsPositive="true" />
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- Chart Placeholder -->
+            <div class="bg-white p-8 rounded-2xl border border-slate-100 shadow-sm h-96 flex flex-col items-center justify-center text-slate-400">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mb-4 opacity-20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z" />
+                </svg>
+                <div class="text-lg font-medium">Gráfico de Neto Acumulado</div>
+                <div class="text-xs uppercase tracking-widest mt-2">[ Chart.js - JS Interop ]</div>
+            </div>
+
+            <!-- Breakdown -->
+            <div class="bg-white p-8 rounded-2xl border border-slate-100 shadow-sm">
+                <h3 class="text-lg font-bold text-slate-900 mb-6 border-b border-slate-50 pb-4">Desglose por Tipo</h3>
+                <div class="space-y-6">
+                    <div>
+                        <div class="flex justify-between text-sm mb-2">
+                            <span class="font-semibold text-slate-700">Combinación FIJA</span>
+                            <span class="@(summary.FixedWon - summary.FixedSpent >= 0 ? "text-emerald-600" : "text-rose-600") font-bold">
+                                @((summary.FixedWon - summary.FixedSpent).ToString("N2"))€
+                            </span>
+                        </div>
+                        <div class="w-full bg-slate-100 rounded-full h-2">
+                            <div class="bg-blue-600 h-2 rounded-full" style="width: @(GetBarWidth(summary.FixedWon, summary.TotalWon))%"></div>
+                        </div>
+                        <div class="flex justify-between text-xs text-slate-400 mt-1">
+                            <span>Gasto: @summary.FixedSpent.ToString("N2")€</span>
+                            <span>Premio: @summary.FixedWon.ToString("N2")€</span>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="flex justify-between text-sm mb-2">
+                            <span class="font-semibold text-slate-700">Combinación AUTO</span>
+                            <span class="@(summary.AutoWon - summary.AutoSpent >= 0 ? "text-emerald-600" : "text-rose-600") font-bold">
+                                @((summary.AutoWon - summary.AutoSpent).ToString("N2"))€
+                            </span>
+                        </div>
+                        <div class="w-full bg-slate-100 rounded-full h-2">
+                            <div class="bg-indigo-600 h-2 rounded-full" style="width: @(GetBarWidth(summary.AutoWon, summary.TotalWon))%"></div>
+                        </div>
+                        <div class="flex justify-between text-xs text-slate-400 mt-1">
+                            <span>Gasto: @summary.AutoSpent.ToString("N2")€</span>
+                            <span>Premio: @summary.AutoWon.ToString("N2")€</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    private SummaryDto? summary;
+
+    protected override async Task OnInitializedAsync()
+    {
+        GlobalState.OnChange += HandleStateChange;
+        await LoadData();
+    }
+
+    private async void HandleStateChange()
+    {
+        await LoadData();
+        StateHasChanged();
+    }
+
+    private async Task LoadData()
+    {
+        var year = GlobalState.SelectedYear;
+        var draws = await Db.DrawRecords
+            .Include(d => d.Plan)
+            .Where(d => d.DrawDate.Year == year)
+            .ToListAsync();
+            
+        summary = SummaryService.GetSummary(draws);
+    }
+
+    private double GetBarWidth(decimal val, decimal total)
+    {
+        if (total == 0) return 0;
+        return (double)(val / total * 100);
+    }
+
+    public void Dispose()
+    {
+        GlobalState.OnChange -= HandleStateChange;
+    }
+}

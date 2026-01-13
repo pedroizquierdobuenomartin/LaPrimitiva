@@ -1,0 +1,29 @@
+{
+	"version": "0.2.0",
+	"configurations": [
+		{
+			"name": ".NET Core Launch (Web)",
+			"type": "coreclr",
+			"request": "launch",
+			"preLaunchTask": "build",
+			"program": "${workspaceFolder}/LaPrimitiva.App/bin/Debug/net10.0/LaPrimitiva.App.dll",
+			"args": [],
+			"cwd": "${workspaceFolder}/LaPrimitiva.App",
+			"stopAtEntry": false,
+			"serverReadyAction": {
+				"action": "openExternally",
+				"pattern": "\\bNow listening on:\\s+(https?://\\S+)"
+			},
+			"env": {
+				"ASPNETCORE_ENVIRONMENT": "Development"
+			}
+		},
+		{
+			"name": "Launch Chrome against localhost",
+			"type": "chrome",
+			"request": "launch",
+			"url": "http://localhost:5007",
+			"webRoot": "${workspaceFolder}"
+		}
+	]
+}

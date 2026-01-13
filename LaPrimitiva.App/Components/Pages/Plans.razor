@@ -1,0 +1,187 @@
+@page "/plans"
+@using LaPrimitiva.Application.Services
+@using LaPrimitiva.Domain.Entities
+@using LaPrimitiva.Infrastructure.Persistence
+@using Microsoft.EntityFrameworkCore
+@inject PrimitivaDbContext Db
+@inject PlanService PlanService
+@inject DrawGenerationService DrawGenService
+@inject NavigationManager Nav
+
+<PageTitle>Planes - La Primitiva Audit</PageTitle>
+
+<div class="space-y-8">
+    <div class="flex justify-between items-center">
+        <div>
+            <h2 class="text-3xl font-extrabold text-slate-900">Gestión de Planes</h2>
+            <p class="text-slate-500">Configura versiones de costes y reglas por periodos.</p>
+        </div>
+        <button @onclick="ShowCreateModal" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-xl font-bold shadow-lg shadow-blue-200 transition-all flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+            </svg>
+            Nuevo Plan
+        </button>
+    </div>
+
+    <div class="grid grid-cols-1 xl:grid-cols-2 gap-8">
+        @if (plans == null)
+        {
+            <div class="flex justify-center p-12 col-span-2">
+                <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+            </div>
+        }
+        else
+        {
+            @foreach (var plan in plans)
+            {
+                <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex flex-col">
+                    <div class="p-6 border-b border-slate-50 bg-slate-50/50 flex justify-between items-start">
+                        <div>
+                            <h3 class="text-xl font-bold text-slate-900">@plan.Name</h3>
+                            <div class="text-sm text-slate-500 mt-1">
+                                @plan.EffectiveFrom.ToString("dd/MM/yyyy") - 
+                                @(plan.EffectiveTo?.ToString("dd/MM/yyyy") ?? "Indefinido")
+                            </div>
+                        </div>
+                        <div class="flex gap-2">
+                            <button @onclick="() => GenerateDraws(plan)" class="text-xs bg-emerald-50 text-emerald-700 px-3 py-1.5 rounded-lg border border-emerald-100 hover:bg-emerald-100 font-bold transition-colors">
+                                Generar Sorteos
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="p-6 grid grid-cols-2 gap-6 flex-1">
+                        <div class="space-y-1">
+                            <div class="text-xs font-bold text-slate-400 uppercase">Coste por Apuesta</div>
+                            <div class="text-lg font-bold text-slate-700">@plan.CostPerBet.ToString("N2")€</div>
+                        </div>
+                        <div class="space-y-1">
+                            <div class="text-xs font-bold text-slate-400 uppercase">Apuestas/Sorteo</div>
+                            <div class="text-lg font-bold text-slate-700">@plan.BetsPerDraw (Fija + Auto)</div>
+                        </div>
+                        <div class="space-y-1">
+                            <div class="text-xs font-bold text-slate-400 uppercase">Joker Activo</div>
+                            <div class="text-lg font-bold text-slate-700">@(plan.EnableJoker ? "SÍ" : "NO")</div>
+                        </div>
+                        <div class="space-y-1">
+                            <div class="text-xs font-bold text-slate-400 uppercase">Coste Joker</div>
+                            <div class="text-lg font-bold text-slate-700">@plan.JokerCostPerBet.ToString("N2")€</div>
+                        </div>
+                        <div class="col-span-2 pt-2">
+                            <div class="text-xs font-bold text-slate-400 uppercase">Etiqueta Fija</div>
+                            <div class="text-sm text-slate-600 italic">"@plan.FixedCombinationLabel"</div>
+                        </div>
+                    </div>
+
+                    <div class="p-4 bg-slate-50 border-t border-slate-100 flex justify-end gap-2 text-xs font-semibold text-slate-400">
+                        Creado @plan.CreatedAt.ToString("g")
+                    </div>
+                </div>
+            }
+        }
+    </div>
+</div>
+
+@if (showModal)
+{
+    <div class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl shadow-2xl w-full max-w-lg overflow-hidden border border-slate-200">
+            <div class="p-6 border-b border-slate-100 flex justify-between items-center">
+                <h3 class="text-xl font-bold text-slate-900">Crear Nuevo Plan</h3>
+                <button @onclick="() => showModal = false" class="text-slate-400 hover:text-slate-600">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <div class="p-6 space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Nombre</label>
+                    <input @bind="newPlan.Name" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 focus:ring-2 focus:ring-blue-500 focus:bg-white outline-none transition-all" placeholder="Ej: Plan 2027" />
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Desde</label>
+                        <input type="date" @bind="newPlan.EffectiveFrom" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 focus:ring-2 focus:ring-blue-500 outline-none" />
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Hasta</label>
+                        <input type="date" @bind="newPlan.EffectiveTo" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 focus:ring-2 focus:ring-blue-500 outline-none" />
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Coste Apuesta (€)</label>
+                        <input type="number" step="0.01" @bind="newPlan.CostPerBet" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 focus:ring-2 focus:ring-blue-500 outline-none" />
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Coste Joker (€)</label>
+                        <input type="number" step="0.01" @bind="newPlan.JokerCostPerBet" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 focus:ring-2 focus:ring-blue-500 outline-none" />
+                    </div>
+                </div>
+                <div class="flex items-center gap-3 py-2">
+                    <input type="checkbox" @bind="newPlan.EnableJoker" id="enableJoker" class="h-5 w-5 rounded border-slate-300 text-blue-600" />
+                    <label for="enableJoker" class="text-sm font-semibold text-slate-700">Activar Joker</label>
+                </div>
+            </div>
+            <div class="p-6 bg-slate-50 flex gap-4">
+                <button @onclick="SavePlan" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl shadow-lg transition-all">Guardar Plan</button>
+                <button @onclick="() => showModal = false" class="flex-1 bg-white border border-slate-200 text-slate-600 font-bold py-3 rounded-xl hover:bg-slate-100 transition-all">Cancelar</button>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    private List<Plan>? plans;
+    private bool showModal = false;
+    private Plan newPlan = new Plan { EffectiveFrom = DateTime.Today };
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadData();
+    }
+
+    private async Task LoadData()
+    {
+        plans = await PlanService.GetPlansAsync();
+    }
+
+    private void ShowCreateModal()
+    {
+        newPlan = new Plan { Name = "Nuevo Plan", EffectiveFrom = DateTime.Today, EffectiveTo = DateTime.Today.AddYears(1) };
+        showModal = true;
+    }
+
+    private async Task SavePlan()
+    {
+        await PlanService.CreatePlanAsync(newPlan);
+        showModal = false;
+        await LoadData();
+    }
+
+    private async Task GenerateDraws(Plan plan)
+    {
+        if (plan.EffectiveTo == null) return;
+        
+        var existingCount = await Db.DrawRecords.CountAsync(d => d.PlanId == plan.Id);
+        if (existingCount > 0)
+        {
+            // Simple check to avoid double generation if UI button is clicked twice
+            return;
+        }
+
+        var newDraws = DrawGenService.GenerateDrawsForRange(plan.Id, plan.EffectiveFrom, plan.EffectiveTo.Value);
+        
+        // Filter out those that already exist by date (globally) if we want global uniqueness
+        // Since we have a unique index on (PlanId, DrawDate, DrawType), EF will enforce it, but let's be cleaner.
+        var existingDates = await Db.DrawRecords.Select(d => d.DrawDate).ToListAsync();
+        var drawsToAdd = newDraws.Where(nd => !existingDates.Contains(nd.DrawDate)).ToList();
+
+        Db.DrawRecords.AddRange(drawsToAdd);
+        await Db.SaveChangesAsync();
+        
+        Nav.NavigateTo("/register");
+    }
+}

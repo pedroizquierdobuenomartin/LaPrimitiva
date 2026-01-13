@@ -1,0 +1,65 @@
+@page "/data"
+@using LaPrimitiva.Infrastructure.Persistence
+@using Microsoft.EntityFrameworkCore
+@using System.Text
+@inject PrimitivaDbContext Db
+@inject IJSRuntime JS
+
+<PageTitle>Datos - La Primitiva Audit</PageTitle>
+
+<div class="space-y-8">
+    <div class="flex flex-col gap-2">
+        <h2 class="text-3xl font-extrabold text-slate-900">Exportación de Datos</h2>
+        <p class="text-slate-500">Descarga tu histórico en formato CSV para auditoría externa o copias de seguridad.</p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <!-- Export Card -->
+        <div class="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
+            <div class="h-12 w-12 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center mb-6">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+            </div>
+            <h3 class="text-xl font-bold text-slate-900 mb-2">Exportar Todo</h3>
+            <p class="text-slate-500 text-sm mb-8">Descarga el registro completo de todos los años y planes en un único archivo .csv.</p>
+            <button @onclick="ExportAll" class="w-full bg-slate-900 hover:bg-black text-white font-bold py-4 rounded-2xl shadow-lg transition-all flex items-center justify-center gap-2">
+                Descargar CSV Completo
+            </button>
+        </div>
+
+        <!-- Future Import Card -->
+        <div class="bg-slate-50 p-8 rounded-3xl border border-dashed border-slate-300 flex flex-col items-center justify-center text-center opacity-60">
+            <div class="h-12 w-12 bg-slate-200 text-slate-400 rounded-2xl flex items-center justify-center mb-6">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                </svg>
+            </div>
+            <h3 class="text-xl font-bold text-slate-400 mb-2">Importar Datos</h3>
+            <p class="text-slate-400 text-sm italic">Funcionalidad planificada para futuras versiones.</p>
+        </div>
+    </div>
+</div>
+
+@code {
+    private async Task ExportAll()
+    {
+        var draws = await Db.DrawRecords
+            .Include(d => d.Plan)
+            .OrderBy(d => d.DrawDate)
+            .ToListAsync();
+
+        var csv = new StringBuilder();
+        csv.AppendLine("Semana #,Sorteo,Fecha,Jugado,Coste Fija (€),Coste Auto (€),Coste Joker Fija (€),Coste Joker Auto (€),Total Coste (€),Premio Fija (€),Premio Auto (€),Premio Joker Fija (€),Premio Joker Auto (€),Total Premios (€),Neto (€),Neto Acumulado (€),Notas");
+
+        foreach (var d in draws)
+        {
+            csv.AppendLine($"{d.WeekNumber},{d.DrawType},{d.DrawDate:yyyy-MM-dd},{(d.Played ? 1 : 0)},{d.CosteFija},{d.CosteAuto},{d.CosteJokerFija},{d.CosteJokerAuto},{d.TotalCoste},{d.FixedPrize},{d.AutoPrize},{d.JokerFixedPrize},{d.JokerAutoPrize},{d.TotalPremios},{d.Neto},{d.Acumulado},\"{d.Notes?.Replace("\"", "\"\"")}\"");
+        }
+
+        var bytes = Encoding.UTF8.GetBytes(csv.ToString());
+        var fileName = $"LaPrimitiva_Export_{DateTime.Now:yyyyMMdd}.csv";
+        
+        await JS.InvokeVoidAsync("downloadFile", fileName, Convert.ToBase64String(bytes));
+    }
+}

@@ -1,0 +1,12 @@
+F:\Repositorios\LaPrimitiva\LaPrimitiva.Domain\bin\Debug\net10.0\LaPrimitiva.Domain.deps.json
+F:\Repositorios\LaPrimitiva\LaPrimitiva.Domain\bin\Debug\net10.0\LaPrimitiva.Domain.dll
+F:\Repositorios\LaPrimitiva\LaPrimitiva.Domain\bin\Debug\net10.0\LaPrimitiva.Domain.pdb
+F:\Repositorios\LaPrimitiva\LaPrimitiva.Domain\obj\Debug\net10.0\LaPrimitiva.Domain.GeneratedMSBuildEditorConfig.editorconfig
+F:\Repositorios\LaPrimitiva\LaPrimitiva.Domain\obj\Debug\net10.0\LaPrimitiva.Domain.AssemblyInfoInputs.cache
+F:\Repositorios\LaPrimitiva\LaPrimitiva.Domain\obj\Debug\net10.0\LaPrimitiva.Domain.AssemblyInfo.cs
+F:\Repositorios\LaPrimitiva\LaPrimitiva.Domain\obj\Debug\net10.0\LaPrimitiva.Domain.csproj.CoreCompileInputs.cache
+F:\Repositorios\LaPrimitiva\LaPrimitiva.Domain\obj\Debug\net10.0\LaPrimitiva.Domain.sourcelink.json
+F:\Repositorios\LaPrimitiva\LaPrimitiva.Domain\obj\Debug\net10.0\LaPrimitiva.Domain.dll
+F:\Repositorios\LaPrimitiva\LaPrimitiva.Domain\obj\Debug\net10.0\refint\LaPrimitiva.Domain.dll
+F:\Repositorios\LaPrimitiva\LaPrimitiva.Domain\obj\Debug\net10.0\LaPrimitiva.Domain.pdb
+F:\Repositorios\LaPrimitiva\LaPrimitiva.Domain\obj\Debug\net10.0\ref\LaPrimitiva.Domain.dll

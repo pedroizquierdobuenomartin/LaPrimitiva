@@ -186,7 +186,7 @@
                                     <div class="text-2xl font-black text-slate-900">@draw.DrawType</div>
                                     <div class="text-sm font-bold text-slate-500 font-mono">@draw.DrawDate.ToString("dd/MM/yyyy")</div>
                                     <label class="flex items-center gap-3 mt-4 p-3 rounded-2xl cursor-pointer transition-all @(draw.Played ? "bg-blue-50 text-blue-600" : "bg-slate-50 text-slate-400 hover:bg-slate-100")">
-                                        <input type="checkbox" @bind="draw.Played" @bind:after="() => RecalculateDraw(draw)" class="h-5 w-5 rounded-lg border-current focus:ring-0" />
+                                        <input type="checkbox" @bind="draw.Played" @bind:after="() => RecalculateDraw(draw, forceDefaults: true)" class="h-5 w-5 rounded-lg border-current focus:ring-0" />
                                         <span class="text-sm font-black uppercase tracking-wider">Jugado</span>
                                     </label>
                                 </div>
@@ -199,11 +199,11 @@
                                         <div class="space-y-3">
                                             <div class="group">
                                                 <label class="text-[9px] font-bold text-slate-400 uppercase ml-1">Fija (€)</label>
-                                                <input type="number" step="0.01" @bind="draw.CosteFija" class="w-full bg-slate-50 border-none rounded-xl p-3 text-sm font-bold focus:ring-2 focus:ring-blue-500/20" />
+                                                <input type="number" step="0.01" @bind="draw.CosteFija" @bind:after="() => RecalculateDraw(draw)" disabled="@(!draw.Played)" class="w-full bg-slate-50 border-none rounded-xl p-3 text-sm font-bold focus:ring-2 focus:ring-blue-500/20 disabled:opacity-50 disabled:cursor-not-allowed" />
                                             </div>
                                             <div class="group">
                                                 <label class="text-[9px] font-bold text-slate-400 uppercase ml-1">Automática (€)</label>
-                                                <input type="number" step="0.01" @bind="draw.CosteAuto" class="w-full bg-slate-50 border-none rounded-xl p-3 text-sm font-bold focus:ring-2 focus:ring-blue-500/20" />
+                                                <input type="number" step="0.01" @bind="draw.CosteAuto" @bind:after="() => RecalculateDraw(draw)" disabled="@(!draw.Played)" class="w-full bg-slate-50 border-none rounded-xl p-3 text-sm font-bold focus:ring-2 focus:ring-blue-500/20 disabled:opacity-50 disabled:cursor-not-allowed" />
                                             </div>
                                         </div>
                                     </div>
@@ -214,11 +214,11 @@
                                         <div class="space-y-3">
                                             <div class="group">
                                                 <label class="text-[9px] font-bold text-blue-400 uppercase ml-1">Premio Fija (€)</label>
-                                                <input type="number" step="0.01" @bind="draw.FixedPrize" @bind:after="() => RecalculateDraw(draw)" class="w-full bg-blue-50/50 border-none rounded-xl p-3 text-sm font-bold text-blue-700 focus:ring-2 focus:ring-blue-500/20" />
+                                                <input type="number" step="0.01" @bind="draw.FixedPrize" @bind:after="() => RecalculateDraw(draw)" disabled="@(!draw.Played || draw.CosteFija == 0)" class="w-full bg-blue-50/50 border-none rounded-xl p-3 text-sm font-bold text-blue-700 focus:ring-2 focus:ring-blue-500/20 disabled:opacity-50 disabled:cursor-not-allowed" />
                                             </div>
                                             <div class="group">
                                                 <label class="text-[9px] font-bold text-blue-400 uppercase ml-1">Premio Auto (€)</label>
-                                                <input type="number" step="0.01" @bind="draw.AutoPrize" @bind:after="() => RecalculateDraw(draw)" class="w-full bg-blue-50/50 border-none rounded-xl p-3 text-sm font-bold text-blue-700 focus:ring-2 focus:ring-blue-500/20" />
+                                                <input type="number" step="0.01" @bind="draw.AutoPrize" @bind:after="() => RecalculateDraw(draw)" disabled="@(!draw.Played || draw.CosteAuto == 0)" class="w-full bg-blue-50/50 border-none rounded-xl p-3 text-sm font-bold text-blue-700 focus:ring-2 focus:ring-blue-500/20 disabled:opacity-50 disabled:cursor-not-allowed" />
                                             </div>
                                         </div>
                                     </div>
@@ -326,6 +326,7 @@
     {
         var year = GlobalState.SelectedYear;
         var rawDraws = await Db.DrawRecords
+            .AsNoTracking()
             .Include(d => d.Plan)
             .Where(d => d.DrawDate.Year == year)
             .OrderBy(d => d.DrawDate) 
@@ -357,16 +358,28 @@
         StateHasChanged();
     }
 
-    private void RecalculateDraw(DrawRecord draw)
+    private void RecalculateDraw(DrawRecord draw, bool forceDefaults = false)
     {
-        // Snapshot audit fields
-        draw.CosteFija = draw.Played ? draw.Plan.CostPerBet : 0;
-        draw.CosteAuto = draw.Played ? draw.Plan.CostPerBet : 0;
-        draw.CosteJokerFija = (draw.Played && draw.Plan.EnableJoker) ? draw.Plan.JokerCostPerBet : 0;
-        draw.CosteJokerAuto = (draw.Played && draw.Plan.EnableJoker) ? draw.Plan.JokerCostPerBet : 0;
+        if (forceDefaults)
+        {
+            // Snapshot audit fields
+            draw.CosteFija = draw.Played ? draw.Plan.CostPerBet : 0;
+            draw.CosteAuto = draw.Played ? draw.Plan.CostPerBet : 0;
+            draw.CosteJokerFija = (draw.Played && draw.Plan.EnableJoker) ? draw.Plan.JokerCostPerBet : 0;
+            draw.CosteJokerAuto = (draw.Played && draw.Plan.EnableJoker) ? draw.Plan.JokerCostPerBet : 0;
+        }
+
+        if (!draw.Played)
+        {
+            draw.FixedPrize = 0;
+            draw.AutoPrize = 0;
+            draw.JokerFixedPrize = 0;
+            draw.JokerAutoPrize = 0;
+        }
         
-        draw.TotalCoste = draw.CosteFija + draw.CosteAuto + draw.CosteJokerFija + draw.CosteJokerAuto;
-        draw.TotalPremios = draw.FixedPrize + draw.AutoPrize + draw.JokerFixedPrize + draw.JokerAutoPrize;
+        // The user wants TotalCoste to be exactly what's visible (Fija + Auto)
+        draw.TotalCoste = draw.CosteFija + draw.CosteAuto;
+        draw.TotalPremios = draw.FixedPrize + draw.AutoPrize;
         draw.Neto = draw.TotalPremios - draw.TotalCoste;
     }
 
@@ -394,6 +407,7 @@
 
         var year = GlobalState.SelectedYear;
         modalDraws = await Db.DrawRecords
+            .AsNoTracking()
             .Include(d => d.Plan)
             .Where(d => d.DrawDate.Year == year && d.WeekNumber == modalWeek)
             .ToListAsync();
@@ -424,10 +438,18 @@
     {
         if (modalDraws == null) return;
 
+        // Clear tracker to avoid "instance already tracked" conflicts with main table
+        Db.ChangeTracker.Clear();
+
         foreach (var draw in modalDraws)
         {
             RecalculateDraw(draw);
             draw.UpdatedAt = DateTime.UtcNow;
+            
+            // Decouple related Plan to avoid "Plan instance already tracked" error 
+            // since multiple draws share the same Plan object in memory.
+            draw.Plan = null!; 
+            
             Db.DrawRecords.Update(draw);
         }
 

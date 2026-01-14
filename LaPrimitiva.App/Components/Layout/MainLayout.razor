@@ -106,7 +106,7 @@
                 <div class="text-sm font-medium text-slate-500 uppercase tracking-wider">
                     Año Seleccionado:
                 </div>
-                <select @bind="GlobalState.SelectedYear" @bind:after="OnYearChanged" class="bg-slate-50 border border-slate-200 text-slate-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2">
+                <select @bind="GlobalState.SelectedYear" class="bg-slate-50 border border-slate-200 text-slate-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2">
                     @for (int y = DateTime.Now.Year - 5; y <= DateTime.Now.Year + 2; y++)
                     {
                         <option value="@y">@y</option>
@@ -149,10 +149,6 @@
         _showMobileMenu = !_showMobileMenu;
     }
 
-    private void OnYearChanged()
-    {
-        // GlobalState updates automatically via @bind, we just trigger refresh or additional logic if needed
-    }
 
     public void Dispose()
     {

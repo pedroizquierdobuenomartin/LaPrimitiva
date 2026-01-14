@@ -22,6 +22,17 @@ namespace LaPrimitiva.Application.Services
             return await _context.Plans.OrderByDescending(p => p.EffectiveFrom).ToListAsync();
         }
 
+        public async Task<List<Plan>> GetPlansByYearAsync(int year)
+        {
+            var startOfYear = new DateTime(year, 1, 1);
+            var endOfYear = new DateTime(year, 12, 31, 23, 59, 59);
+
+            return await _context.Plans
+                .Where(p => p.EffectiveFrom <= endOfYear && (p.EffectiveTo == null || p.EffectiveTo >= startOfYear))
+                .OrderByDescending(p => p.EffectiveFrom)
+                .ToListAsync();
+        }
+
         public async Task<Plan?> GetPlanByIdAsync(Guid id)
         {
             return await _context.Plans.FirstOrDefaultAsync(p => p.Id == id);

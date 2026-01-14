@@ -4,22 +4,35 @@ namespace LaPrimitiva.Application.Services
 {
     public class GlobalState
     {
-        public int SelectedYear { get; set; } = DateTime.Now.Year;
-        public Guid? SelectedPlanId { get; set; }
+        private int _selectedYear = DateTime.Now.Year;
+        public int SelectedYear
+        {
+            get => _selectedYear;
+            set
+            {
+                if (_selectedYear != value)
+                {
+                    _selectedYear = value;
+                    NotifyStateChanged();
+                }
+            }
+        }
+
+        private Guid? _selectedPlanId;
+        public Guid? SelectedPlanId
+        {
+            get => _selectedPlanId;
+            set
+            {
+                if (_selectedPlanId != value)
+                {
+                    _selectedPlanId = value;
+                    NotifyStateChanged();
+                }
+            }
+        }
 
         public event Action? OnChange;
-
-        public void SetYear(int year)
-        {
-            SelectedYear = year;
-            NotifyStateChanged();
-        }
-
-        public void SetPlan(Guid? planId)
-        {
-            SelectedPlanId = planId;
-            NotifyStateChanged();
-        }
 
         private void NotifyStateChanged() => OnChange?.Invoke();
     }

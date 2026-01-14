@@ -257,8 +257,6 @@ F:\Repositorios\LaPrimitiva\LaPrimitiva.App\obj\Debug\net10.0\compressed\zc1ma95
 F:\Repositorios\LaPrimitiva\LaPrimitiva.App\obj\Debug\net10.0\compressed\mortpo6x4l-{0}-63fj8s7r0e-63fj8s7r0e.gz
 F:\Repositorios\LaPrimitiva\LaPrimitiva.App\obj\Debug\net10.0\compressed\urpntujsnn-{0}-0j3bgjxly4-0j3bgjxly4.gz
 F:\Repositorios\LaPrimitiva\LaPrimitiva.App\obj\Debug\net10.0\compressed\zzxk0f9wp0-{0}-13ja33weya-13ja33weya.gz
-F:\Repositorios\LaPrimitiva\LaPrimitiva.App\obj\Debug\net10.0\compressed\arl85wtr0v-{0}-wmp8iwak4q-wmp8iwak4q.gz
-F:\Repositorios\LaPrimitiva\LaPrimitiva.App\obj\Debug\net10.0\compressed\2jgqtlotj2-{0}-2lgipwaf5j-2lgipwaf5j.gz
 F:\Repositorios\LaPrimitiva\LaPrimitiva.App\obj\Debug\net10.0\compressed\adz9kk55kt-{0}-491f1h4dql-491f1h4dql.gz
 F:\Repositorios\LaPrimitiva\LaPrimitiva.App\obj\Debug\net10.0\compressed\m49roka59d-{0}-491f1h4dql-491f1h4dql.gz
 F:\Repositorios\LaPrimitiva\LaPrimitiva.App\obj\Debug\net10.0\staticwebassets.build.json
@@ -272,3 +270,5 @@ F:\Repositorios\LaPrimitiva\LaPrimitiva.App\obj\Debug\net10.0\refint\LaPrimitiva
 F:\Repositorios\LaPrimitiva\LaPrimitiva.App\obj\Debug\net10.0\LaPrimitiva.App.pdb
 F:\Repositorios\LaPrimitiva\LaPrimitiva.App\obj\Debug\net10.0\LaPrimitiva.App.genruntimeconfig.cache
 F:\Repositorios\LaPrimitiva\LaPrimitiva.App\obj\Debug\net10.0\ref\LaPrimitiva.App.dll
+F:\Repositorios\LaPrimitiva\LaPrimitiva.App\obj\Debug\net10.0\compressed\arl85wtr0v-{0}-2i0r6wwb69-2i0r6wwb69.gz
+F:\Repositorios\LaPrimitiva\LaPrimitiva.App\obj\Debug\net10.0\compressed\2jgqtlotj2-{0}-iz83ucvm53-iz83ucvm53.gz

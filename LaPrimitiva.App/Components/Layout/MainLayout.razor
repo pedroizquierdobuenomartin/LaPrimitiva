@@ -5,50 +5,90 @@
 
 <div class="h-full flex">
     <!-- Sidebar -->
-    <aside class="w-64 bg-slate-900 text-slate-300 flex-shrink-0 flex flex-col hidden md:flex">
-        <div class="p-6">
-            <h1 class="text-xl font-bold text-white flex items-center gap-2">
+    <aside class="@(_isCollapsed ? "w-20" : "w-64") bg-slate-900 text-slate-300 flex-shrink-0 flex flex-col hidden md:flex transition-all duration-300 ease-in-out relative z-30">
+        <div class="h-16 flex items-center @(_isCollapsed ? "justify-center" : "px-6") border-b border-slate-800 flex-shrink-0">
+            @if (!_isCollapsed)
+            {
+                <h1 class="text-xl font-bold text-white flex items-center gap-2 overflow-hidden whitespace-nowrap">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-blue-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                    </svg>
+                    <span>Primitiva Audit</span>
+                </h1>
+            }
+            else
+            {
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                 </svg>
-                Primitiva Audit
-            </h1>
+            }
         </div>
+
+        <!-- Toggle Button -->
+        <button @onclick="ToggleSidebar" class="absolute -right-4 top-20 bg-blue-600 text-white p-1.5 rounded-full border-2 border-slate-50 hover:bg-blue-700 transition-all z-50 shadow-md group" aria-label="Toggle Sidebar">
+            @if (_isCollapsed)
+            {
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 transform group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7" />
+                </svg>
+            }
+            else
+            {
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 transform group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
+                </svg>
+            }
+        </button>
         
-        <nav class="flex-1 px-4 space-y-2 mt-4">
-            <NavLink href="" Match="NavLinkMatch.All" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-slate-800 transition-colors" ActiveClass="bg-blue-600 text-white hover:bg-blue-600">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <nav class="flex-1 px-4 space-y-2 mt-4 overflow-x-hidden">
+            <NavLink href="" Match="NavLinkMatch.All" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-slate-800 transition-colors" ActiveClass="bg-blue-600 text-white hover:bg-blue-600" title="Dashboard">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
                 </svg>
-                Dashboard
+                @if (!_isCollapsed)
+                {
+                    <span class="whitespace-nowrap transition-opacity duration-300">Dashboard</span>
+                }
             </NavLink>
-            <NavLink href="register" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-slate-800 transition-colors" ActiveClass="bg-blue-600 text-white hover:bg-blue-600">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <NavLink href="register" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-slate-800 transition-colors" ActiveClass="bg-blue-600 text-white hover:bg-blue-600" title="Registro">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
                 </svg>
-                Registro
+                @if (!_isCollapsed)
+                {
+                    <span class="whitespace-nowrap transition-opacity duration-300">Registro</span>
+                }
             </NavLink>
-            <NavLink href="plans" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-slate-800 transition-colors" ActiveClass="bg-blue-600 text-white hover:bg-blue-600">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <NavLink href="plans" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-slate-800 transition-colors" ActiveClass="bg-blue-600 text-white hover:bg-blue-600" title="Planes">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
                 </svg>
-                Planes
+                @if (!_isCollapsed)
+                {
+                    <span class="whitespace-nowrap transition-opacity duration-300">Planes</span>
+                }
             </NavLink>
-            <NavLink href="data" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-slate-800 transition-colors" ActiveClass="bg-blue-600 text-white hover:bg-blue-600">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <NavLink href="data" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-slate-800 transition-colors" ActiveClass="bg-blue-600 text-white hover:bg-blue-600" title="Datos">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                 </svg>
-                Datos
+                @if (!_isCollapsed)
+                {
+                    <span class="whitespace-nowrap transition-opacity duration-300">Datos</span>
+                }
             </NavLink>
         </nav>
 
-        <div class="p-6 text-xs text-slate-500">
-            &copy; 2026 La Primitiva Audit.
-        </div>
+        @if (!_isCollapsed)
+        {
+            <div class="p-6 text-xs text-slate-500 whitespace-nowrap overflow-hidden">
+                &copy; 2026 La Primitiva Audit.
+            </div>
+        }
     </aside>
 
     <!-- Main Content -->
-    <main class="flex-1 flex flex-col min-h-0 bg-slate-50">
+    <main class="flex-1 flex flex-col min-h-0 bg-slate-50 transition-all duration-300 ease-in-out">
         <!-- Header -->
         <header class="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-8 flex-shrink-0 z-10 shadow-sm">
             <div class="flex items-center gap-4">
@@ -85,9 +125,16 @@
 </div>
 
 @code {
+    private bool _isCollapsed = false;
+
     protected override void OnInitialized()
     {
         GlobalState.OnChange += StateHasChanged;
+    }
+
+    private void ToggleSidebar()
+    {
+        _isCollapsed = !_isCollapsed;
     }
 
     private void OnYearChanged()

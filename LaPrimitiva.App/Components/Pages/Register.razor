@@ -23,9 +23,21 @@
                 Alta Nuevo Sorteo
             </button>
             <div class="bg-white/80 backdrop-blur-md px-4 py-3 rounded-2xl border border-slate-200 shadow-sm h-full flex items-center gap-3">
-                <div class="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></div>
+                <div class="h-2 w-2 rounded-full @(allPlans?.Any() == true ? "bg-emerald-500 animate-pulse" : "bg-rose-500")"></div>
                 <span class="text-slate-500 text-xs font-bold uppercase tracking-wider">Plan:</span>
-                <span class="text-slate-900 text-sm font-bold">@activePlanName</span>
+                @if (allPlans?.Any() == true)
+                {
+                    <select @bind="SelectedPlanId" class="text-slate-900 text-sm font-bold bg-transparent border-none p-0 focus:ring-0 cursor-pointer">
+                        @foreach (var plan in allPlans)
+                        {
+                            <option value="@plan.Id">@plan.Name</option>
+                        }
+                    </select>
+                }
+                else
+                {
+                    <span class="text-rose-600 text-sm font-bold">No existe plan</span>
+                }
             </div>
         </div>
     </div>
@@ -207,9 +219,9 @@
                                             int idx = i;
                                             <div class="flex items-center gap-3">
                                                 <input type="date" @bind="newDrawDates[idx]" class="flex-1 bg-slate-50 border-none rounded-xl p-3 text-sm font-bold text-slate-700 focus:ring-2 focus:ring-blue-500/20" />
-                                                @if (newDrawDates[idx].HasValue)
+                                                @if (newDrawDates[idx] is DateTime dateValue)
                                                 {
-                                                    <span class="text-[10px] font-black text-blue-600 uppercase w-20">@GetDrawType(newDrawDates[idx].Value)</span>
+                                                    <span class="text-[10px] font-black text-blue-600 uppercase w-20">@GetDrawType(dateValue)</span>
                                                 }
                                             </div>
                                         }
@@ -347,6 +359,7 @@
     private List<Plan>? allPlans;
     private Guid? selectedPlanId;
     private DateTime?[] newDrawDates = new DateTime?[3];
+    private bool _isLoading;
 
     private class DrawWithCumulative
     {
@@ -362,7 +375,6 @@
         modalWeek = GetCurrentWeekNumber();
         
         await LoadData();
-        allPlans = await Db.Plans.AsNoTracking().ToListAsync();
     }
 
     private int GetCurrentWeekNumber()
@@ -377,33 +389,89 @@
 
     private async void HandleStateChange()
     {
-        await LoadData();
-        StateHasChanged();
+        await InvokeAsync(async () => 
+        {
+            await LoadData();
+            StateHasChanged();
+        });
     }
 
     private async Task LoadData()
     {
-        var year = GlobalState.SelectedYear;
-        var rawDraws = await Db.DrawRecords
-            .AsNoTracking()
-            .Include(d => d.Plan)
-            .Where(d => d.DrawDate.Year == year)
-            .OrderBy(d => d.DrawDate) 
-            .ToListAsync();
+        if (_isLoading) return;
+        _isLoading = true;
 
-        // Recalculate Acumulado if missing or mismatch (ensure view consistency)
-        decimal runningNet = 0;
-        foreach (var d in rawDraws)
+        try
         {
-            runningNet += d.Neto;
-            d.Acumulado = runningNet;
+            var year = GlobalState.SelectedYear;
+            
+            // Ensure allPlans is loaded for the year
+            allPlans = await Db.Plans.AsNoTracking()
+                .Where(p => p.EffectiveFrom.Year == year)
+                .ToListAsync();
+
+            if (allPlans.Any())
+            {
+                // If no plan selected OR selected plan doesn't belong to current year's plans
+                if (GlobalState.SelectedPlanId == null || !allPlans.Any(p => p.Id == GlobalState.SelectedPlanId))
+                {
+                    GlobalState.SelectedPlanId = allPlans.OrderByDescending(p => p.EffectiveFrom).First().Id;
+                }
+            }
+            else
+            {
+                GlobalState.SelectedPlanId = null;
+            }
+
+            var query = Db.DrawRecords
+                .AsNoTracking()
+                .Include(d => d.Plan)
+                .Where(d => d.DrawDate.Year == year);
+
+            if (GlobalState.SelectedPlanId != null)
+            {
+                query = query.Where(d => d.PlanId == GlobalState.SelectedPlanId);
+            }
+
+            var rawDraws = await query.OrderBy(d => d.DrawDate).ToListAsync();
+
+            // Recalculate Acumulado if missing or mismatch (ensure view consistency)
+            decimal runningNet = 0;
+            foreach (var d in rawDraws)
+            {
+                runningNet += d.Neto;
+                d.Acumulado = runningNet;
+            }
+
+            drawsWithCumulative = rawDraws.Select(d => new DrawWithCumulative { Draw = d }).Reverse().ToList();
+
+            if (rawDraws.Any())
+            {
+                activePlanName = rawDraws.Last().Plan.Name;
+            }
+            else
+            {
+                activePlanName = allPlans.FirstOrDefault(p => p.Id == GlobalState.SelectedPlanId)?.Name ?? "Sin Plan";
+            }
+            
+            StateHasChanged();
         }
-
-        drawsWithCumulative = rawDraws.Select(d => new DrawWithCumulative { Draw = d }).Reverse().ToList();
-
-        if (rawDraws.Any())
+        finally
         {
-            activePlanName = rawDraws.Last().Plan.Name;
+            _isLoading = false;
+        }
+    }
+
+    private Guid? SelectedPlanId
+    {
+        get => GlobalState.SelectedPlanId;
+        set
+        {
+            if (GlobalState.SelectedPlanId != value)
+            {
+                GlobalState.SelectedPlanId = value;
+                // Navigation/State change will trigger LoadData
+            }
         }
     }
 

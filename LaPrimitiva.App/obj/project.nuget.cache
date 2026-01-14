@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "P7sCjRj6k9c=",
+  "dgSpecHash": "vt2618sFCPY=",
   "success": true,
   "projectFilePath": "F:\\Repositorios\\LaPrimitiva\\LaPrimitiva.App\\LaPrimitiva.App.csproj",
   "expectedPackageFiles": [
@@ -29,7 +29,6 @@
     "C:\\Users\\pedro.izquierdobueno\\.nuget\\packages\\microsoft.entityframeworkcore.relational\\10.0.1\\microsoft.entityframeworkcore.relational.10.0.1.nupkg.sha512",
     "C:\\Users\\pedro.izquierdobueno\\.nuget\\packages\\microsoft.entityframeworkcore.sqlserver\\10.0.1\\microsoft.entityframeworkcore.sqlserver.10.0.1.nupkg.sha512",
     "C:\\Users\\pedro.izquierdobueno\\.nuget\\packages\\microsoft.extensions.dependencymodel\\10.0.1\\microsoft.extensions.dependencymodel.10.0.1.nupkg.sha512",
-    "C:\\Users\\pedro.izquierdobueno\\.nuget\\packages\\microsoft.extensions.http\\10.0.1\\microsoft.extensions.http.10.0.1.nupkg.sha512",
     "C:\\Users\\pedro.izquierdobueno\\.nuget\\packages\\microsoft.identity.client\\4.73.1\\microsoft.identity.client.4.73.1.nupkg.sha512",
     "C:\\Users\\pedro.izquierdobueno\\.nuget\\packages\\microsoft.identity.client.extensions.msal\\4.73.1\\microsoft.identity.client.extensions.msal.4.73.1.nupkg.sha512",
     "C:\\Users\\pedro.izquierdobueno\\.nuget\\packages\\microsoft.identitymodel.abstractions\\7.7.1\\microsoft.identitymodel.abstractions.7.7.1.nupkg.sha512",
@@ -61,18 +60,5 @@
     "C:\\Users\\pedro.izquierdobueno\\.nuget\\packages\\system.security.permissions\\9.0.0\\system.security.permissions.9.0.0.nupkg.sha512",
     "C:\\Users\\pedro.izquierdobueno\\.nuget\\packages\\system.windows.extensions\\9.0.0\\system.windows.extensions.9.0.0.nupkg.sha512"
   ],
-  "logs": [
-    {
-      "code": "NU1510",
-      "level": "Warning",
-      "message": "PackageReference Microsoft.Extensions.Http no se eliminará. Considere la posibilidad de quitar este paquete de las dependencias, ya que es probable que no sea necesario.",
-      "projectPath": "F:\\Repositorios\\LaPrimitiva\\LaPrimitiva.App\\LaPrimitiva.App.csproj",
-      "warningLevel": 1,
-      "filePath": "F:\\Repositorios\\LaPrimitiva\\LaPrimitiva.App\\LaPrimitiva.App.csproj",
-      "libraryId": "Microsoft.Extensions.Http",
-      "targetGraphs": [
-        "net10.0"
-      ]
-    }
-  ]
+  "logs": []
 }

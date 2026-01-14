@@ -176,6 +176,7 @@
     private bool isEditing = false;
     private string? errorMessage;
     private Plan newPlan = new Plan { EffectiveFrom = DateTime.Today };
+    private bool _isLoading;
 
     protected override async Task OnInitializedAsync()
     {
@@ -185,13 +186,25 @@
 
     private async void HandleStateChange()
     {
-        await LoadData();
-        StateHasChanged();
+        await InvokeAsync(async () => 
+        {
+            await LoadData();
+            StateHasChanged();
+        });
     }
 
     private async Task LoadData()
     {
-        plans = await PlanService.GetPlansByYearAsync(GlobalState.SelectedYear);
+        if (_isLoading) return;
+        _isLoading = true;
+        try 
+        {
+            plans = await PlanService.GetPlansByYearAsync(GlobalState.SelectedYear);
+        }
+        finally 
+        {
+            _isLoading = false;
+        }
     }
 
     private void ShowCreateModal()
@@ -236,7 +249,7 @@
         {
             errorMessage = ex.Message;
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             errorMessage = "Ha ocurrido un error inesperado al guardar el plan.";
         }
@@ -256,7 +269,7 @@
         {
             await JS.InvokeVoidAsync("alert", ex.Message);
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             await JS.InvokeVoidAsync("alert", "Error al borrar el plan.");
         }
@@ -264,18 +277,21 @@
 
     private async Task GenerateDraws(Plan plan)
     {
-        if (plan.EffectiveTo == null) return;
-        
-        var existingCount = await Db.DrawRecords.CountAsync(d => d.PlanId == plan.Id);
-        if (existingCount > 0) return;
+        if (plan.EffectiveTo != null)
+        {
+            var existingCount = await Db.DrawRecords.CountAsync(d => d.PlanId == plan.Id);
+            if (existingCount == 0)
+            {
+                var newDraws = DrawGenService.GenerateDrawsForRange(plan.Id, plan.EffectiveFrom, plan.EffectiveTo.Value);
+                var existingDates = await Db.DrawRecords.Select(d => d.DrawDate).ToListAsync();
+                var drawsToAdd = newDraws.Where(nd => !existingDates.Contains(nd.DrawDate)).ToList();
 
-        var newDraws = DrawGenService.GenerateDrawsForRange(plan.Id, plan.EffectiveFrom, plan.EffectiveTo.Value);
-        var existingDates = await Db.DrawRecords.Select(d => d.DrawDate).ToListAsync();
-        var drawsToAdd = newDraws.Where(nd => !existingDates.Contains(nd.DrawDate)).ToList();
-
-        Db.DrawRecords.AddRange(drawsToAdd);
-        await Db.SaveChangesAsync();
+                Db.DrawRecords.AddRange(drawsToAdd);
+                await Db.SaveChangesAsync();
+            }
+        }
         
+        GlobalState.SelectedPlanId = plan.Id;
         Nav.NavigateTo("/register");
     }
 

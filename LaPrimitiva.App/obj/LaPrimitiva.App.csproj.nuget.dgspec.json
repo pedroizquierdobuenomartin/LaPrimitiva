@@ -420,10 +420,6 @@
               "suppressParent": "All",
               "target": "Package",
               "version": "[10.0.1, )"
-            },
-            "Microsoft.Extensions.Http": {
-              "target": "Package",
-              "version": "[10.0.1, )"
             }
           },
           "imports": [

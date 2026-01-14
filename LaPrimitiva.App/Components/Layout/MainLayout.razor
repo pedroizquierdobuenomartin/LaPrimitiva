@@ -3,9 +3,15 @@
 @inject GlobalState GlobalState
 @implements IDisposable
 
-<div class="h-full flex">
+<div class="h-full flex relative">
+    @if (_showMobileMenu)
+    {
+        <!-- Mobile Backdrop -->
+        <div class="fixed inset-0 bg-slate-900/50 z-40 md:hidden backdrop-blur-sm" @onclick="ToggleMobileMenu"></div>
+    }
+
     <!-- Sidebar -->
-    <aside class="@(_isCollapsed ? "w-20" : "w-64") bg-slate-900 text-slate-300 flex-shrink-0 flex flex-col hidden md:flex transition-all duration-300 ease-in-out relative z-30">
+    <aside class="@(_isCollapsed ? "w-20" : "w-64") @(_showMobileMenu ? "flex" : "hidden") md:flex bg-slate-900 text-slate-300 flex-shrink-0 flex flex-col transition-all duration-300 ease-in-out fixed inset-y-0 left-0 z-50 md:relative">
         <div class="h-16 flex items-center @(_isCollapsed ? "justify-center" : "px-6") border-b border-slate-800 flex-shrink-0">
             @if (!_isCollapsed)
             {
@@ -92,7 +98,7 @@
         <!-- Header -->
         <header class="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-8 flex-shrink-0 z-10 shadow-sm">
             <div class="flex items-center gap-4">
-                <button class="md:hidden p-2 text-slate-600">
+                <button @onclick="ToggleMobileMenu" class="md:hidden p-2 text-slate-600 hover:bg-slate-100 rounded-lg transition-colors" aria-label="Open Menu">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
                     </svg>
@@ -126,6 +132,7 @@
 
 @code {
     private bool _isCollapsed = false;
+    private bool _showMobileMenu = false;
 
     protected override void OnInitialized()
     {
@@ -135,6 +142,11 @@
     private void ToggleSidebar()
     {
         _isCollapsed = !_isCollapsed;
+    }
+
+    private void ToggleMobileMenu()
+    {
+        _showMobileMenu = !_showMobileMenu;
     }
 
     private void OnYearChanged()

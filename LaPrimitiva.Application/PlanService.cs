@@ -40,14 +40,14 @@ namespace LaPrimitiva.Application.Services
 
         public async Task CreatePlanAsync(Plan plan)
         {
-            // Simple overlap validation: check if any plan exists with EffectiveFrom or EffectiveTo within the new plan's range
+            // Overlap validation
             var overlap = await _context.Plans.AnyAsync(p => 
                 (plan.EffectiveTo == null || p.EffectiveFrom <= plan.EffectiveTo) && 
                 (p.EffectiveTo == null || p.EffectiveTo >= plan.EffectiveFrom));
 
             if (overlap)
             {
-                // In a real app we might throw a custom exception. For this audit app, we'll just log or handle in UI.
+                throw new InvalidOperationException("Ya existe un plan que se solapa con este periodo de fechas.");
             }
 
             _context.Plans.Add(plan);
@@ -56,6 +56,16 @@ namespace LaPrimitiva.Application.Services
 
         public async Task UpdatePlanAsync(Plan plan)
         {
+            var overlap = await _context.Plans.AnyAsync(p => 
+                p.Id != plan.Id &&
+                (plan.EffectiveTo == null || p.EffectiveFrom <= plan.EffectiveTo) && 
+                (p.EffectiveTo == null || p.EffectiveTo >= plan.EffectiveFrom));
+
+            if (overlap)
+            {
+                throw new InvalidOperationException("Las nuevas fechas se solapan con otro plan existente.");
+            }
+
             plan.UpdatedAt = DateTime.UtcNow;
             _context.Entry(plan).State = EntityState.Modified;
             await _context.SaveChangesAsync();
@@ -63,6 +73,12 @@ namespace LaPrimitiva.Application.Services
 
         public async Task DeletePlanAsync(Guid id)
         {
+            var hasDraws = await _context.DrawRecords.AnyAsync(d => d.PlanId == id);
+            if (hasDraws)
+            {
+                throw new InvalidOperationException("No se puede borrar un plan que ya tiene sorteos asociados.");
+            }
+
             var plan = await _context.Plans.FindAsync(id);
             if (plan != null)
             {

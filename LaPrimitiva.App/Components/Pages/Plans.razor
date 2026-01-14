@@ -8,6 +8,7 @@
 @inject PlanService PlanService
 @inject DrawGenerationService DrawGenService
 @inject NavigationManager Nav
+@inject IJSRuntime JS
 @implements IDisposable
 
 <PageTitle>Planes - La Primitiva Audit</PageTitle>
@@ -59,6 +60,12 @@
                             </div>
                         </div>
                         <div class="flex gap-2">
+                            <button @onclick="() => ShowEditModal(plan)" class="text-[10px] bg-slate-100 text-slate-600 px-3 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-200 font-bold uppercase transition-colors">
+                                Editar
+                            </button>
+                            <button @onclick="() => DeletePlan(plan)" class="text-[10px] bg-red-50 text-red-600 px-3 py-1.5 rounded-lg border border-red-100 hover:bg-red-100 font-bold uppercase transition-colors">
+                                Borrar
+                            </button>
                             <button @onclick="() => GenerateDraws(plan)" class="text-[10px] bg-emerald-50 text-emerald-700 px-3 py-1.5 rounded-lg border border-emerald-100 hover:bg-emerald-100 font-black uppercase tracking-wider transition-colors">
                                 Generar Sorteos
                             </button>
@@ -103,8 +110,8 @@
         <div class="bg-white rounded-[2rem] shadow-2xl w-full max-w-lg overflow-hidden border border-slate-200 transform animate-in zoom-in-95 duration-200">
             <div class="p-8 border-b border-slate-100 flex justify-between items-center bg-white">
                 <div>
-                    <h3 class="text-2xl font-black text-slate-900 uppercase">Nuevo Plan</h3>
-                    <p class="text-slate-400 text-xs font-medium uppercase tracking-widest">Configuración inicial de periodo</p>
+                    <h3 class="text-2xl font-black text-slate-900 uppercase">@(isEditing ? "Editar Plan" : "Nuevo Plan")</h3>
+                    <p class="text-slate-400 text-xs font-medium uppercase tracking-widest">Configuración de periodo y costes</p>
                 </div>
                 <button @onclick="() => showModal = false" class="h-10 w-10 rounded-xl flex items-center justify-center text-slate-300 hover:text-slate-900 hover:bg-slate-50 transition-all">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -112,6 +119,16 @@
                     </svg>
                 </button>
             </div>
+            
+            @if (!string.IsNullOrEmpty(errorMessage))
+            {
+                <div class="mx-8 mt-6 p-4 bg-red-50 border border-red-100 rounded-2xl flex gap-3 items-center animate-in slide-in-from-top-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-red-500 shrink-0" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                    </svg>
+                    <p class="text-xs font-bold text-red-700">@errorMessage</p>
+                </div>
+            }
             <div class="p-8 space-y-6 bg-slate-50/30">
                 <div>
                     <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 px-1">Nombre</label>
@@ -156,6 +173,8 @@
 @code {
     private List<Plan>? plans;
     private bool showModal = false;
+    private bool isEditing = false;
+    private string? errorMessage;
     private Plan newPlan = new Plan { EffectiveFrom = DateTime.Today };
 
     protected override async Task OnInitializedAsync()
@@ -177,6 +196,8 @@
 
     private void ShowCreateModal()
     {
+        errorMessage = null;
+        isEditing = false;
         var year = GlobalState.SelectedYear;
         newPlan = new Plan 
         { 
@@ -187,11 +208,58 @@
         showModal = true;
     }
 
+    private void ShowEditModal(Plan plan)
+    {
+        errorMessage = null;
+        isEditing = true;
+        newPlan = plan; // En una app real haríamos un shallow copy o cargaríamos por ID
+        showModal = true;
+    }
+
     private async Task SavePlan()
     {
-        await PlanService.CreatePlanAsync(newPlan);
-        showModal = false;
-        await LoadData();
+        try 
+        {
+            errorMessage = null;
+            if (isEditing)
+            {
+                await PlanService.UpdatePlanAsync(newPlan);
+            }
+            else
+            {
+                await PlanService.CreatePlanAsync(newPlan);
+            }
+            showModal = false;
+            await LoadData();
+        }
+        catch (InvalidOperationException ex)
+        {
+            errorMessage = ex.Message;
+        }
+        catch (Exception ex)
+        {
+            errorMessage = "Ha ocurrido un error inesperado al guardar el plan.";
+        }
+    }
+
+    private async Task DeletePlan(Plan plan)
+    {
+        var confirmed = await JS.InvokeAsync<bool>("confirm", $"¿Estás seguro de que quieres borrar el plan '{plan.Name}'?");
+        if (!confirmed) return;
+
+        try 
+        {
+            await PlanService.DeletePlanAsync(plan.Id);
+            await LoadData();
+        }
+        catch (InvalidOperationException ex)
+        {
+            await JS.InvokeVoidAsync("alert", ex.Message);
+        }
+        catch (Exception ex)
+        {
+            await JS.InvokeVoidAsync("alert", "Error al borrar el plan.");
+        }
     }
 
     private async Task GenerateDraws(Plan plan)

@@ -5,6 +5,7 @@
 @using Microsoft.EntityFrameworkCore
 @inject PrimitivaDbContext Db
 @inject GlobalState GlobalState
+@inject IDrawService DrawService
 @implements IDisposable
 
 <PageTitle>Registro - La Primitiva Audit</PageTitle>
@@ -111,10 +112,15 @@
                                 
                                 <td class="px-4 py-3 max-w-[150px] truncate text-slate-400 italic">@draw.Notes</td>
                                 
-                                <td class="px-4 py-3">
-                                    <button @onclick="() => EditDraw(draw)" class="p-1.5 rounded-lg text-slate-300 hover:text-blue-600 hover:bg-blue-50 transition-all">
+                                <td class="px-4 py-3 flex items-center justify-end gap-2">
+                                    <button @onclick="() => EditDraw(draw)" class="p-1.5 rounded-lg text-slate-300 hover:text-blue-600 hover:bg-blue-50 transition-all" title="Editar Semana">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                        </svg>
+                                    </button>
+                                    <button @onclick="() => ConfirmDeleteWeek(draw.WeekNumber, draw.DrawDate.Year, draw.PlanId)" class="p-1.5 rounded-lg text-slate-300 hover:text-rose-600 hover:bg-rose-50 transition-all" title="Eliminar Semana">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                         </svg>
                                     </button>
                                 </td>
@@ -337,8 +343,49 @@
                 <button @onclick="CloseModal" class="px-8 py-4 rounded-2xl text-sm font-black text-slate-500 hover:bg-slate-100 transition-all uppercase tracking-widest">
                     Cancelar
                 </button>
+                @if (!isNewRegistration && modalDraws != null && modalDraws.Any())
+                {
+                    <button @onclick="() => ConfirmDeleteWeek(modalWeek, GlobalState.SelectedYear, modalPlan?.Id ?? Guid.Empty)" class="px-8 py-4 rounded-2xl text-sm font-black text-rose-500 hover:bg-rose-50 hover:text-rose-600 transition-all uppercase tracking-widest flex items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                        Eliminar
+                    </button>
+                }
                 <button @onclick="SaveModalChanges" disabled="@(modalDraws == null || !modalDraws.Any())" class="px-12 py-4 rounded-[1.5rem] text-sm font-black bg-slate-900 text-white hover:bg-black shadow-2xl shadow-slate-200 transition-all disabled:opacity-30 uppercase tracking-widest">
                     Guardar Semana Auditada
+                </button>
+            </div>
+        </div>
+    </div>
+}
+
+<!-- Confirmation Modal -->
+@if (showDeleteArgs != null)
+{
+    <div class="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-sm transition-all animate-in fade-in duration-200">
+        <div class="bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden animate-in zoom-in duration-200 p-8 text-center space-y-6">
+            <div class="h-20 w-20 bg-rose-100 rounded-full flex items-center justify-center mx-auto text-rose-600">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+            </div>
+            
+            <div>
+                <h3 class="text-xl font-black text-slate-900">¿Eliminar Semana @showDeleteArgs.Value.WeekNumber?</h3>
+                <p class="text-slate-500 mt-2 text-sm leading-relaxed">
+                    Estás a punto de eliminar todos los registros de sorteos asociados a la <strong>semana @showDeleteArgs.Value.WeekNumber</strong> del año @showDeleteArgs.Value.Year.
+                    <br/><br/>
+                    <span class="text-rose-600 font-bold">Esta acción no se puede deshacer.</span>
+                </p>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4 pt-2">
+                <button @onclick="CancelDelete" class="px-4 py-3 rounded-xl text-sm font-bold text-slate-500 bg-slate-100 hover:bg-slate-200 transition-colors">
+                    Cancelar
+                </button>
+                <button @onclick="ExecuteDelete" class="px-4 py-3 rounded-xl text-sm font-bold text-white bg-rose-600 hover:bg-rose-700 shadow-lg shadow-rose-200 transition-transform active:scale-95">
+                    Sí, Eliminar
                 </button>
             </div>
         </div>
@@ -360,6 +407,9 @@
     private Guid? selectedPlanId;
     private DateTime?[] newDrawDates = new DateTime?[3];
     private bool _isLoading;
+    
+    // Delete Confirmation State
+    private (int WeekNumber, int Year, Guid PlanId)? showDeleteArgs;
 
     private class DrawWithCumulative
     {
@@ -641,6 +691,30 @@
 
         await Db.SaveChangesAsync();
         showModal = false;
+        await LoadData();
+        StateHasChanged();
+    }
+
+    private void ConfirmDeleteWeek(int week, int year, Guid planId)
+    {
+        if (planId == Guid.Empty) return;
+        showDeleteArgs = (week, year, planId);
+    }
+
+    private void CancelDelete()
+    {
+        showDeleteArgs = null;
+    }
+
+    private async Task ExecuteDelete()
+    {
+        if (showDeleteArgs == null) return;
+        
+        var args = showDeleteArgs.Value;
+        await DrawService.DeleteWeeklyDrawAsync(args.WeekNumber, args.Year, args.PlanId);
+        
+        showDeleteArgs = null;
+        showModal = false; // Close edit modal if open
         await LoadData();
         StateHasChanged();
     }

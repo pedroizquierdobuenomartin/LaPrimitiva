@@ -18,6 +18,7 @@ builder.Services.AddScoped<PlanService>();
 builder.Services.AddScoped<DrawGenerationService>();
 builder.Services.AddScoped<SummaryService>();
 builder.Services.AddScoped<GlobalState>();
+builder.Services.AddScoped<IDrawService, DrawService>();
 
 var app = builder.Build();
 

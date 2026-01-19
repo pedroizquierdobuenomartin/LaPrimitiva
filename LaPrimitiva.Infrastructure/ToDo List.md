@@ -10,5 +10,5 @@
 - [ ] Plan: Al editar el plan, debe mostrar el campo de etiqueta fija
 - [ ] Plan: No gardar automáticamente los datos, solo al pulsar en guardar
 - [ ] Plan: No debe dejar de guardar el plan si el nombre está vacío
-- [ ] Sorteo: El título del popup debe cambiar según sea nuevo, edición o eliminación
+- [X] Sorteo: El título del popup debe cambiar según sea nuevo o edición
 - [ ] Sorteo: Poder añadir/borrar un sorteo individual de la semana. La fecha debe aparecer automáticamente según el año, y semana (lunes, jueves o sábado)

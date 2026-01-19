@@ -1,7 +1,7 @@
 using System;
 using System.Threading.Tasks;
 
-namespace LaPrimitiva.Application.Services
+namespace LaPrimitiva.Application.Interfaces
 {
     public interface IDrawService
     {

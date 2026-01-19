@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using LaPrimitiva.Domain.Entities;
 using LaPrimitiva.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
+using LaPrimitiva.Application.Interfaces;
 
 namespace LaPrimitiva.Application.Services
 {

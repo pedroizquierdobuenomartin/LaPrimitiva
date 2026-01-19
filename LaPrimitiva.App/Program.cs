@@ -1,5 +1,6 @@
 using LaPrimitiva.App.Components;
 using LaPrimitiva.Application.Services;
+using LaPrimitiva.Application.Interfaces;
 using LaPrimitiva.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 

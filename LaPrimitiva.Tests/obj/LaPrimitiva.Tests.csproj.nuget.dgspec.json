@@ -32,8 +32,8 @@
           "net10.0": {
             "targetAlias": "net10.0",
             "projectReferences": {
-              "F:\\Repositorios\\LaPrimitiva\\LaPrimitiva.Domain\\LaPrimitiva.Domain.csproj": {
-                "projectPath": "F:\\Repositorios\\LaPrimitiva\\LaPrimitiva.Domain\\LaPrimitiva.Domain.csproj"
+              "f:\\Repositorios\\LaPrimitiva\\LaPrimitiva.Domain\\LaPrimitiva.Domain.csproj": {
+                "projectPath": "f:\\Repositorios\\LaPrimitiva\\LaPrimitiva.Domain\\LaPrimitiva.Domain.csproj"
               },
               "F:\\Repositorios\\LaPrimitiva\\LaPrimitiva.Infrastructure\\LaPrimitiva.Infrastructure.csproj": {
                 "projectPath": "F:\\Repositorios\\LaPrimitiva\\LaPrimitiva.Infrastructure\\LaPrimitiva.Infrastructure.csproj"
@@ -859,14 +859,14 @@
         }
       }
     },
-    "F:\\Repositorios\\LaPrimitiva\\LaPrimitiva.Domain\\LaPrimitiva.Domain.csproj": {
+    "f:\\Repositorios\\LaPrimitiva\\LaPrimitiva.Domain\\LaPrimitiva.Domain.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "F:\\Repositorios\\LaPrimitiva\\LaPrimitiva.Domain\\LaPrimitiva.Domain.csproj",
+        "projectUniqueName": "f:\\Repositorios\\LaPrimitiva\\LaPrimitiva.Domain\\LaPrimitiva.Domain.csproj",
         "projectName": "LaPrimitiva.Domain",
-        "projectPath": "F:\\Repositorios\\LaPrimitiva\\LaPrimitiva.Domain\\LaPrimitiva.Domain.csproj",
+        "projectPath": "f:\\Repositorios\\LaPrimitiva\\LaPrimitiva.Domain\\LaPrimitiva.Domain.csproj",
         "packagesPath": "C:\\Users\\pedro.izquierdobueno\\.nuget\\packages\\",
-        "outputPath": "F:\\Repositorios\\LaPrimitiva\\LaPrimitiva.Domain\\obj\\",
+        "outputPath": "f:\\Repositorios\\LaPrimitiva\\LaPrimitiva.Domain\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -1226,8 +1226,8 @@
           "net10.0": {
             "targetAlias": "net10.0",
             "projectReferences": {
-              "F:\\Repositorios\\LaPrimitiva\\LaPrimitiva.Domain\\LaPrimitiva.Domain.csproj": {
-                "projectPath": "F:\\Repositorios\\LaPrimitiva\\LaPrimitiva.Domain\\LaPrimitiva.Domain.csproj"
+              "f:\\Repositorios\\LaPrimitiva\\LaPrimitiva.Domain\\LaPrimitiva.Domain.csproj": {
+                "projectPath": "f:\\Repositorios\\LaPrimitiva\\LaPrimitiva.Domain\\LaPrimitiva.Domain.csproj"
               }
             }
           }
@@ -1593,8 +1593,8 @@
               "F:\\Repositorios\\LaPrimitiva\\LaPrimitiva.App\\LaPrimitiva.App.csproj": {
                 "projectPath": "F:\\Repositorios\\LaPrimitiva\\LaPrimitiva.App\\LaPrimitiva.App.csproj"
               },
-              "F:\\Repositorios\\LaPrimitiva\\LaPrimitiva.Domain\\LaPrimitiva.Domain.csproj": {
-                "projectPath": "F:\\Repositorios\\LaPrimitiva\\LaPrimitiva.Domain\\LaPrimitiva.Domain.csproj"
+              "f:\\Repositorios\\LaPrimitiva\\LaPrimitiva.Domain\\LaPrimitiva.Domain.csproj": {
+                "projectPath": "f:\\Repositorios\\LaPrimitiva\\LaPrimitiva.Domain\\LaPrimitiva.Domain.csproj"
               },
               "F:\\Repositorios\\LaPrimitiva\\LaPrimitiva.Infrastructure\\LaPrimitiva.Infrastructure.csproj": {
                 "projectPath": "F:\\Repositorios\\LaPrimitiva\\LaPrimitiva.Infrastructure\\LaPrimitiva.Infrastructure.csproj"
@@ -1633,6 +1633,10 @@
             "Moq": {
               "target": "Package",
               "version": "[4.20.72, )"
+            },
+            "Respawn": {
+              "target": "Package",
+              "version": "[7.0.0, )"
             },
             "coverlet.collector": {
               "target": "Package",

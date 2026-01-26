@@ -515,3 +515,4 @@ F:\Repositorios\LaPrimitiva\LaPrimitiva.Tests\bin\Debug\net10.0\Microsoft.Extens
 F:\Repositorios\LaPrimitiva\LaPrimitiva.Tests\bin\Debug\net10.0\LaPrimitiva.App.dll
 F:\Repositorios\LaPrimitiva\LaPrimitiva.Tests\bin\Debug\net10.0\LaPrimitiva.App.pdb
 F:\Repositorios\LaPrimitiva\LaPrimitiva.Tests\bin\Debug\net10.0\es\LaPrimitiva.Domain.resources.dll
+F:\Repositorios\LaPrimitiva\LaPrimitiva.Tests\bin\Debug\net10.0\Respawn.dll

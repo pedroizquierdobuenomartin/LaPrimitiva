@@ -1,44 +1,45 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Http;
 using System.Threading.Tasks;
 using LaPrimitiva.Application.DTOs;
 using LaPrimitiva.Application.Services;
 using LaPrimitiva.Domain.Entities;
-using LaPrimitiva.Domain.Repositories;
+using LaPrimitiva.App;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
-using LaPrimitiva.App;
 using Xunit;
 
 namespace LaPrimitiva.Tests.Integration
 {
-    public class PlanIntegrationTests : IClassFixture<WebApplicationFactory<Program>>
+    public class PlanIntegrationTests : IntegrationTestBase
     {
-        private readonly WebApplicationFactory<Program> _factory;
-
-        public PlanIntegrationTests(WebApplicationFactory<Program> factory)
+        public PlanIntegrationTests(WebApplicationFactory<Program> factory) : base(factory)
         {
-            _factory = factory;
         }
 
         [Fact]
-        public async Task GetPlansByYearAsync_ShouldReturnPlans_FromDatabase()
+        public async Task GetPlansByYearAsync_ShouldReturnPlans_FromService()
         {
             // Arrange
-            using var scope = _factory.Services.CreateScope();
+            await ResetDatabaseAsync();
+            using var scope = CreateScope();
             var planService = scope.ServiceProvider.GetRequiredService<PlanService>();
-            var planRepo = scope.ServiceProvider.GetRequiredService<IPlanRepository>();
 
             var year = 2027;
             var testPlan = new Plan 
             { 
                 Name = "Integration Test Plan", 
                 EffectiveFrom = new DateTime(year, 1, 1),
-                EffectiveTo = new DateTime(year, 12, 31)
+                EffectiveTo = new DateTime(year, 12, 31),
+                CostPerBet = 1.0m,
+                BetsPerDraw = 2,
+                EnableJoker = false,
+                JokerCostPerBet = 0.5m
             };
-            await planRepo.CreateAsync(testPlan);
+            
+            // Use PlanService to create, ensuring validations are run
+            await planService.CreatePlanAsync(testPlan);
 
             // Act
             var results = await planService.GetPlansByYearAsync(year);
@@ -49,38 +50,75 @@ namespace LaPrimitiva.Tests.Integration
         }
 
         [Fact]
-        public async Task UpdatePlan_ShouldSucceed_WhenAlreadyLoaded()
+        public async Task CreatePlan_ShouldFail_WhenDatesOverlap()
         {
             // Arrange
-            using var scope = _factory.Services.CreateScope();
+            await ResetDatabaseAsync();
+            using var scope = CreateScope();
             var planService = scope.ServiceProvider.GetRequiredService<PlanService>();
-            var planRepo = scope.ServiceProvider.GetRequiredService<IPlanRepository>();
+
+            var existingPlan = new Plan
+            {
+                Name = "Existing Plan",
+                EffectiveFrom = new DateTime(2025, 1, 1),
+                EffectiveTo = new DateTime(2025, 12, 31),
+                CostPerBet = 1.0m,
+                BetsPerDraw = 2
+            };
+            await planService.CreatePlanAsync(existingPlan);
+
+            var overlappingPlan = new Plan
+            {
+                Name = "Overlapping Plan",
+                EffectiveFrom = new DateTime(2025, 6, 1),
+                EffectiveTo = new DateTime(2026, 6, 1),
+                CostPerBet = 1.0m,
+                BetsPerDraw = 2
+            };
+
+            // Act & Assert
+            await Assert.ThrowsAsync<InvalidOperationException>(() => planService.CreatePlanAsync(overlappingPlan));
+        }
+
+        [Fact]
+        public async Task UpdatePlan_ShouldSucceed_WhenValid()
+        {
+            // Arrange
+            await ResetDatabaseAsync();
+            using var scope = CreateScope();
+            var planService = scope.ServiceProvider.GetRequiredService<PlanService>();
 
             var year = 2030;
             var testPlan = new Plan 
             { 
-                Name = "Reproduction Plan", 
+                Name = "Update Test Plan", 
                 EffectiveFrom = new DateTime(year, 1, 1),
-                EffectiveTo = new DateTime(year, 12, 31)
+                EffectiveTo = new DateTime(year, 12, 31),
+                CostPerBet = 1.0m,
+                BetsPerDraw = 2
             };
-            await planRepo.CreateAsync(testPlan);
+            await planService.CreatePlanAsync(testPlan);
 
-            // Fetch it first (this creates the tracking entry in the current DbContext if not using AsNoTracking)
+            // Fetch and update
             var loadedPlanDto = await planService.GetPlanByIdAsync(testPlan.Id);
             Assert.NotNull(loadedPlanDto);
 
-            // Try to update it using a new instance with the same ID (simulating what the UI does)
             var updatedPlan = new Plan
             {
                 Id = testPlan.Id,
-                Name = "Reproduction Plan Updated",
+                Name = "Update Test Plan Updated",
                 EffectiveFrom = testPlan.EffectiveFrom,
-                EffectiveTo = testPlan.EffectiveTo
+                EffectiveTo = testPlan.EffectiveTo,
+                CostPerBet = testPlan.CostPerBet,
+                BetsPerDraw = testPlan.BetsPerDraw
             };
 
-            // Act & Assert
-            // This is expected to FAIL currently with InvalidOperationException (due to tracking conflict)
+            // Act
             await planService.UpdatePlanAsync(updatedPlan);
+
+            // Assert
+            var result = await planService.GetPlanByIdAsync(testPlan.Id);
+            Assert.Equal("Update Test Plan Updated", result?.Name);
         }
     }
 }

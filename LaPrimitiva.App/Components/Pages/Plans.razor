@@ -1,5 +1,6 @@
 @page "/plans"
 @using LaPrimitiva.Application.Services
+@using LaPrimitiva.Application.DTOs
 @using LaPrimitiva.Domain.Entities
 @using LaPrimitiva.Infrastructure.Persistence
 @using Microsoft.EntityFrameworkCore
@@ -66,8 +67,8 @@
                             <button @onclick="() => DeletePlan(plan)" class="text-[10px] bg-red-50 text-red-600 px-3 py-1.5 rounded-lg border border-red-100 hover:bg-red-100 font-bold uppercase transition-colors">
                                 Borrar
                             </button>
-                            <button @onclick="() => GenerateDraws(plan)" class="text-[10px] bg-emerald-50 text-emerald-700 px-3 py-1.5 rounded-lg border border-emerald-100 hover:bg-emerald-100 font-black uppercase tracking-wider transition-colors">
-                                Generar Sorteos
+                            <button @onclick="() => HandlePlanAction(plan)" class="text-[10px] @(plan.HasDraws ? "bg-blue-50 text-blue-700 border-blue-100 hover:bg-blue-100" : "bg-emerald-50 text-emerald-700 border-emerald-100 hover:bg-emerald-100") px-3 py-1.5 rounded-lg border font-black uppercase tracking-wider transition-colors">
+                                @(plan.HasDraws ? "Ver Sorteos" : "Generar Sorteos")
                             </button>
                         </div>
                     </div>
@@ -229,12 +230,12 @@
 }
 
 @code {
-    private List<Plan>? plans;
+    private List<PlanDto>? plans;
     private bool showModal = false;
     private bool isEditing = false;
     private string? errorMessage;
     private Plan newPlan = new Plan { EffectiveFrom = DateTime.Today };
-    private Plan? _planToDelete;
+    private PlanDto? _planToDelete;
     private string? _deleteErrorMessage;
     private bool _hasLinkedDraws;
     private bool _isLoading;
@@ -282,12 +283,21 @@
         showModal = true;
     }
 
-    private void ShowEditModal(Plan plan)
+    private async Task ShowEditModal(PlanDto planDto)
     {
         errorMessage = null;
         isEditing = true;
-        newPlan = plan; // En una app real haríamos un shallow copy o cargaríamos por ID
-        showModal = true;
+        var plan = await PlanService.GetPlanByIdAsync(planDto.Id);
+        if (plan != null)
+        {
+            newPlan = plan;
+            showModal = true;
+        }
+        else 
+        {
+            // Handle error, maybe refresh list
+            await LoadData();
+        }
     }
 
     private async Task SavePlan()
@@ -316,10 +326,10 @@
         }
     }
 
-    private async Task DeletePlan(Plan plan)
+    private async Task DeletePlan(PlanDto plan)
     {
         _deleteErrorMessage = null;
-        _hasLinkedDraws = await Db.DrawRecords.AnyAsync(d => d.PlanId == plan.Id);
+        _hasLinkedDraws = plan.HasDraws;
         _planToDelete = plan;
         StateHasChanged();
     }
@@ -354,23 +364,22 @@
         }
     }
 
-    private async Task GenerateDraws(Plan plan)
+    private void HandlePlanAction(PlanDto plan)
     {
-        if (plan.EffectiveTo != null)
+        // 2.- Cuando se clique en Generar sorteos (no tiene sorteos) debe llevar a Registro del año del plan.
+        // 3.- Cuando se clique en Ver Sorteos debe llevar a Registro con el filtro de la fecha del plan para ver solo los sorteos asociados al plan.
+        
+        GlobalState.SelectedYear = plan.EffectiveFrom.Year;
+        
+        if (plan.HasDraws)
         {
-            var existingCount = await Db.DrawRecords.CountAsync(d => d.PlanId == plan.Id);
-            if (existingCount == 0)
-            {
-                var newDraws = DrawGenService.GenerateDrawsForRange(plan.Id, plan.EffectiveFrom, plan.EffectiveTo.Value);
-                var existingDates = await Db.DrawRecords.Select(d => d.DrawDate).ToListAsync();
-                var drawsToAdd = newDraws.Where(nd => !existingDates.Contains(nd.DrawDate)).ToList();
-
-                Db.DrawRecords.AddRange(drawsToAdd);
-                await Db.SaveChangesAsync();
-            }
+            GlobalState.SelectedPlanId = plan.Id;
+        }
+        else 
+        {
+            GlobalState.SelectedPlanId = null;
         }
         
-        GlobalState.SelectedPlanId = plan.Id;
         Nav.NavigateTo("/register");
     }
 

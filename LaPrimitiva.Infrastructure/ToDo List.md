@@ -1,7 +1,7 @@
 - [ ] Mejorar Look & Feel
 - [X] Sorteo: Botón de eliminar sorteo semanal
 - [X] Plan: Botón de eliminar plan, cambiar a un popup de confirmación y no una alerta
-- [ ] Plan: Mostrar los sorteos en el plan
+- [X] Plan: Mostrar los sorteos del plan
 - [ ] Sorteo: No añadir un sorteo si ya existe uno para la fecha
 - [ ] Sorteo: No añadir un sorteo si está fuera del plan seleccionado
 - [ ] Sorteo: Al dar de alta el sorteo semanal, la semana debe calcularse automáticamente según el año

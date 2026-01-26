@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using LaPrimitiva.Domain.Entities;
 using LaPrimitiva.Infrastructure.Persistence;
+using LaPrimitiva.Application.DTOs;
 
 namespace LaPrimitiva.Application.Services
 {
@@ -22,7 +23,7 @@ namespace LaPrimitiva.Application.Services
             return await _context.Plans.OrderByDescending(p => p.EffectiveFrom).ToListAsync();
         }
 
-        public async Task<List<Plan>> GetPlansByYearAsync(int year)
+        public async Task<List<PlanDto>> GetPlansByYearAsync(int year)
         {
             var startOfYear = new DateTime(year, 1, 1);
             var endOfYear = new DateTime(year, 12, 31, 23, 59, 59);
@@ -30,6 +31,20 @@ namespace LaPrimitiva.Application.Services
             return await _context.Plans
                 .Where(p => p.EffectiveFrom <= endOfYear && (p.EffectiveTo == null || p.EffectiveTo >= startOfYear))
                 .OrderByDescending(p => p.EffectiveFrom)
+                .Select(p => new PlanDto
+                {
+                    Id = p.Id,
+                    Name = p.Name,
+                    EffectiveFrom = p.EffectiveFrom,
+                    EffectiveTo = p.EffectiveTo,
+                    CostPerBet = p.CostPerBet,
+                    BetsPerDraw = p.BetsPerDraw,
+                    EnableJoker = p.EnableJoker,
+                    JokerCostPerBet = p.JokerCostPerBet,
+                    FixedCombinationLabel = p.FixedCombinationLabel,
+                    CreatedAt = p.CreatedAt,
+                    HasDraws = p.Draws.Any()
+                })
                 .ToListAsync();
         }
 

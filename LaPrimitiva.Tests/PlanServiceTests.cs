@@ -91,5 +91,42 @@ namespace LaPrimitiva.Tests
             // Act & Assert
             await Assert.ThrowsAsync<InvalidOperationException>(() => service.DeletePlanAsync(plan.Id));
         }
+
+        [Fact]
+        public async Task GetPlansByYearAsync_ShouldPopulateHasDrawsCorrectly()
+        {
+            // Arrange
+            var context = GetDbContext();
+            var service = new PlanService(context);
+            var year = 2026;
+
+            var planWithDraws = new Plan
+            {
+                Name = "Plan With Draws",
+                EffectiveFrom = new DateTime(year, 1, 1),
+                EffectiveTo = new DateTime(year, 6, 30)
+            };
+            var planWithoutDraws = new Plan
+            {
+                Name = "Plan Without Draws",
+                EffectiveFrom = new DateTime(year, 7, 1),
+                EffectiveTo = new DateTime(year, 12, 31)
+            };
+
+            context.Plans.AddRange(planWithDraws, planWithoutDraws);
+            context.DrawRecords.Add(new DrawRecord { PlanId = planWithDraws.Id, DrawDate = new DateTime(year, 2, 1) });
+            await context.SaveChangesAsync();
+
+            // Act
+            var result = await service.GetPlansByYearAsync(year);
+
+            // Assert
+            Assert.Equal(2, result.Count);
+            var dtoWithDraws = result.First(p => p.Id == planWithDraws.Id);
+            var dtoWithoutDraws = result.First(p => p.Id == planWithoutDraws.Id);
+
+            Assert.True(dtoWithDraws.HasDraws);
+            Assert.False(dtoWithoutDraws.HasDraws);
+        }
     }
 }

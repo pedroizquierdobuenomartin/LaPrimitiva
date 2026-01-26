@@ -15,5 +15,6 @@ namespace LaPrimitiva.Application.DTOs
         public string? FixedCombinationLabel { get; init; }
         public DateTime CreatedAt { get; init; }
         public bool HasDraws { get; init; }
+        public bool HasOverlap { get; init; }
     }
 }

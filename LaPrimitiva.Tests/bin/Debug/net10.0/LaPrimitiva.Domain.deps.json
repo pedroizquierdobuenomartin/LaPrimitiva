@@ -9,6 +9,11 @@
       "LaPrimitiva.Domain/1.0.0": {
         "runtime": {
           "LaPrimitiva.Domain.dll": {}
+        },
+        "resources": {
+          "es/LaPrimitiva.Domain.resources.dll": {
+            "locale": "es"
+          }
         }
       }
     }

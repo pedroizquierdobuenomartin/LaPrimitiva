@@ -32,7 +32,24 @@ namespace LaPrimitiva.Application.Services
         public async Task<List<PlanDto>> GetPlansByYearAsync(int year)
         {
             var plans = await _planRepository.GetByYearAsync(year);
-            return plans.Select(MapToDto).ToList();
+            var dtos = plans.Select(MapToDto).ToList();
+            
+            // In-memory overlap detection for visual flagging
+            for (int i = 0; i < dtos.Count; i++)
+            {
+                var current = dtos[i];
+                var hasOverlap = dtos.Any(other => 
+                    other.Id != current.Id &&
+                    (current.EffectiveTo == null || other.EffectiveFrom <= current.EffectiveTo) &&
+                    (other.EffectiveTo == null || other.EffectiveTo >= current.EffectiveFrom));
+                
+                if (hasOverlap)
+                {
+                    dtos[i] = current with { HasOverlap = true };
+                }
+            }
+            
+            return dtos;
         }
 
         /// <summary>

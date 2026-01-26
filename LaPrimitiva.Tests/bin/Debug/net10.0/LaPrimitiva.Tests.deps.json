@@ -1233,6 +1233,11 @@
             "fileVersion": "1.0.0.0"
           }
         },
+        "resources": {
+          "es/LaPrimitiva.Domain.resources.dll": {
+            "locale": "es"
+          }
+        },
         "compile": {
           "LaPrimitiva.Domain.dll": {}
         }

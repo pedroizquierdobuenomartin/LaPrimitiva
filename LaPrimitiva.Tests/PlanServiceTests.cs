@@ -76,5 +76,46 @@ namespace LaPrimitiva.Tests
             Assert.False(result[0].HasDraws);
             Assert.True(result[1].HasDraws);
         }
+
+        [Fact]
+        public async Task GetPlansByYearAsync_ShouldFlagOverlappingPlans()
+        {
+            // Arrange
+            var year = 2026;
+            var plans = new List<Plan>
+            {
+                new Plan 
+                { 
+                    Id = Guid.NewGuid(), 
+                    Name = "Plan A", 
+                    EffectiveFrom = new DateTime(year, 1, 1), 
+                    EffectiveTo = new DateTime(year, 6, 30) 
+                },
+                new Plan 
+                { 
+                    Id = Guid.NewGuid(), 
+                    Name = "Plan B", 
+                    EffectiveFrom = new DateTime(year, 6, 1), // Overlaps with A
+                    EffectiveTo = new DateTime(year, 12, 31) 
+                },
+                new Plan 
+                { 
+                    Id = Guid.NewGuid(), 
+                    Name = "Plan C", 
+                    EffectiveFrom = new DateTime(year + 1, 1, 1), 
+                    EffectiveTo = new DateTime(year + 1, 12, 31) 
+                }
+            };
+
+            _planRepoMock.Setup(r => r.GetByYearAsync(year)).ReturnsAsync(plans);
+
+            // Act
+            var result = await _service.GetPlansByYearAsync(year);
+
+            // Assert
+            Assert.True(result[0].HasOverlap, "Plan A should have overlap detected");
+            Assert.True(result[1].HasOverlap, "Plan B should have overlap detected");
+            Assert.False(result[2].HasOverlap, "Plan C should not have overlap detected");
+        }
     }
 }

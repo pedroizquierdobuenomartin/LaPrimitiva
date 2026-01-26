@@ -1040,6 +1040,11 @@
             "assemblyVersion": "1.0.0.0",
             "fileVersion": "1.0.0.0"
           }
+        },
+        "resources": {
+          "es/LaPrimitiva.Domain.resources.dll": {
+            "locale": "es"
+          }
         }
       }
     }

@@ -12,8 +12,23 @@ namespace LaPrimitiva.Domain.Entities
         public int WeeksToTrackDefault { get; set; } = 52;
         public decimal CostPerBet { get; set; } = 1.00m;
         public int BetsPerDraw { get; set; } = 2; // Fixed + Auto
-        public bool EnableJoker { get; set; }
-        public decimal JokerCostPerBet { get; set; } = 0.50m; // Usually 1.00 but requirement says default 0 or 1.00. I'll stick to requirement default.
+        public bool EnableJoker
+        {
+            get => field;
+            set
+            {
+                field = value;
+                if (!value)
+                {
+                    JokerCostPerBet = 0m;
+                }
+                else if (JokerCostPerBet == 0)
+                {
+                    JokerCostPerBet = 1.00m;
+                }
+            }
+        }
+        public decimal JokerCostPerBet { get; set; } = 0.50m; // Default value if active
         public string? FixedCombinationLabel { get; set; }
         
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;

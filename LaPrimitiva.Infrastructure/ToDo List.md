@@ -6,8 +6,8 @@
 - [ ] Sorteo: No añadir un sorteo si está fuera del plan seleccionado
 - [ ] Sorteo: Al dar de alta el sorteo semanal, la semana debe calcularse automáticamente según el año
 - [ ] Plan: Mostrar el número de sorteos en el plan: Totales, activos e inactivos
-- [ ] Plan: Si el jocker no está activo, se descativará el coste de jocker y se pondrá a 0
-- [ ] Plan: Si el jocker está activo, se pondrá el coste de jocker
+- [-] Plan: Si el jocker no está activo, se descativará el coste de jocker y se pondrá a 0
+- [-] Plan: Si el jocker está activo, se pondrá el coste de jocker
 - [ ] Plan: Al editar el plan, debe mostrar el campo de etiqueta fija
 - [ ] Plan: No gardar automáticamente los datos, solo al pulsar en guardar
 - [ ] Plan: No debe dejar de guardar el plan si el nombre está vacío

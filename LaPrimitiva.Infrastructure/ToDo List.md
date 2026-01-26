@@ -1,9 +1,10 @@
 - [ ] Mejorar Look & Feel
-- [X] Botón de eliminar sorteo semanal
-- [ ] Botón de eliminar plan, cambiar a un popup de confirmación y no una alerta
-- [ ] No añadir un sorteo si ya existe uno para la fecha
-- [ ] No añadir un sorteo si está fuera del plan seleccionado
-- [ ] Al dar de alta el sorteo semanal, la semana debe calcularse automáticamente según el año
+- [X] Sorteo: Botón de eliminar sorteo semanal
+- [X] Plan: Botón de eliminar plan, cambiar a un popup de confirmación y no una alerta
+- [ ] Plan: Mostrar los sorteos en el plan
+- [ ] Sorteo: No añadir un sorteo si ya existe uno para la fecha
+- [ ] Sorteo: No añadir un sorteo si está fuera del plan seleccionado
+- [ ] Sorteo: Al dar de alta el sorteo semanal, la semana debe calcularse automáticamente según el año
 - [ ] Plan: Mostrar el número de sorteos en el plan: Totales, activos e inactivos
 - [ ] Plan: Si el jocker no está activo, se descativará el coste de jocker y se pondrá a 0
 - [ ] Plan: Si el jocker está activo, se pondrá el coste de jocker

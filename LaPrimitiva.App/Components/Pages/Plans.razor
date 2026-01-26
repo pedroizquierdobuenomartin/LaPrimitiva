@@ -170,12 +170,73 @@
     </div>
 }
 
+@if (_planToDelete != null)
+{
+    <div class="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-sm transition-all animate-in fade-in duration-200">
+        <div class="bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden animate-in zoom-in duration-200 p-8 text-center space-y-6 border border-slate-100">
+            <div class="h-20 w-20 bg-red-100 rounded-full flex items-center justify-center mx-auto text-red-600 shadow-inner">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+            </div>
+            
+            <div>
+                <h3 class="text-xl font-black text-slate-900 uppercase tracking-tight">¿Eliminar @_planToDelete.Name?</h3>
+                
+                @if (_hasLinkedDraws)
+                {
+                    <div class="mt-4 p-4 bg-amber-50 border border-amber-100 rounded-2xl flex flex-col gap-2 items-center animate-in slide-in-from-top-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-amber-500" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                        </svg>
+                        <p class="text-sm font-bold text-amber-800 leading-tight">No se puede borrar el plan</p>
+                        <p class="text-xs text-amber-700">Primero debes borrar todos los sorteos asociados a este plan en la sección de Registro.</p>
+                    </div>
+                }
+                else if (!string.IsNullOrEmpty(_deleteErrorMessage))
+                {
+                    <div class="mt-4 p-4 bg-red-50 border border-red-100 rounded-2xl flex flex-col gap-2 items-center animate-in slide-in-from-top-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-red-500" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                        </svg>
+                        <p class="text-sm font-bold text-red-800 leading-tight">Error</p>
+                        <p class="text-xs text-red-700">@_deleteErrorMessage</p>
+                    </div>
+                }
+                else
+                {
+                    <p class="text-slate-500 mt-2 text-sm leading-relaxed font-medium">
+                        Estás a punto de eliminar permanentemente este plan y todas sus configuraciones asociadas.
+                        <br/><br/>
+                        <span class="text-red-600 font-bold bg-red-50 px-2 py-0.5 rounded-lg">Esta acción es irreversible.</span>
+                    </p>
+                }
+            </div>
+
+            <div class="grid @(_hasLinkedDraws ? "grid-cols-1" : "grid-cols-2") gap-4 pt-2">
+                <button @onclick="CancelDelete" class="px-4 py-3.5 rounded-2xl text-xs font-black text-slate-500 bg-slate-100 hover:bg-slate-200 transition-all uppercase tracking-widest text-wrap">
+                    @(_hasLinkedDraws ? "Entendido" : "Cancelar")
+                </button>
+                @if (!_hasLinkedDraws)
+                {
+                    <button @onclick="ConfirmDelete" class="px-4 py-3.5 rounded-2xl text-xs font-black text-white bg-red-600 hover:bg-red-700 shadow-xl shadow-red-200 transition-all active:scale-95 uppercase tracking-widest">
+                        Sí, Eliminar
+                    </button>
+                }
+            </div>
+        </div>
+    </div>
+}
+
 @code {
     private List<Plan>? plans;
     private bool showModal = false;
     private bool isEditing = false;
     private string? errorMessage;
     private Plan newPlan = new Plan { EffectiveFrom = DateTime.Today };
+    private Plan? _planToDelete;
+    private string? _deleteErrorMessage;
+    private bool _hasLinkedDraws;
     private bool _isLoading;
 
     protected override async Task OnInitializedAsync()
@@ -257,21 +318,39 @@
 
     private async Task DeletePlan(Plan plan)
     {
-        var confirmed = await JS.InvokeAsync<bool>("confirm", $"¿Estás seguro de que quieres borrar el plan '{plan.Name}'?");
-        if (!confirmed) return;
+        _deleteErrorMessage = null;
+        _hasLinkedDraws = await Db.DrawRecords.AnyAsync(d => d.PlanId == plan.Id);
+        _planToDelete = plan;
+        StateHasChanged();
+    }
+
+    private void CancelDelete()
+    {
+        _planToDelete = null;
+        _deleteErrorMessage = null;
+        _hasLinkedDraws = false;
+    }
+
+    private async Task ConfirmDelete()
+    {
+        if (_planToDelete == null || _hasLinkedDraws) return;
 
         try 
         {
-            await PlanService.DeletePlanAsync(plan.Id);
+            await PlanService.DeletePlanAsync(_planToDelete.Id);
+            _planToDelete = null;
+            _deleteErrorMessage = null;
+            _hasLinkedDraws = false;
             await LoadData();
         }
         catch (InvalidOperationException ex)
         {
-            await JS.InvokeVoidAsync("alert", ex.Message);
+            _deleteErrorMessage = ex.Message;
+            _hasLinkedDraws = true; // Refresh state if backend rejected it
         }
         catch (Exception)
         {
-            await JS.InvokeVoidAsync("alert", "Error al borrar el plan.");
+            _deleteErrorMessage = "Ha ocurrido un error inesperado al intentar borrar el plan.";
         }
     }
 

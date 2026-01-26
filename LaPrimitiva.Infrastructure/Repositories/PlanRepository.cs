@@ -38,7 +38,7 @@ namespace LaPrimitiva.Infrastructure.Repositories
 
         public async Task<Plan?> GetAsync(Guid id)
         {
-            return await _context.Plans.FirstOrDefaultAsync(p => p.Id == id);
+            return await _context.Plans.AsNoTracking().FirstOrDefaultAsync(p => p.Id == id);
         }
 
         public async Task<Plan?> GetForDateAsync(DateTime date)
@@ -63,6 +63,16 @@ namespace LaPrimitiva.Infrastructure.Repositories
         public async Task UpdateAsync(Plan plan)
         {
             plan.UpdatedAt = DateTime.UtcNow;
+            
+            var local = _context.Set<Plan>()
+                .Local
+                .FirstOrDefault(entry => entry.Id.Equals(plan.Id));
+
+            if (local != null)
+            {
+                _context.Entry(local).State = EntityState.Detached;
+            }
+
             _context.Entry(plan).State = EntityState.Modified;
             await _context.SaveChangesAsync();
         }

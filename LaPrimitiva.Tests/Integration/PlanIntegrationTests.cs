@@ -47,5 +47,40 @@ namespace LaPrimitiva.Tests.Integration
             Assert.NotEmpty(results);
             Assert.Contains(results, p => p.Name == "Integration Test Plan");
         }
+
+        [Fact]
+        public async Task UpdatePlan_ShouldSucceed_WhenAlreadyLoaded()
+        {
+            // Arrange
+            using var scope = _factory.Services.CreateScope();
+            var planService = scope.ServiceProvider.GetRequiredService<PlanService>();
+            var planRepo = scope.ServiceProvider.GetRequiredService<IPlanRepository>();
+
+            var year = 2030;
+            var testPlan = new Plan 
+            { 
+                Name = "Reproduction Plan", 
+                EffectiveFrom = new DateTime(year, 1, 1),
+                EffectiveTo = new DateTime(year, 12, 31)
+            };
+            await planRepo.CreateAsync(testPlan);
+
+            // Fetch it first (this creates the tracking entry in the current DbContext if not using AsNoTracking)
+            var loadedPlanDto = await planService.GetPlanByIdAsync(testPlan.Id);
+            Assert.NotNull(loadedPlanDto);
+
+            // Try to update it using a new instance with the same ID (simulating what the UI does)
+            var updatedPlan = new Plan
+            {
+                Id = testPlan.Id,
+                Name = "Reproduction Plan Updated",
+                EffectiveFrom = testPlan.EffectiveFrom,
+                EffectiveTo = testPlan.EffectiveTo
+            };
+
+            // Act & Assert
+            // This is expected to FAIL currently with InvalidOperationException (due to tracking conflict)
+            await planService.UpdatePlanAsync(updatedPlan);
+        }
     }
 }

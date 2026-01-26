@@ -120,6 +120,41 @@ namespace LaPrimitiva.Application.Services
             return plan != null ? MapToDto(plan) : null;
         }
 
+        /// <summary>
+        /// Obtiene la lista de años en los que existen planes activos.
+        /// </summary>
+        public async Task<List<int>> GetAvailableYearsAsync()
+        {
+            var plans = await _planRepository.GetListAsync();
+            if (!plans.Any())
+            {
+                return [DateTime.Now.Year];
+            }
+
+            var years = new HashSet<int>();
+            var currentYear = DateTime.Now.Year;
+            var maxFutureYear = currentYear + 2;
+
+            foreach (var plan in plans)
+            {
+                int startYear = plan.EffectiveFrom.Year;
+                int endYear = plan.EffectiveTo?.Year ?? maxFutureYear;
+
+                // Clamp future years for indefinite plans to avoid huge lists
+                if (endYear > maxFutureYear + 5) endYear = maxFutureYear + 5;
+
+                for (int y = startYear; y <= endYear; y++)
+                {
+                    years.Add(y);
+                }
+            }
+
+            // Always ensure current year is available if it's within or near plan ranges
+            years.Add(currentYear);
+
+            return [.. years.OrderBy(y => y)];
+        }
+
         private static PlanDto MapToDto(Plan p) => new()
         {
             Id = p.Id,

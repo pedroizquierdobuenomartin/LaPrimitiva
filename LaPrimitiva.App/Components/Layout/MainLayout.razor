@@ -3,6 +3,7 @@
 @using Microsoft.Extensions.Localization
 @inherits LayoutComponentBase
 @inject GlobalState GlobalState
+@inject IServiceScopeFactory ScopeFactory
 @inject IStringLocalizer<PrimitivaResource> L
 @implements IDisposable
 
@@ -110,9 +111,12 @@
                     @L["SelectedYear"]:
                 </div>
                 <select @bind="GlobalState.SelectedYear" class="bg-slate-50 border border-slate-200 text-slate-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2">
-                    @for (int y = DateTime.Now.Year - 5; y <= DateTime.Now.Year + 2; y++)
+                    @if (_availableYears != null)
                     {
-                        <option value="@y">@y</option>
+                        @foreach (var y in _availableYears)
+                        {
+                            <option value="@y">@y</option>
+                        }
                     }
                 </select>
             </div>
@@ -136,10 +140,28 @@
 @code {
     private bool _isCollapsed = false;
     private bool _showMobileMenu = false;
+    private List<int>? _availableYears;
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        GlobalState.OnChange += StateHasChanged;
+        GlobalState.OnChange += HandleStateChange;
+        await LoadYears();
+    }
+
+    private async void HandleStateChange()
+    {
+        await InvokeAsync(async () => 
+        {
+            await LoadYears();
+            StateHasChanged();
+        });
+    }
+
+    private async Task LoadYears()
+    {
+        using var scope = ScopeFactory.CreateScope();
+        var planService = scope.ServiceProvider.GetRequiredService<PlanService>();
+        _availableYears = await planService.GetAvailableYearsAsync();
     }
 
     private void ToggleSidebar()
@@ -155,6 +177,6 @@
 
     public void Dispose()
     {
-        GlobalState.OnChange -= StateHasChanged;
+        GlobalState.OnChange -= HandleStateChange;
     }
 }

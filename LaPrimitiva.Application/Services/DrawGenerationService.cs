@@ -5,8 +5,14 @@ using LaPrimitiva.Domain.Entities;
 
 namespace LaPrimitiva.Application.Services
 {
+    /// <summary>
+    /// Servicio encargado de la lógica de generación de sorteos para un rango de fechas.
+    /// </summary>
     public class DrawGenerationService
     {
+        /// <summary>
+        /// Genera una lista de sorteos (Lunes, Jueves, Sábado) para un rango de fechas.
+        /// </summary>
         public List<DrawRecord> GenerateDrawsForRange(Guid planId, DateTime from, DateTime to)
         {
             var draws = new List<DrawRecord>();

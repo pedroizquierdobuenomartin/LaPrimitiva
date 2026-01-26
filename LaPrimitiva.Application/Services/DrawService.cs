@@ -1,26 +1,27 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using LaPrimitiva.Domain.Entities;
-using LaPrimitiva.Infrastructure.Persistence;
-using Microsoft.EntityFrameworkCore;
+using LaPrimitiva.Domain.Repositories;
 using LaPrimitiva.Application.Interfaces;
 
 namespace LaPrimitiva.Application.Services
 {
-    public class DrawService(PrimitivaDbContext db) : IDrawService
+    /// <summary>
+    /// Servicio para operaciones relacionadas con los sorteos registrados.
+    /// </summary>
+    public class DrawService(IDrawRepository drawRepository) : IDrawService
     {
+        private readonly IDrawRepository _drawRepository = drawRepository;
+
+        /// <summary>
+        /// Elimina los sorteos de una semana completa para un plan y año específicos.
+        /// </summary>
         public async Task DeleteWeeklyDrawAsync(int weekNumber, int year, Guid planId)
         {
-            var draws = await db.DrawRecords
-                .Where(d => d.WeekNumber == weekNumber && d.DrawDate.Year == year && d.PlanId == planId)
-                .ToListAsync();
-
-            if (draws.Any())
-            {
-                db.DrawRecords.RemoveRange(draws);
-                await db.SaveChangesAsync();
-            }
+            await _drawRepository.DeleteRangeAsync(d => 
+                d.WeekNumber == weekNumber && 
+                d.DrawDate.Year == year && 
+                d.PlanId == planId);
         }
     }
 }

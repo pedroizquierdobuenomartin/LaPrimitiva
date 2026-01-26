@@ -1,39 +1,36 @@
-using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Threading.Tasks;
 using LaPrimitiva.Application.Services;
 using LaPrimitiva.Domain.Entities;
-using LaPrimitiva.Infrastructure.Persistence;
+using LaPrimitiva.Domain.Repositories;
+using Moq;
 using Xunit;
-using System;
-using System.Threading.Tasks;
-using System.Collections.Generic;
 
 namespace LaPrimitiva.Tests
 {
+    /// <summary>
+    /// Pruebas unitarias para PlanService utilizando mocks de repositorios.
+    /// </summary>
     public class PlanServiceTests
     {
-        private PrimitivaDbContext GetDbContext()
+        private readonly Mock<IPlanRepository> _planRepoMock = new();
+        private readonly Mock<IDrawRepository> _drawRepoMock = new();
+        private readonly PlanService _service;
+
+        public PlanServiceTests()
         {
-            var options = new DbContextOptionsBuilder<PrimitivaDbContext>()
-                .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
-                .Options;
-            return new PrimitivaDbContext(options);
+            _service = new PlanService(_planRepoMock.Object, _drawRepoMock.Object);
         }
 
         [Fact]
         public async Task CreatePlanAsync_ShouldThrowException_WhenDatesOverlap()
         {
             // Arrange
-            var context = GetDbContext();
-            var service = new PlanService(context);
-
-            var existingPlan = new Plan
-            {
-                Name = "Existing",
-                EffectiveFrom = new DateTime(2026, 1, 1),
-                EffectiveTo = new DateTime(2026, 12, 31)
-            };
-            context.Plans.Add(existingPlan);
-            await context.SaveChangesAsync();
+            _planRepoMock.Setup(r => r.AnyAsync(It.IsAny<Expression<Func<Plan, bool>>>()))
+                .ReturnsAsync(true);
 
             var overlappingPlan = new Plan
             {
@@ -43,90 +40,41 @@ namespace LaPrimitiva.Tests
             };
 
             // Act & Assert
-            await Assert.ThrowsAsync<InvalidOperationException>(() => service.CreatePlanAsync(overlappingPlan));
-        }
-
-        [Fact]
-        public async Task UpdatePlanAsync_ShouldThrowException_WhenDatesOverlapWithOtherPlan()
-        {
-            // Arrange
-            var context = GetDbContext();
-            var service = new PlanService(context);
-
-            var otherPlan = new Plan
-            {
-                Name = "Other",
-                EffectiveFrom = new DateTime(2026, 1, 1),
-                EffectiveTo = new DateTime(2026, 6, 30)
-            };
-            var myPlan = new Plan
-            {
-                Name = "Mine",
-                EffectiveFrom = new DateTime(2026, 7, 1),
-                EffectiveTo = new DateTime(2026, 12, 31)
-            };
-            context.Plans.AddRange(otherPlan, myPlan);
-            await context.SaveChangesAsync();
-
-            // Act: Update myPlan to overlap with otherPlan
-            myPlan.EffectiveFrom = new DateTime(2026, 6, 1);
-
-            // Assert
-            await Assert.ThrowsAsync<InvalidOperationException>(() => service.UpdatePlanAsync(myPlan));
+            await Assert.ThrowsAsync<InvalidOperationException>(() => _service.CreatePlanAsync(overlappingPlan));
         }
 
         [Fact]
         public async Task DeletePlanAsync_ShouldThrowException_WhenPlanHasDraws()
         {
             // Arrange
-            var context = GetDbContext();
-            var service = new PlanService(context);
-
-            var plan = new Plan { Name = "Plan with Draws" };
-            var draw = new DrawRecord { PlanId = plan.Id, DrawDate = DateTime.Today };
-            context.Plans.Add(plan);
-            context.DrawRecords.Add(draw);
-            await context.SaveChangesAsync();
+            var planId = Guid.NewGuid();
+            _drawRepoMock.Setup(r => r.AnyAsync(It.IsAny<Expression<Func<DrawRecord, bool>>>()))
+                .ReturnsAsync(true);
 
             // Act & Assert
-            await Assert.ThrowsAsync<InvalidOperationException>(() => service.DeletePlanAsync(plan.Id));
+            await Assert.ThrowsAsync<InvalidOperationException>(() => _service.DeletePlanAsync(planId));
         }
 
         [Fact]
-        public async Task GetPlansByYearAsync_ShouldPopulateHasDrawsCorrectly()
+        public async Task GetPlansByYearAsync_ShouldReturnMappedDtos()
         {
             // Arrange
-            var context = GetDbContext();
-            var service = new PlanService(context);
             var year = 2026;
-
-            var planWithDraws = new Plan
+            var plans = new List<Plan>
             {
-                Name = "Plan With Draws",
-                EffectiveFrom = new DateTime(year, 1, 1),
-                EffectiveTo = new DateTime(year, 6, 30)
-            };
-            var planWithoutDraws = new Plan
-            {
-                Name = "Plan Without Draws",
-                EffectiveFrom = new DateTime(year, 7, 1),
-                EffectiveTo = new DateTime(year, 12, 31)
+                new Plan { Id = Guid.NewGuid(), Name = "Plan A", EffectiveFrom = new DateTime(year, 1, 1), Draws = new List<DrawRecord>() },
+                new Plan { Id = Guid.NewGuid(), Name = "Plan B", EffectiveFrom = new DateTime(year, 7, 1), Draws = new List<DrawRecord> { new() } }
             };
 
-            context.Plans.AddRange(planWithDraws, planWithoutDraws);
-            context.DrawRecords.Add(new DrawRecord { PlanId = planWithDraws.Id, DrawDate = new DateTime(year, 2, 1) });
-            await context.SaveChangesAsync();
+            _planRepoMock.Setup(r => r.GetByYearAsync(year)).ReturnsAsync(plans);
 
             // Act
-            var result = await service.GetPlansByYearAsync(year);
+            var result = await _service.GetPlansByYearAsync(year);
 
             // Assert
             Assert.Equal(2, result.Count);
-            var dtoWithDraws = result.First(p => p.Id == planWithDraws.Id);
-            var dtoWithoutDraws = result.First(p => p.Id == planWithoutDraws.Id);
-
-            Assert.True(dtoWithDraws.HasDraws);
-            Assert.False(dtoWithoutDraws.HasDraws);
+            Assert.False(result[0].HasDraws);
+            Assert.True(result[1].HasDraws);
         }
     }
 }

@@ -2,61 +2,55 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
 using LaPrimitiva.Domain.Entities;
-using LaPrimitiva.Infrastructure.Persistence;
+using LaPrimitiva.Domain.Repositories;
 using LaPrimitiva.Application.DTOs;
 
 namespace LaPrimitiva.Application.Services
 {
-    public class PlanService
+    /// <summary>
+    /// Servicio para la gestión de planes de sorteo.
+    /// </summary>
+    public class PlanService(IPlanRepository planRepository, IDrawRepository drawRepository)
     {
-        private readonly PrimitivaDbContext _context;
+        private readonly IPlanRepository _planRepository = planRepository;
+        private readonly IDrawRepository _drawRepository = drawRepository;
 
-        public PlanService(PrimitivaDbContext context)
+        /// <summary>
+        /// Obtiene la lista completa de planes.
+        /// </summary>
+        public async Task<List<PlanDto>> GetPlansAsync()
         {
-            _context = context;
+            var plans = await _planRepository.GetListAsync(includeDraws: true);
+            return plans.Select(MapToDto).ToList();
         }
 
-        public async Task<List<Plan>> GetPlansAsync()
-        {
-            return await _context.Plans.OrderByDescending(p => p.EffectiveFrom).ToListAsync();
-        }
-
+        /// <summary>
+        /// Obtiene los planes vigentes para un año específico.
+        /// </summary>
+        /// <param name="year">Año a consultar.</param>
         public async Task<List<PlanDto>> GetPlansByYearAsync(int year)
         {
-            var startOfYear = new DateTime(year, 1, 1);
-            var endOfYear = new DateTime(year, 12, 31, 23, 59, 59);
-
-            return await _context.Plans
-                .Where(p => p.EffectiveFrom <= endOfYear && (p.EffectiveTo == null || p.EffectiveTo >= startOfYear))
-                .OrderByDescending(p => p.EffectiveFrom)
-                .Select(p => new PlanDto
-                {
-                    Id = p.Id,
-                    Name = p.Name,
-                    EffectiveFrom = p.EffectiveFrom,
-                    EffectiveTo = p.EffectiveTo,
-                    CostPerBet = p.CostPerBet,
-                    BetsPerDraw = p.BetsPerDraw,
-                    EnableJoker = p.EnableJoker,
-                    JokerCostPerBet = p.JokerCostPerBet,
-                    FixedCombinationLabel = p.FixedCombinationLabel,
-                    CreatedAt = p.CreatedAt,
-                    HasDraws = p.Draws.Any()
-                })
-                .ToListAsync();
+            var plans = await _planRepository.GetByYearAsync(year);
+            return plans.Select(MapToDto).ToList();
         }
 
-        public async Task<Plan?> GetPlanByIdAsync(Guid id)
+        /// <summary>
+        /// Obtiene un plan por su identificador único.
+        /// </summary>
+        public async Task<PlanDto?> GetPlanByIdAsync(Guid id)
         {
-            return await _context.Plans.FirstOrDefaultAsync(p => p.Id == id);
+            var plan = await _planRepository.GetAsync(id);
+            return plan != null ? MapToDto(plan) : null;
         }
 
+        /// <summary>
+        /// Crea un nuevo plan de sorteo validando que no existan solapamientos de fechas.
+        /// </summary>
         public async Task CreatePlanAsync(Plan plan)
         {
-            // Overlap validation
-            var overlap = await _context.Plans.AnyAsync(p => 
+            // Validación de solapamiento
+            var overlap = await _planRepository.AnyAsync(p => 
                 (plan.EffectiveTo == null || p.EffectiveFrom <= plan.EffectiveTo) && 
                 (p.EffectiveTo == null || p.EffectiveTo >= plan.EffectiveFrom));
 
@@ -65,13 +59,15 @@ namespace LaPrimitiva.Application.Services
                 throw new InvalidOperationException("Ya existe un plan que se solapa con este periodo de fechas.");
             }
 
-            _context.Plans.Add(plan);
-            await _context.SaveChangesAsync();
+            await _planRepository.CreateAsync(plan);
         }
 
+        /// <summary>
+        /// Actualiza un plan existente.
+        /// </summary>
         public async Task UpdatePlanAsync(Plan plan)
         {
-            var overlap = await _context.Plans.AnyAsync(p => 
+            var overlap = await _planRepository.AnyAsync(p => 
                 p.Id != plan.Id &&
                 (plan.EffectiveTo == null || p.EffectiveFrom <= plan.EffectiveTo) && 
                 (p.EffectiveTo == null || p.EffectiveTo >= plan.EffectiveFrom));
@@ -81,33 +77,45 @@ namespace LaPrimitiva.Application.Services
                 throw new InvalidOperationException("Las nuevas fechas se solapan con otro plan existente.");
             }
 
-            plan.UpdatedAt = DateTime.UtcNow;
-            _context.Entry(plan).State = EntityState.Modified;
-            await _context.SaveChangesAsync();
+            await _planRepository.UpdateAsync(plan);
         }
 
+        /// <summary>
+        /// Elimina un plan si no tiene sorteos asociados.
+        /// </summary>
         public async Task DeletePlanAsync(Guid id)
         {
-            var hasDraws = await _context.DrawRecords.AnyAsync(d => d.PlanId == id);
+            var hasDraws = await _drawRepository.AnyAsync(d => d.PlanId == id);
             if (hasDraws)
             {
                 throw new InvalidOperationException("No se puede borrar un plan que ya tiene sorteos asociados.");
             }
 
-            var plan = await _context.Plans.FindAsync(id);
-            if (plan != null)
-            {
-                _context.Plans.Remove(plan);
-                await _context.SaveChangesAsync();
-            }
+            await _planRepository.DeleteAsync(id);
         }
 
-        public async Task<Plan?> GetPlanForDateAsync(DateTime date)
+        /// <summary>
+        /// Obtiene el plan vigente para una fecha concreta.
+        /// </summary>
+        public async Task<PlanDto?> GetPlanForDateAsync(DateTime date)
         {
-            return await _context.Plans
-                .Where(p => p.EffectiveFrom <= date && (p.EffectiveTo == null || p.EffectiveTo >= date))
-                .OrderByDescending(p => p.EffectiveFrom)
-                .FirstOrDefaultAsync();
+            var plan = await _planRepository.GetForDateAsync(date);
+            return plan != null ? MapToDto(plan) : null;
         }
+
+        private static PlanDto MapToDto(Plan p) => new()
+        {
+            Id = p.Id,
+            Name = p.Name,
+            EffectiveFrom = p.EffectiveFrom,
+            EffectiveTo = p.EffectiveTo,
+            CostPerBet = p.CostPerBet,
+            BetsPerDraw = p.BetsPerDraw,
+            EnableJoker = p.EnableJoker,
+            JokerCostPerBet = p.JokerCostPerBet,
+            FixedCombinationLabel = p.FixedCombinationLabel,
+            CreatedAt = p.CreatedAt,
+            HasDraws = p.Draws != null && p.Draws.Any()
+        };
     }
 }

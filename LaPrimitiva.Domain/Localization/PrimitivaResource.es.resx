@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="Plans" xml:space="preserve"><value>Planes</value></data>
+  <data name="PlanManagement" xml:space="preserve"><value>Gestión de Planes</value></data>
+  <data name="ConfigurePlanRules" xml:space="preserve"><value>Configura versiones de costes y reglas para el año</value></data>
+  <data name="NewPlan" xml:space="preserve"><value>Nuevo Plan</value></data>
+  <data name="CostPerBet" xml:space="preserve"><value>Coste por Apuesta</value></data>
+  <data name="BetsPerDraw" xml:space="preserve"><value>Apuestas/Sorteo</value></data>
+  <data name="JokerActive" xml:space="preserve"><value>Joker Activo</value></data>
+  <data name="JokerCost" xml:space="preserve"><value>Coste Joker</value></data>
+  <data name="FixedLabel" xml:space="preserve"><value>Etiqueta Fija</value></data>
+  <data name="Edit" xml:space="preserve"><value>Editar</value></data>
+  <data name="Delete" xml:space="preserve"><value>Borrar</value></data>
+  <data name="ViewDraws" xml:space="preserve"><value>Ver Sorteos</value></data>
+  <data name="GenerateDraws" xml:space="preserve"><value>Generar Sorteos</value></data>
+  <data name="Yes" xml:space="preserve"><value>SÍ</value></data>
+  <data name="No" xml:space="preserve"><value>NO</value></data>
+  <data name="Dashboard" xml:space="preserve"><value>Dashboard</value></data>
+  <data name="SummaryAndKPIs" xml:space="preserve"><value>Resumen y KPIs para el año</value></data>
+  <data name="TotalSpent" xml:space="preserve"><value>Total Gastado</value></data>
+  <data name="PlayedDraws" xml:space="preserve"><value>sorteos jugados</value></data>
+  <data name="TotalWon" xml:space="preserve"><value>Total Ganado</value></data>
+  <data name="WithPrize" xml:space="preserve"><value>con premio</value></data>
+  <data name="Net" xml:space="preserve"><value>Neto</value></data>
+  <data name="Effectiveness" xml:space="preserve"><value>Efectividad</value></data>
+  <data name="WinningDrawsDesc" xml:space="preserve"><value>Sorteos con premio</value></data>
+  <data name="Registration" xml:space="preserve"><value>Registro</value></data>
+  <data name="DrawRecordsForYear" xml:space="preserve"><value>Listado de sorteos para el año</value></data>
+  <data name="AddNewDraw" xml:space="preserve"><value>Alta Nuevo Sorteo</value></data>
+  <data name="Plan" xml:space="preserve"><value>Plan</value></data>
+  <data name="NoPlanExists" xml:space="preserve"><value>No existe plan</value></data>
+  <data name="Week" xml:space="preserve"><value>Semana</value></data>
+  <data name="DrawType" xml:space="preserve"><value>Sorteo</value></data>
+  <data name="Date" xml:space="preserve"><value>Fecha</value></data>
+  <data name="Notes" xml:space="preserve"><value>Notas</value></data>
+  <data name="Acumulado" xml:space="preserve"><value>Acumulado</value></data>
+  <data name="BreakdownByType" xml:space="preserve"><value>Desglose por Tipo</value></data>
+  <data name="FixedCombination" xml:space="preserve"><value>Combinación FIJA</value></data>
+  <data name="AutoCombination" xml:space="preserve"><value>Combinación AUTO</value></data>
+  <data name="Expense" xml:space="preserve"><value>Gasto</value></data>
+  <data name="Prize" xml:space="preserve"><value>Premio</value></data>
+  <data name="SelectedYear" xml:space="preserve"><value>AÑO SELECCIONADO</value></data>
+  <data name="Data" xml:space="preserve"><value>Datos</value></data>
+  <data name="AddNewWeeklyDrawTitle" xml:space="preserve"><value>Alta Nuevo Sorteo Semanal</value></data>
+  <data name="EditWeeklyDrawTitle" xml:space="preserve"><value>Editar Sorteo Semanal</value></data>
+  <data name="WeeklyDrawAuditSubtitle" xml:space="preserve"><value>Auditoría completa de resultados y costes.</value></data>
+  <data name="WeeklyDrawEditSubtitle" xml:space="preserve"><value>Modifica los resultados y costes registrados.</value></data>
+  <data name="WeekNumberLabel" xml:space="preserve"><value>Número de Semana</value></data>
+  <data name="LoadDataButton" xml:space="preserve"><value>Cargar Datos</value></data>
+  <data name="ActivePlanDetected" xml:space="preserve"><value>Plan Activo Detectado</value></data>
+  <data name="NewWeekConfigTitle" xml:space="preserve"><value>Configuración de Nueva Semana</value></data>
+  <data name="NewWeekConfigSubtitle" xml:space="preserve"><value>Define el plan y los días de sorteo para la semana</value></data>
+  <data name="SelectPlanLabel" xml:space="preserve"><value>Seleccionar Plan</value></data>
+  <data name="DrawDatesLabel" xml:space="preserve"><value>Fechas de Sorteos (Lunes, Jueves, Sábado)</value></data>
+  <data name="CreateAuditedTemplateButton" xml:space="preserve"><value>Crear Plantilla Auditada</value></data>
+  <data name="PlayedLabel" xml:space="preserve"><value>Jugado</value></data>
+  <data name="AuditedCostsTitle" xml:space="preserve"><value>Costes de apuestas Auditadas</value></data>
+  <data name="FixedCostLabel" xml:space="preserve"><value>Fija (€)</value></data>
+  <data name="AutoCostLabel" xml:space="preserve"><value>Automática (€)</value></data>
+  <data name="RegisteredPrizesTitle" xml:space="preserve"><value>Premios Registrados</value></data>
+  <data name="FixedPrizeLabel" xml:space="preserve"><value>Premio Fija (€)</value></data>
+  <data name="AutoPrizeLabel" xml:space="preserve"><value>Premio Auto (€)</value></data>
+  <data name="FinalResultsTitle" xml:space="preserve"><value>Resultados Finales</value></data>
+  <data name="TotalCostLabel" xml:space="preserve"><value>TOTAL COSTE</value></data>
+  <data name="TotalPrizesLabel" xml:space="preserve"><value>TOTAL PREMIOS</value></data>
+  <data name="NetDrawLabel" xml:space="preserve"><value>NETO SORTEO</value></data>
+  <data name="RemarksLabel" xml:space="preserve"><value>Observaciones</value></data>
+  <data name="RemarksPlaceholder" xml:space="preserve"><value>Añade notas de auditoría aquí...</value></data>
+  <data name="CancelButton" xml:space="preserve"><value>Cancelar</value></data>
+  <data name="DeleteButton" xml:space="preserve"><value>Eliminar</value></data>
+  <data name="SaveAuditedWeekButton" xml:space="preserve"><value>Guardar Semana Auditada</value></data>
+  <data name="DeleteWeekConfirmTitle" xml:space="preserve"><value>¿Eliminar Semana?</value></data>
+  <data name="DeleteWeekWarningText" xml:space="preserve"><value>Estás a punto de eliminar todos los registros de sorteos asociados a la semana</value></data>
+  <data name="NoUndoWarning" xml:space="preserve"><value>Esta acción no se puede deshacer.</value></data>
+  <data name="ConfirmDeleteButton" xml:space="preserve"><value>Sí, Eliminar</value></data>
+  <data name="EnterWeekNumberPrompt" xml:space="preserve"><value>Introduce un número de semana</value></data>
+  <data name="ClickLoadDataPrompt" xml:space="preserve"><value>Pulsa en "Cargar Datos" para auditar los sorteos.</value></data>
+</root>

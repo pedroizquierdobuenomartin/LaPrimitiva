@@ -1,19 +1,22 @@
 ﻿@page "/"
 @using LaPrimitiva.Application.Services
-@using LaPrimitiva.Infrastructure.Persistence
+@using LaPrimitiva.Application.DTOs
+@using LaPrimitiva.Domain.Repositories
+@using LaPrimitiva.Domain.Localization
 @using LaPrimitiva.App.Components.Shared
-@using Microsoft.EntityFrameworkCore
-@inject PrimitivaDbContext Db
+@using Microsoft.Extensions.Localization
+@inject IDrawRepository DrawRepository
 @inject SummaryService SummaryService
 @inject GlobalState GlobalState
+@inject IStringLocalizer<PrimitivaResource> L
 @implements IDisposable
 
-<PageTitle>Dashboard - La Primitiva Audit</PageTitle>
+<PageTitle>@L["Dashboard"] - La Primitiva Audit</PageTitle>
 
 <div class="space-y-8">
     <div class="flex flex-col gap-2">
-        <h2 class="text-3xl font-extrabold text-slate-900">Dashboard</h2>
-        <p class="text-slate-500">Resumen y KPIs para el año @GlobalState.SelectedYear.</p>
+        <h2 class="text-3xl font-extrabold text-slate-900">@L["Dashboard"]</h2>
+        <p class="text-slate-500">@L["SummaryAndKPIs"] @GlobalState.SelectedYear.</p>
     </div>
 
     @if (summary == null)
@@ -26,10 +29,10 @@
     {
         <!-- KPI Row -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <KpiCard Title="Total Gastado" Value="@($"{summary.TotalSpent:N2}€")" SubValue="@($"{summary.PlayedDraws} sorteos jugados")" />
-            <KpiCard Title="Total Ganado" Value="@($"{summary.TotalWon:N2}€")" SubValue="@($"{summary.WinningDraws} con premio")" IsPositive="true" />
-            <KpiCard Title="Neto" Value="@($"{summary.NetResult:N2}€")" SubValue="@($"{summary.ROI:N1}% ROI")" IsPositive="@(summary.NetResult >= 0)" />
-            <KpiCard Title="Efectividad" Value="@($"{summary.WinningPercentage:N1}%")" SubValue="Sorteos con premio" IsPositive="true" />
+            <KpiCard Title="@L["TotalSpent"]" Value="@($"{summary.TotalSpent:N2}€")" SubValue="@($"{summary.PlayedDraws} {L["PlayedDraws"]}")" />
+            <KpiCard Title="@L["TotalWon"]" Value="@($"{summary.TotalWon:N2}€")" SubValue="@($"{summary.WinningDraws} {L["WithPrize"]}")" IsPositive="true" />
+            <KpiCard Title="@L["Net"]" Value="@($"{summary.NetResult:N2}€")" SubValue="@($"{summary.ROI:N1}% ROI")" IsPositive="@(summary.NetResult >= 0)" />
+            <KpiCard Title="@L["Effectiveness"]" Value="@($"{summary.WinningPercentage:N1}%")" SubValue="@L["WinningDrawsDesc"]" IsPositive="true" />
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -44,11 +47,11 @@
 
             <!-- Breakdown -->
             <div class="bg-white p-8 rounded-2xl border border-slate-100 shadow-sm">
-                <h3 class="text-lg font-bold text-slate-900 mb-6 border-b border-slate-50 pb-4">Desglose por Tipo</h3>
+                <h3 class="text-lg font-bold text-slate-900 mb-6 border-b border-slate-50 pb-4">@L["BreakdownByType"]</h3>
                 <div class="space-y-6">
                     <div>
                         <div class="flex justify-between text-sm mb-2">
-                            <span class="font-semibold text-slate-700">Combinación FIJA</span>
+                            <span class="font-semibold text-slate-700">@L["FixedCombination"]</span>
                             <span class="@(summary.FixedWon - summary.FixedSpent >= 0 ? "text-emerald-600" : "text-rose-600") font-bold">
                                 @((summary.FixedWon - summary.FixedSpent).ToString("N2"))€
                             </span>
@@ -57,13 +60,13 @@
                             <div class="bg-blue-600 h-2 rounded-full" style="width: @(GetBarWidth(summary.FixedWon, summary.TotalWon))%"></div>
                         </div>
                         <div class="flex justify-between text-xs text-slate-400 mt-1">
-                            <span>Gasto: @summary.FixedSpent.ToString("N2")€</span>
-                            <span>Premio: @summary.FixedWon.ToString("N2")€</span>
+                            <span>@L["Expense"]: @summary.FixedSpent.ToString("N2")€</span>
+                            <span>@L["Prize"]: @summary.FixedWon.ToString("N2")€</span>
                         </div>
                     </div>
                     <div>
                         <div class="flex justify-between text-sm mb-2">
-                            <span class="font-semibold text-slate-700">Combinación AUTO</span>
+                            <span class="font-semibold text-slate-700">@L["AutoCombination"]</span>
                             <span class="@(summary.AutoWon - summary.AutoSpent >= 0 ? "text-emerald-600" : "text-rose-600") font-bold">
                                 @((summary.AutoWon - summary.AutoSpent).ToString("N2"))€
                             </span>
@@ -72,8 +75,8 @@
                             <div class="bg-indigo-600 h-2 rounded-full" style="width: @(GetBarWidth(summary.AutoWon, summary.TotalWon))%"></div>
                         </div>
                         <div class="flex justify-between text-xs text-slate-400 mt-1">
-                            <span>Gasto: @summary.AutoSpent.ToString("N2")€</span>
-                            <span>Premio: @summary.AutoWon.ToString("N2")€</span>
+                            <span>@L["Expense"]: @summary.AutoSpent.ToString("N2")€</span>
+                            <span>@L["Prize"]: @summary.AutoWon.ToString("N2")€</span>
                         </div>
                     </div>
                 </div>
@@ -93,17 +96,25 @@
 
     private async void HandleStateChange()
     {
-        await LoadData();
-        StateHasChanged();
+        await InvokeAsync(async () => 
+        {
+            try 
+            {
+                await LoadData();
+            }
+            finally 
+            {
+                StateHasChanged();
+            }
+        });
     }
 
     private async Task LoadData()
     {
         var year = GlobalState.SelectedYear;
-        var draws = await Db.DrawRecords
-            .Include(d => d.Plan)
-            .Where(d => d.DrawDate.Year == year)
-            .ToListAsync();
+        // In a real app we would Include(d => d.Plan) if needed, 
+        // but SummaryService only needs the draw values.
+        var draws = await DrawRepository.GetListAsync(d => d.DrawDate.Year == year);
             
         summary = SummaryService.GetSummary(draws);
     }

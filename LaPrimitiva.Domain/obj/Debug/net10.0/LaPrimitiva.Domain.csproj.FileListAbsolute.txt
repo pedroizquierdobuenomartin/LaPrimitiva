@@ -10,3 +10,8 @@ F:\Repositorios\LaPrimitiva\LaPrimitiva.Domain\obj\Debug\net10.0\LaPrimitiva.Dom
 F:\Repositorios\LaPrimitiva\LaPrimitiva.Domain\obj\Debug\net10.0\refint\LaPrimitiva.Domain.dll
 F:\Repositorios\LaPrimitiva\LaPrimitiva.Domain\obj\Debug\net10.0\LaPrimitiva.Domain.pdb
 F:\Repositorios\LaPrimitiva\LaPrimitiva.Domain\obj\Debug\net10.0\ref\LaPrimitiva.Domain.dll
+F:\Repositorios\LaPrimitiva\LaPrimitiva.Domain\bin\Debug\net10.0\es\LaPrimitiva.Domain.resources.dll
+F:\Repositorios\LaPrimitiva\LaPrimitiva.Domain\obj\Debug\net10.0\LaPrimitiva.Domain.Localization.PrimitivaResource.es.resources
+F:\Repositorios\LaPrimitiva\LaPrimitiva.Domain\obj\Debug\net10.0\LaPrimitiva.Domain.csproj.GenerateResource.cache
+F:\Repositorios\LaPrimitiva\LaPrimitiva.Domain\obj\Debug\net10.0\es\LaPrimitiva.Domain.resources.cs
+F:\Repositorios\LaPrimitiva\LaPrimitiva.Domain\obj\Debug\net10.0\es\LaPrimitiva.Domain.resources.dll

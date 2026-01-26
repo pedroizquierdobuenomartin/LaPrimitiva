@@ -1,8 +1,10 @@
-using LaPrimitiva.App.Components;
-using LaPrimitiva.Application.Services;
-using LaPrimitiva.Application.Interfaces;
+using LaPrimitiva.Domain.Repositories;
+using LaPrimitiva.Infrastructure.Repositories;
 using LaPrimitiva.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
+using LaPrimitiva.Application.Services;
+using LaPrimitiva.Application.Interfaces;
+using LaPrimitiva.App.Components;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,9 +12,15 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
+builder.Services.AddLocalization();
+
 // Register DbContext
 builder.Services.AddDbContext<PrimitivaDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+// Register Repositories
+builder.Services.AddScoped<IPlanRepository, PlanRepository>();
+builder.Services.AddScoped<IDrawRepository, DrawRepository>();
 
 // Register Application Services
 builder.Services.AddScoped<PlanService>();
@@ -69,3 +77,4 @@ using (var scope = app.Services.CreateScope())
 }
 
 app.Run();
+namespace LaPrimitiva.App { public partial class Program { } }

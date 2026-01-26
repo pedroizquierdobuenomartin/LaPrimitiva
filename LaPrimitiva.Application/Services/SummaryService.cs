@@ -6,8 +6,14 @@ using LaPrimitiva.Domain.Entities;
 
 namespace LaPrimitiva.Application.Services
 {
+    /// <summary>
+    /// Servicio para calcular resúmenes y estadísticas de los sorteos.
+    /// </summary>
     public class SummaryService
     {
+        /// <summary>
+        /// Calcula el resumen global de una lista de sorteos.
+        /// </summary>
         public SummaryDto GetSummary(IEnumerable<DrawRecord> draws)
         {
             var summary = new SummaryDto();

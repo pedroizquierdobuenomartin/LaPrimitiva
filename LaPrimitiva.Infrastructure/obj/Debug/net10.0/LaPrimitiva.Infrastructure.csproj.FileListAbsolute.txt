@@ -62,3 +62,4 @@ F:\Repositorios\LaPrimitiva\LaPrimitiva.Infrastructure\obj\Debug\net10.0\refint\
 F:\Repositorios\LaPrimitiva\LaPrimitiva.Infrastructure\obj\Debug\net10.0\LaPrimitiva.Infrastructure.pdb
 F:\Repositorios\LaPrimitiva\LaPrimitiva.Infrastructure\obj\Debug\net10.0\LaPrimitiva.Infrastructure.genruntimeconfig.cache
 F:\Repositorios\LaPrimitiva\LaPrimitiva.Infrastructure\obj\Debug\net10.0\ref\LaPrimitiva.Infrastructure.dll
+F:\Repositorios\LaPrimitiva\LaPrimitiva.Infrastructure\bin\Debug\net10.0\es\LaPrimitiva.Domain.resources.dll

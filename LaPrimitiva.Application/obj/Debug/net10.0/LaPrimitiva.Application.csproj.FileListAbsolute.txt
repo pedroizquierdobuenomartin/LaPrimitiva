@@ -62,3 +62,4 @@ F:\Repositorios\LaPrimitiva\LaPrimitiva.Application\obj\Debug\net10.0\LaPrimitiv
 F:\Repositorios\LaPrimitiva\LaPrimitiva.Application\obj\Debug\net10.0\refint\LaPrimitiva.Application.dll
 F:\Repositorios\LaPrimitiva\LaPrimitiva.Application\obj\Debug\net10.0\LaPrimitiva.Application.pdb
 F:\Repositorios\LaPrimitiva\LaPrimitiva.Application\obj\Debug\net10.0\ref\LaPrimitiva.Application.dll
+F:\Repositorios\LaPrimitiva\LaPrimitiva.Application\bin\Debug\net10.0\es\LaPrimitiva.Domain.resources.dll

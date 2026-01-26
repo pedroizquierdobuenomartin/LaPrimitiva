@@ -9,6 +9,7 @@
 
   <ItemGroup>
     <PackageReference Include="coverlet.collector" Version="6.0.4" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="10.0.1" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="10.0.1" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
     <PackageReference Include="Moq" Version="4.20.72" />
@@ -24,6 +25,7 @@
     <ProjectReference Include="..\LaPrimitiva.Application\LaPrimitiva.Application.csproj" />
     <ProjectReference Include="..\LaPrimitiva.Infrastructure\LaPrimitiva.Infrastructure.csproj" />
     <ProjectReference Include="..\LaPrimitiva.Domain\LaPrimitiva.Domain.csproj" />
+    <ProjectReference Include="..\LaPrimitiva.App\LaPrimitiva.App.csproj" />
   </ItemGroup>
 
 </Project>

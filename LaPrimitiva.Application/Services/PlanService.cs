@@ -66,6 +66,11 @@ namespace LaPrimitiva.Application.Services
         /// </summary>
         public async Task CreatePlanAsync(Plan plan)
         {
+            if (string.IsNullOrWhiteSpace(plan.Name))
+            {
+                throw new InvalidOperationException("El nombre del plan no puede estar vacío.");
+            }
+
             // Validación de solapamiento
             var overlap = await _planRepository.AnyAsync(p => 
                 (plan.EffectiveTo == null || p.EffectiveFrom <= plan.EffectiveTo) && 
@@ -84,6 +89,11 @@ namespace LaPrimitiva.Application.Services
         /// </summary>
         public async Task UpdatePlanAsync(Plan plan)
         {
+            if (string.IsNullOrWhiteSpace(plan.Name))
+            {
+                throw new InvalidOperationException("El nombre del plan no puede estar vacío.");
+            }
+
             var overlap = await _planRepository.AnyAsync(p => 
                 p.Id != plan.Id &&
                 (plan.EffectiveTo == null || p.EffectiveFrom <= plan.EffectiveTo) && 
@@ -167,7 +177,10 @@ namespace LaPrimitiva.Application.Services
             JokerCostPerBet = p.JokerCostPerBet,
             FixedCombinationLabel = p.FixedCombinationLabel,
             CreatedAt = p.CreatedAt,
-            HasDraws = p.Draws != null && p.Draws.Any()
+            HasDraws = p.Draws != null && p.Draws.Any(),
+            TotalDraws = p.Draws?.Count ?? 0,
+            ActiveDraws = p.Draws?.Count(d => d.Played) ?? 0,
+            InactiveDraws = p.Draws?.Count(d => !d.Played) ?? 0
         };
     }
 }

@@ -16,5 +16,8 @@ namespace LaPrimitiva.Application.DTOs
         public DateTime CreatedAt { get; init; }
         public bool HasDraws { get; init; }
         public bool HasOverlap { get; init; }
+        public int TotalDraws { get; init; }
+        public int ActiveDraws { get; init; }
+        public int InactiveDraws { get; init; }
     }
 }

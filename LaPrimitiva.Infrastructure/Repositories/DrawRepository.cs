@@ -35,6 +35,18 @@ namespace LaPrimitiva.Infrastructure.Repositories
             await _context.SaveChangesAsync();
         }
 
+        public async Task UpdateAsync(DrawRecord draw)
+        {
+            _context.DrawRecords.Update(draw);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task UpdateRangeAsync(IEnumerable<DrawRecord> draws)
+        {
+            _context.DrawRecords.UpdateRange(draws);
+            await _context.SaveChangesAsync();
+        }
+
         public async Task DeleteAsync(Guid id)
         {
             await _context.DrawRecords

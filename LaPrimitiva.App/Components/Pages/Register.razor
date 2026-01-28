@@ -210,8 +210,8 @@
                     <div class="bg-white rounded-[3rem] border border-slate-100 shadow-sm p-12">
                         <div class="max-w-4xl mx-auto space-y-10">
                             <div class="text-center">
-                                <h4 class="text-2xl font-black text-slate-900 uppercase tracking-tighter">@L["NewWeekConfigTitle"]</h4>
-                                <p class="text-slate-400 font-medium mt-1">@L["NewWeekConfigSubtitle"] @modalWeek.</p>
+                                <h4 class="text-2xl font-black text-slate-900 uppercase tracking-tighter">Configuración de la Semana</h4>
+                                <p class="text-slate-400 font-medium mt-1">Selecciona el plan y los sorteos que se han jugado en la semana @modalWeek.</p>
                             </div>
 
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
@@ -223,33 +223,55 @@
                                         {
                                             @foreach (var plan in allPlans)
                                             {
-                                                <option value="@plan.Id">@plan.Name (@plan.BetsPerDraw Bets)</option>
+                                                <option value="@plan.Id">@plan.Name (@plan.BetsPerDraw Apuestas)</option>
                                             }
                                         }
                                     </select>
                                 </div>
 
-                                <!-- Dates Selection -->
+                                <!-- Custom Draw Addition -->
                                 <div class="space-y-4">
-                                    <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">@L["DrawDatesLabel"]</label>
-                                    <div class="space-y-3">
-                                        @for (int i = 0; i < 3; i++)
-                                        {
-                                            int idx = i;
-                                            <div class="flex items-center gap-3">
-                                                <input type="date" @bind="newDrawDates[idx]" class="flex-1 bg-slate-50 border-none rounded-xl p-3 text-sm font-bold text-slate-700 focus:ring-2 focus:ring-blue-500/20" />
-                                                @if (newDrawDates[idx] is DateTime dateValue)
-                                                {
-                                                    <span class="text-[10px] font-black text-blue-600 uppercase w-20">@GetDrawType(dateValue)</span>
-                                                }
-                                            </div>
-                                        }
+                                    <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Añadir Sorteos Individuales</label>
+                                    <div class="flex flex-wrap gap-2">
+                                        <button @onclick='() => AddDrawTemplate(DayOfWeek.Monday)' class="bg-blue-50 text-blue-600 px-4 py-2 rounded-xl text-xs font-black uppercase hover:bg-blue-100 transition-colors">+ Lunes</button>
+                                        <button @onclick='() => AddDrawTemplate(DayOfWeek.Thursday)' class="bg-blue-50 text-blue-600 px-4 py-2 rounded-xl text-xs font-black uppercase hover:bg-blue-100 transition-colors">+ Jueves</button>
+                                        <button @onclick='() => AddDrawTemplate(DayOfWeek.Saturday)' class="bg-blue-50 text-blue-600 px-4 py-2 rounded-xl text-xs font-black uppercase hover:bg-blue-100 transition-colors">+ Sábado</button>
                                     </div>
+                                    
+                                    @if (tempModalDraws.Any())
+                                    {
+                                        <div class="mt-4 space-y-2">
+                                            @foreach (var d in tempModalDraws)
+                                            {
+                                                <div class="bg-white border border-slate-100 p-3 rounded-xl flex justify-between items-center shadow-sm">
+                                                    <div>
+                                                        <span class="text-xs font-black text-slate-900">@d.DrawType</span>
+                                                        <span class="text-[10px] text-slate-400 ml-2">@d.DrawDate.ToString("dd/MM/yyyy")</span>
+                                                    </div>
+                                                    <button @onclick="() => tempModalDraws.Remove(d)" class="text-rose-500 hover:bg-rose-50 p-1.5 rounded-lg transition-colors">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                                        </svg>
+                                                    </button>
+                                                </div>
+                                            }
+                                        </div>
+                                    }
                                 </div>
                             </div>
 
+                            @if (!string.IsNullOrEmpty(modalErrorMessage))
+                            {
+                                <div class="p-4 bg-rose-50 border border-rose-100 rounded-2xl flex gap-3 items-center animate-in slide-in-from-top-2">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-rose-500 shrink-0" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                                    </svg>
+                                    <p class="text-xs font-bold text-rose-700">@modalErrorMessage</p>
+                                </div>
+                            }
+
                             <div class="pt-6 flex justify-center">
-                                <button @onclick="PrepareNewWeek" class="bg-blue-600 text-white px-10 py-4 rounded-2xl font-black uppercase tracking-widest shadow-xl shadow-blue-200 hover:bg-blue-700 transition-all flex items-center gap-3">
+                                <button @onclick="PrepareNewWeek" disabled="@(!tempModalDraws.Any())" class="bg-blue-600 text-white px-10 py-4 rounded-2xl font-black uppercase tracking-widest shadow-xl shadow-blue-200 hover:bg-blue-700 transition-all flex items-center gap-3 disabled:opacity-30">
                                     @L["CreateAuditedTemplateButton"]
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                                         <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-8.707l-3-3a1 1 0 00-1.414 1.414L10.586 9H7a1 1 0 100 2h3.586l-1.293 1.293a1 1 0 101.414 1.414l3-3a1 1 0 000-1.414z" clip-rule="evenodd" />
@@ -335,6 +357,16 @@
                                 </div>
                             </div>
                         }
+
+                        @if (!string.IsNullOrEmpty(modalErrorMessage))
+                        {
+                            <div class="p-4 bg-rose-50 border border-rose-100 rounded-2xl flex gap-3 items-center animate-in slide-in-from-top-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-rose-500 shrink-0" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                                </svg>
+                                <p class="text-xs font-bold text-rose-700">@modalErrorMessage</p>
+                            </div>
+                        }
                     </div>
                 }
                 else
@@ -418,7 +450,8 @@
     private bool isNewRegistration = false;
     private List<Plan>? allPlans;
     private Guid? selectedPlanId;
-    private DateTime?[] newDrawDates = new DateTime?[3];
+    private List<DrawRecord> tempModalDraws = new();
+    private string? modalErrorMessage;
     private bool _isLoading;
     
     // Delete Confirmation State
@@ -442,12 +475,15 @@
 
     private int GetCurrentWeekNumber()
     {
-        // Simple week calc for 2026 or current year
+        var year = GlobalState.SelectedYear;
         var now = DateTime.Now;
-        var start = new DateTime(now.Year, 1, 1);
+        var referenceDate = now.Year == year ? now : new DateTime(year, 1, 1);
+        
+        var start = new DateTime(year, 1, 1);
         while (start.DayOfWeek != DayOfWeek.Monday) start = start.AddDays(1);
-        if (now < start) return 1;
-        return ((now - start).Days / 7) + 1;
+        
+        if (referenceDate < start) return 1;
+        return ((referenceDate - start).Days / 7) + 1;
     }
 
     private async void HandleStateChange()
@@ -563,11 +599,14 @@
     {
         if (forceDefaults)
         {
-            // Snapshot audit fields
-            draw.CosteFija = draw.Played ? draw.Plan.CostPerBet : 0;
-            draw.CosteAuto = draw.Played ? draw.Plan.CostPerBet : 0;
-            draw.CosteJokerFija = (draw.Played && draw.Plan.EnableJoker) ? draw.Plan.JokerCostPerBet : 0;
-            draw.CosteJokerAuto = (draw.Played && draw.Plan.EnableJoker) ? draw.Plan.JokerCostPerBet : 0;
+            // Snapshot audit fields - only if Plan is available
+            if (draw.Plan != null)
+            {
+                draw.CosteFija = draw.Played ? draw.Plan.CostPerBet : 0;
+                draw.CosteAuto = draw.Played ? draw.Plan.CostPerBet : 0;
+                draw.CosteJokerFija = (draw.Played && draw.Plan.EnableJoker) ? draw.Plan.JokerCostPerBet : 0;
+                draw.CosteJokerAuto = (draw.Played && draw.Plan.EnableJoker) ? draw.Plan.JokerCostPerBet : 0;
+            }
         }
 
         if (!draw.Played)
@@ -590,7 +629,8 @@
         modalWeek = GetCurrentWeekNumber();
         modalDraws = null;
         selectedPlanId = allPlans?.FirstOrDefault()?.Id;
-        newDrawDates = new DateTime?[3];
+        tempModalDraws.Clear();
+        modalErrorMessage = null;
         showModal = true;
     }
 
@@ -598,6 +638,7 @@
     {
         isNewRegistration = false;
         modalWeek = draw.WeekNumber;
+        modalErrorMessage = null;
         showModal = true;
         await LoadWeekDataInModal();
     }
@@ -606,6 +647,7 @@
     {
         if (modalWeek <= 0) return;
         
+        modalErrorMessage = null;
         isModalLoading = true;
         StateHasChanged();
 
@@ -644,30 +686,55 @@
 
     private void PrepareNewWeek()
     {
+        if (!tempModalDraws.Any()) return;
+        
+        modalDraws = new List<DrawRecord>(tempModalDraws);
+        // tempModalDraws are already configured with plan and dates
+    }
+
+    private void AddDrawTemplate(DayOfWeek day)
+    {
         if (selectedPlanId == null || allPlans == null) return;
         var plan = allPlans.FirstOrDefault(p => p.Id == selectedPlanId);
         if (plan == null) return;
 
-        modalPlan = plan;
-        modalDraws = new List<DrawRecord>();
-        foreach (var date in newDrawDates)
+        var year = GlobalState.SelectedYear;
+        var date = GetDateForWeekAndDay(year, modalWeek, day);
+        
+        if (tempModalDraws.Any(d => d.DrawDate.Date == date.Date))
         {
-            if (date.HasValue)
-            {
-                var draw = new DrawRecord
-                {
-                    WeekNumber = modalWeek,
-                    DrawDate = date.Value,
-                    DrawType = GetDrawType(date.Value),
-                    PlanId = plan.Id,
-                    Plan = plan,
-                    CreatedAt = DateTime.UtcNow,
-                    UpdatedAt = DateTime.UtcNow
-                };
-                RecalculateDraw(draw);
-                modalDraws.Add(draw);
-            }
+            modalErrorMessage = $"Ya has añadido un sorteo para el {date:dd/MM/yyyy}.";
+            return;
         }
+
+        modalErrorMessage = null;
+        var draw = new DrawRecord
+        {
+            Id = Guid.Empty, // Explicitly set to empty for new draws
+            WeekNumber = modalWeek,
+            DrawDate = date,
+            DrawType = GetDrawType(date),
+            PlanId = plan.Id,
+            Plan = plan,
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow
+        };
+        RecalculateDraw(draw);
+        tempModalDraws.Add(draw);
+    }
+
+    private DateTime GetDateForWeekAndDay(int year, int week, DayOfWeek day)
+    {
+        var startOfYear = new DateTime(year, 1, 1);
+        var firstMonday = startOfYear;
+        while (firstMonday.DayOfWeek != DayOfWeek.Monday) firstMonday = firstMonday.AddDays(1);
+        
+        var targetDate = firstMonday.AddDays((week - 1) * 7);
+        // If the target day is earlier in the week than Monday (not possible in .NET as Monday=1), 
+        // but let's be safe and adjust to the correct day of that week.
+        while (targetDate.DayOfWeek != day) targetDate = targetDate.AddDays(1);
+        
+        return targetDate;
     }
 
     private DrawType GetDrawType(DateTime date)
@@ -690,29 +757,63 @@
     {
         if (modalDraws == null) return;
 
-        foreach (var draw in modalDraws)
+        try 
         {
-            RecalculateDraw(draw);
-            draw.UpdatedAt = DateTime.UtcNow;
+            modalErrorMessage = null;
             
-            // Decouple related Plan to avoid "Plan instance already tracked" error 
-            draw.Plan = null!; 
-            
-            var existing = await DrawRepository.AnyAsync(d => d.Id == draw.Id);
-            if (!existing)
+            // Validate all draws before saving anything
+            foreach (var draw in modalDraws)
             {
-                await DrawRepository.CreateRangeAsync(new[] { draw });
+                await DrawService.ValidateDrawAsync(draw.PlanId, draw.DrawDate, draw.Id != Guid.Empty ? draw.Id : null);
             }
-            else
-            {
-                // Update implementation in repo or use a SaveChanges
-                await DrawRepository.SaveChangesAsync();
-            }
-        }
 
-        showModal = false;
-        await LoadData();
-        StateHasChanged();
+            // Separate new and existing
+            var newDraws = new List<DrawRecord>();
+            var existingDraws = new List<DrawRecord>();
+
+            foreach (var draw in modalDraws)
+            {
+                RecalculateDraw(draw);
+                draw.UpdatedAt = DateTime.UtcNow;
+                
+                // Decouple related Plan to avoid "Plan instance already tracked" error 
+                var planRef = draw.Plan;
+                draw.Plan = null!; 
+
+                if (draw.Id == Guid.Empty)
+                {
+                    newDraws.Add(draw);
+                }
+                else
+                {
+                    existingDraws.Add(draw);
+                }
+            }
+
+            // Batch insert new
+            if (newDraws.Any())
+            {
+                await DrawRepository.CreateRangeAsync(newDraws);
+            }
+
+            // Batch update existing
+            if (existingDraws.Any())
+            {
+                await DrawRepository.UpdateRangeAsync(existingDraws);
+            }
+
+            showModal = false;
+            await LoadData();
+            StateHasChanged();
+        }
+        catch (InvalidOperationException ex)
+        {
+            modalErrorMessage = ex.Message;
+        }
+        catch (Exception)
+        {
+            modalErrorMessage = "Ha ocurrido un error inesperado al guardar los cambios.";
+        }
     }
 
     private void ConfirmDeleteWeek(int week, int year, Guid planId)

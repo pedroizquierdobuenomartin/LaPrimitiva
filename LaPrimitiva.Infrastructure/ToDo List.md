@@ -1,2 +1,1 @@
 - [ ] Mejorar Look & Feel
-- [ ] Sorteo: Solo permitir configurar sorteos en el plan activo y no mostrar la configuración de la semana si ya existen sorteos para esa semana.

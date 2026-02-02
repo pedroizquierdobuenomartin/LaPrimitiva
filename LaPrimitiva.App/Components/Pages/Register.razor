@@ -178,7 +178,7 @@
                     <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 flex-1 min-w-[200px]">
                         <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3">@L["WeekNumberLabel"]</label>
                         <div class="flex items-center gap-4">
-                            <input type="number" @bind="modalWeek" class="w-24 text-3xl font-black text-blue-600 bg-transparent border-none p-0 focus:ring-0" />
+                            <input type="number" @bind="modalWeek" disabled="@(!isNewRegistration)" class="w-24 text-3xl font-black @(isNewRegistration ? "text-blue-600" : "text-slate-400") bg-transparent border-none p-0 focus:ring-0" />
                             @if (isNewRegistration)
                             {
                                 <button @onclick="LoadWeekDataInModal" class="text-xs font-bold text-blue-600 hover:text-blue-700 flex items-center gap-1 group">

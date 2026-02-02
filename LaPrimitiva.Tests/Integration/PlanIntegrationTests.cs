@@ -12,9 +12,9 @@ using Xunit;
 
 namespace LaPrimitiva.Tests.Integration
 {
-    public class PlanIntegrationTests : IntegrationTestBase
+    public class PlanIntegrationTests : IntegrationTestBase, IClassFixture<WebApplicationFactory<LaPrimitiva.App.Program>>
     {
-        public PlanIntegrationTests(WebApplicationFactory<Program> factory) : base(factory)
+        public PlanIntegrationTests(WebApplicationFactory<LaPrimitiva.App.Program> factory) : base(factory)
         {
         }
 

@@ -611,6 +611,11 @@
 
         if (!draw.Played)
         {
+            // When not played, reset ALL costs and prizes to zero
+            draw.CosteFija = 0;
+            draw.CosteAuto = 0;
+            draw.CosteJokerFija = 0;
+            draw.CosteJokerAuto = 0;
             draw.FixedPrize = 0;
             draw.AutoPrize = 0;
             draw.JokerFixedPrize = 0;

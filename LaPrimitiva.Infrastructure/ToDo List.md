@@ -9,7 +9,7 @@
 - [X] Plan: No debe dejar de guardar el plan si el nombre está vacío
 - [X] Sorteo: Botón de eliminar sorteo semanal
 - [X] Sorteo: El título del popup debe cambiar según sea nuevo o edición
-- [ ] Sorteo: No añadir un sorteo si ya existe uno para la fecha
+- [X] Sorteo: No añadir un sorteo si ya existe uno para la fecha
 - [X] Sorteo: No añadir un sorteo si está fuera del plan seleccionado
 - [X] Sorteo: Al dar de alta el sorteo semanal, la semana debe calcularse automáticamente según el año
-- [ ] Sorteo: Poder añadir/borrar un sorteo individual de la semana. La fecha debe aparecer automáticamente según el año, y semana (lunes, jueves o sábado)
+- [X] Sorteo: Poder añadir/borrar un sorteo individual de la semana. La fecha debe aparecer automáticamente según el año, y semana (lunes, jueves o sábado)

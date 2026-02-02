@@ -33,18 +33,35 @@ namespace LaPrimitiva.Infrastructure.Repositories
         {
             await _context.DrawRecords.AddRangeAsync(draws);
             await _context.SaveChangesAsync();
+            _context.ChangeTracker.Clear();
         }
 
         public async Task UpdateAsync(DrawRecord draw)
         {
+            var tracked = _context.DrawRecords.Local.FirstOrDefault(e => e.Id == draw.Id);
+            if (tracked != null)
+            {
+                _context.Entry(tracked).State = EntityState.Detached;
+            }
+
             _context.DrawRecords.Update(draw);
             await _context.SaveChangesAsync();
         }
 
         public async Task UpdateRangeAsync(IEnumerable<DrawRecord> draws)
         {
+            foreach (var draw in draws)
+            {
+                var tracked = _context.DrawRecords.Local.FirstOrDefault(e => e.Id == draw.Id);
+                if (tracked != null)
+                {
+                    _context.Entry(tracked).State = EntityState.Detached;
+                }
+            }
+
             _context.DrawRecords.UpdateRange(draws);
             await _context.SaveChangesAsync();
+            _context.ChangeTracker.Clear();
         }
 
         public async Task DeleteAsync(Guid id)

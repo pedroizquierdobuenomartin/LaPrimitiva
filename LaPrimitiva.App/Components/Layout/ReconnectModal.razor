@@ -1,4 +1,7 @@
-﻿<script type="module" src="@Assets["Components/Layout/ReconnectModal.razor.js"]"></script>
+﻿@using Microsoft.Extensions.Options
+@using LaPrimitiva.App.Models
+@inject IOptionsSnapshot<ReconnectionLabels> Labels
+<script type="module" src="@Assets["Components/Layout/ReconnectModal.razor.js"]"></script>
 
 <dialog id="components-reconnect-modal" data-nosnippet>
     <div class="components-reconnect-container">
@@ -7,25 +10,25 @@
             <div></div>
         </div>
         <p class="components-reconnect-first-attempt-visible">
-            Rejoining the server...
+            @Labels.Value.Rejoining
         </p>
         <p class="components-reconnect-repeated-attempt-visible">
-            Rejoin failed... trying again in <span id="components-seconds-to-next-attempt"></span> seconds.
+            @((MarkupString)string.Format(Labels.Value.RejoinFailed, "<span id=\"components-seconds-to-next-attempt\"></span>"))
         </p>
         <p class="components-reconnect-failed-visible">
-            Failed to rejoin.<br />Please retry or reload the page.
+            @((MarkupString)Labels.Value.FailedToRejoin)
         </p>
-        <button id="components-reconnect-button" class="components-reconnect-failed-visible">
-            Retry
+        <button id="components-reconnect-button" class="components-reconnect-failed-visible text-white bg-blue-600 hover:bg-blue-700 font-medium rounded-lg text-sm px-5 py-2.5 text-center">
+            @Labels.Value.Retry
         </button>
         <p class="components-pause-visible">
-            The session has been paused by the server.
+            @Labels.Value.SessionPaused
         </p>
-        <button id="components-resume-button" class="components-pause-visible">
-            Resume
+        <button id="components-resume-button" class="components-pause-visible text-white bg-blue-600 hover:bg-blue-700 font-medium rounded-lg text-sm px-5 py-2.5 text-center">
+            @Labels.Value.Resume
         </button>
         <p class="components-resume-failed-visible">
-            Failed to resume the session.<br />Please reload the page.
+            @((MarkupString)Labels.Value.FailedToResume)
         </p>
     </div>
 </dialog>

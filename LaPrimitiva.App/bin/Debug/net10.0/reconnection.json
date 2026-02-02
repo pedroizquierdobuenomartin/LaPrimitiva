@@ -1,0 +1,11 @@
+{
+  "ReconnectionLabels": {
+    "Rejoining": "Reconectando con el servidor...",
+    "RejoinFailed": "Error al reconectar... reintentando en {0} segundos.",
+    "FailedToRejoin": "No se pudo reconectar. Por favor, reintenta o recarga la página.",
+    "Retry": "Reintentar",
+    "SessionPaused": "La sesión ha sido pausada por el servidor.",
+    "Resume": "Reanudar",
+    "FailedToResume": "Error al reanudar la sesión. Por favor, recarga la página."
+  }
+}

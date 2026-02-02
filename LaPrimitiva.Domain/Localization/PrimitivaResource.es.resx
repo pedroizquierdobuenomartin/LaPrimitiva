@@ -105,4 +105,11 @@
   <data name="ConfirmDeleteButton" xml:space="preserve"><value>Sí, Eliminar</value></data>
   <data name="EnterWeekNumberPrompt" xml:space="preserve"><value>Introduce un número de semana</value></data>
   <data name="ClickLoadDataPrompt" xml:space="preserve"><value>Pulsa en "Cargar Datos" para auditar los sorteos.</value></data>
+  <data name="Rejoining" xml:space="preserve"><value>Reconectando con el servidor...</value></data>
+  <data name="RejoinFailed" xml:space="preserve"><value>Error al reconectar... reintentando en {0} segundos.</value></data>
+  <data name="FailedToRejoin" xml:space="preserve"><value>No se pudo reconectar. Por favor, reintenta o recarga la página.</value></data>
+  <data name="Retry" xml:space="preserve"><value>Reintentar</value></data>
+  <data name="SessionPaused" xml:space="preserve"><value>La sesión ha sido pausada por el servidor.</value></data>
+  <data name="Resume" xml:space="preserve"><value>Reanudar</value></data>
+  <data name="FailedToResume" xml:space="preserve"><value>Error al reanudar la sesión. Por favor, recarga la página.</value></data>
 </root>

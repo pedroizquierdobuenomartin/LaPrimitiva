@@ -1,4 +1,5 @@
 using LaPrimitiva.Domain.Repositories;
+using LaPrimitiva.App.Models;
 using LaPrimitiva.Infrastructure.Repositories;
 using LaPrimitiva.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
@@ -9,6 +10,9 @@ using LaPrimitiva.App.Components;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+builder.Configuration.AddJsonFile("reconnection.json", optional: false, reloadOnChange: true);
+builder.Services.Configure<ReconnectionLabels>(builder.Configuration.GetSection("ReconnectionLabels"));
+
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 

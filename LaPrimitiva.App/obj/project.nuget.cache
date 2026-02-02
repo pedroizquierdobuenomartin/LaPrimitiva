@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "His18VfxmMM=",
+  "dgSpecHash": "vt2618sFCPY=",
   "success": true,
-  "projectFilePath": "f:\\Repositorios\\LaPrimitiva\\LaPrimitiva.App\\LaPrimitiva.App.csproj",
+  "projectFilePath": "F:\\Repositorios\\LaPrimitiva\\LaPrimitiva.App\\LaPrimitiva.App.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\pedro.izquierdobueno\\.nuget\\packages\\azure.core\\1.47.1\\azure.core.1.47.1.nupkg.sha512",
     "C:\\Users\\pedro.izquierdobueno\\.nuget\\packages\\azure.identity\\1.14.2\\azure.identity.1.14.2.nupkg.sha512",

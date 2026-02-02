@@ -179,12 +179,15 @@
                         <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3">@L["WeekNumberLabel"]</label>
                         <div class="flex items-center gap-4">
                             <input type="number" @bind="modalWeek" class="w-24 text-3xl font-black text-blue-600 bg-transparent border-none p-0 focus:ring-0" />
-                            <button @onclick="LoadWeekDataInModal" class="text-xs font-bold text-blue-600 hover:text-blue-700 flex items-center gap-1">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                                </svg>
-                                @L["LoadDataButton"]
-                            </button>
+                            @if (isNewRegistration)
+                            {
+                                <button @onclick="LoadWeekDataInModal" class="text-xs font-bold text-blue-600 hover:text-blue-700 flex items-center gap-1 group">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 transition-transform group-hover:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                                    </svg>
+                                    @L["LoadDataButton"]
+                                </button>
+                            }
                         </div>
                     </div>
                     <div class="bg-blue-600 p-6 rounded-3xl shadow-xl shadow-blue-200 flex-[2] min-w-[300px] text-white overflow-hidden relative">
@@ -199,58 +202,122 @@
                     </div>
                 </div>
 
+                @if (!string.IsNullOrEmpty(modalErrorMessage))
+                {
+                    <div class="mb-8 p-6 bg-rose-50 border border-rose-100 rounded-[2rem] flex gap-4 items-center animate-in slide-in-from-top-4 duration-300">
+                        <div class="h-10 w-10 bg-rose-100 rounded-xl flex items-center justify-center text-rose-600 shrink-0">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                            </svg>
+                        </div>
+                        <div>
+                            <p class="text-sm font-black text-rose-900 uppercase tracking-tight">Error Detectado</p>
+                            <p class="text-xs font-bold text-rose-700/80">@modalErrorMessage</p>
+                        </div>
+                    </div>
+                }
+
+                @if (weekAlreadyExists && isNewRegistration)
+                {
+                    <div class="mb-8 p-8 bg-amber-50 border border-amber-100 rounded-[2.5rem] flex flex-col md:flex-row gap-6 items-center animate-in fade-in zoom-in duration-500">
+                        <div class="h-16 w-16 bg-amber-100 rounded-2xl flex items-center justify-center text-amber-600 shrink-0 shadow-sm">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                            </svg>
+                        </div>
+                        <div class="text-center md:text-left space-y-2">
+                            <h4 class="text-xl font-black text-amber-900 uppercase tracking-tighter">Semana ya registrada</h4>
+                            <p class="text-sm font-bold text-amber-800/70 leading-relaxed">
+                                La semana <span class="text-amber-900">@modalWeek</span> ya tiene sorteos registrados en el sistema. 
+                                Si deseas modificarlos, por favor cierra este asistente y pulsa el botón de edición en la lista de sorteos.
+                            </p>
+                        </div>
+                    </div>
+                }
+
                 @if (isModalLoading)
                 {
                     <div class="flex justify-center p-20">
                         <div class="h-12 w-12 rounded-full border-4 border-slate-100 border-t-blue-600 animate-spin"></div>
                     </div>
                 }
-                else if (isNewRegistration && modalDraws == null)
+                else if (isNewRegistration && modalDraws == null && !weekAlreadyExists)
                 {
-                    <div class="bg-white rounded-[3rem] border border-slate-100 shadow-sm p-12">
-                        <div class="max-w-4xl mx-auto space-y-10">
-                            <div class="text-center">
-                                <h4 class="text-2xl font-black text-slate-900 uppercase tracking-tighter">Configuración de la Semana</h4>
-                                <p class="text-slate-400 font-medium mt-1">Selecciona el plan y los sorteos que se han jugado en la semana @modalWeek.</p>
+                    <div class="bg-white rounded-[3.5rem] border border-slate-100 shadow-xl shadow-slate-200/20 p-12 overflow-hidden relative">
+                        <div class="absolute top-0 right-0 p-8 opacity-5">
+                            <svg class="h-64 w-64 text-slate-900" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0L7.43 7.52H3.07c-1.61 0-2.28 2.06-.98 3.02l3.53 2.56-1.35 4.35c-.48 1.56 1.31 2.87 2.61 1.91l3.58-2.62 3.58 2.62c1.3 0.96 3.09-0.35 2.61-1.91l-1.35-4.35 3.53-2.56c1.3-.96.63-3.02-.98-3.02h-4.36l-1.08-4.35z" clip-rule="evenodd"/></svg>
+                        </div>
+                        
+                        <div class="max-w-4xl mx-auto space-y-12 relative z-10">
+                            <div class="text-center space-y-2">
+                                <span class="inline-block px-4 py-1.5 rounded-full bg-blue-50 text-blue-600 text-[10px] font-black uppercase tracking-widest mb-2">Configurador Inteligente</span>
+                                <h4 class="text-4xl font-black text-slate-900 tracking-tight">Personaliza tu Semana</h4>
+                                <p class="text-slate-400 font-bold text-lg">Configura el plan de apuestas y los días de sorteo para la semana @modalWeek.</p>
                             </div>
 
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
                                 <!-- Plan Selection -->
-                                <div class="space-y-4">
-                                    <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">@L["SelectPlanLabel"]</label>
-                                    <select @bind="selectedPlanId" class="w-full bg-slate-50 border-none rounded-2xl p-4 text-sm font-bold text-slate-700 focus:ring-2 focus:ring-blue-500/20">
-                                        @if (allPlans != null)
-                                        {
-                                            @foreach (var plan in allPlans)
+                                <div class="space-y-6">
+                                    <div class="flex items-center gap-3 px-1">
+                                        <div class="h-8 w-8 rounded-lg bg-slate-900 text-white flex items-center justify-center">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                                            </svg>
+                                        </div>
+                                        <label class="text-xs font-black text-slate-900 uppercase tracking-widest">Modelo de Plan</label>
+                                    </div>
+                                    <div class="relative group">
+                                        <select @bind="selectedPlanId" class="w-full bg-slate-50 border-2 border-slate-50 rounded-[1.5rem] p-5 text-base font-black text-slate-800 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500/20 transition-all appearance-none cursor-pointer">
+                                            @if (allPlans != null)
                                             {
-                                                <option value="@plan.Id">@plan.Name (@plan.BetsPerDraw Apuestas)</option>
+                                                @foreach (var plan in allPlans)
+                                                {
+                                                    <option value="@plan.Id">@plan.Name (@plan.BetsPerDraw Apuestas)</option>
+                                                }
                                             }
-                                        }
-                                    </select>
+                                        </select>
+                                        <div class="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                                <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                            </svg>
+                                        </div>
+                                    </div>
                                 </div>
 
                                 <!-- Custom Draw Addition -->
-                                <div class="space-y-4">
-                                    <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Añadir Sorteos Individuales</label>
-                                    <div class="flex flex-wrap gap-2">
-                                        <button @onclick='() => AddDrawTemplate(DayOfWeek.Monday)' class="bg-blue-50 text-blue-600 px-4 py-2 rounded-xl text-xs font-black uppercase hover:bg-blue-100 transition-colors">+ Lunes</button>
-                                        <button @onclick='() => AddDrawTemplate(DayOfWeek.Thursday)' class="bg-blue-50 text-blue-600 px-4 py-2 rounded-xl text-xs font-black uppercase hover:bg-blue-100 transition-colors">+ Jueves</button>
-                                        <button @onclick='() => AddDrawTemplate(DayOfWeek.Saturday)' class="bg-blue-50 text-blue-600 px-4 py-2 rounded-xl text-xs font-black uppercase hover:bg-blue-100 transition-colors">+ Sábado</button>
+                                <div class="space-y-6">
+                                    <div class="flex items-center gap-3 px-1">
+                                        <div class="h-8 w-8 rounded-lg bg-blue-600 text-white flex items-center justify-center shadow-lg shadow-blue-100">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                                            </svg>
+                                        </div>
+                                        <label class="text-xs font-black text-slate-900 uppercase tracking-widest">Añadir Sorteos</label>
+                                    </div>
+                                    <div class="flex flex-wrap gap-3">
+                                        <button @onclick='() => AddDrawTemplate(DayOfWeek.Monday)' class="flex-1 bg-white border-2 border-slate-100 text-slate-600 px-6 py-4 rounded-2xl text-[11px] font-black uppercase tracking-wider hover:border-blue-500 hover:text-blue-600 hover:bg-blue-50/50 transition-all active:scale-95">Lunes</button>
+                                        <button @onclick='() => AddDrawTemplate(DayOfWeek.Thursday)' class="flex-1 bg-white border-2 border-slate-100 text-slate-600 px-6 py-4 rounded-2xl text-[11px] font-black uppercase tracking-wider hover:border-blue-500 hover:text-blue-600 hover:bg-blue-50/50 transition-all active:scale-95">Jueves</button>
+                                        <button @onclick='() => AddDrawTemplate(DayOfWeek.Saturday)' class="flex-1 bg-white border-2 border-slate-100 text-slate-600 px-6 py-4 rounded-2xl text-[11px] font-black uppercase tracking-wider hover:border-blue-500 hover:text-blue-600 hover:bg-blue-50/50 transition-all active:scale-95">Sábado</button>
                                     </div>
                                     
                                     @if (tempModalDraws.Any())
                                     {
-                                        <div class="mt-4 space-y-2">
+                                        <div class="mt-8 grid grid-cols-1 gap-3">
                                             @foreach (var d in tempModalDraws)
                                             {
-                                                <div class="bg-white border border-slate-100 p-3 rounded-xl flex justify-between items-center shadow-sm">
-                                                    <div>
-                                                        <span class="text-xs font-black text-slate-900">@d.DrawType</span>
-                                                        <span class="text-[10px] text-slate-400 ml-2">@d.DrawDate.ToString("dd/MM/yyyy")</span>
+                                                <div class="bg-slate-50/50 border-2 border-dashed border-slate-200 p-4 rounded-2xl flex justify-between items-center group/item hover:border-blue-200 hover:bg-blue-50/30 transition-all">
+                                                    <div class="flex items-center gap-4">
+                                                        <div class="h-10 w-10 rounded-xl bg-white flex items-center justify-center text-blue-600 font-black text-xs shadow-sm shadow-slate-100">
+                                                            @d.DrawDate.Day
+                                                        </div>
+                                                        <div>
+                                                            <div class="text-xs font-black text-slate-900 uppercase tracking-tight">@d.DrawType</div>
+                                                            <div class="text-[10px] text-slate-400 font-bold">@d.DrawDate.ToString("MMMM yyyy")</div>
+                                                        </div>
                                                     </div>
-                                                    <button @onclick="() => tempModalDraws.Remove(d)" class="text-rose-500 hover:bg-rose-50 p-1.5 rounded-lg transition-colors">
-                                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                                    <button @onclick="() => tempModalDraws.Remove(d)" class="h-10 w-10 text-slate-300 hover:text-rose-500 hover:bg-rose-50 rounded-xl transition-all flex items-center justify-center">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                                         </svg>
                                                     </button>
                                                 </div>
@@ -260,21 +327,11 @@
                                 </div>
                             </div>
 
-                            @if (!string.IsNullOrEmpty(modalErrorMessage))
-                            {
-                                <div class="p-4 bg-rose-50 border border-rose-100 rounded-2xl flex gap-3 items-center animate-in slide-in-from-top-2">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-rose-500 shrink-0" viewBox="0 0 20 20" fill="currentColor">
-                                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
-                                    </svg>
-                                    <p class="text-xs font-bold text-rose-700">@modalErrorMessage</p>
-                                </div>
-                            }
-
-                            <div class="pt-6 flex justify-center">
-                                <button @onclick="PrepareNewWeek" disabled="@(!tempModalDraws.Any())" class="bg-blue-600 text-white px-10 py-4 rounded-2xl font-black uppercase tracking-widest shadow-xl shadow-blue-200 hover:bg-blue-700 transition-all flex items-center gap-3 disabled:opacity-30">
-                                    @L["CreateAuditedTemplateButton"]
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-8.707l-3-3a1 1 0 00-1.414 1.414L10.586 9H7a1 1 0 100 2h3.586l-1.293 1.293a1 1 0 101.414 1.414l3-3a1 1 0 000-1.414z" clip-rule="evenodd" />
+                            <div class="pt-8 flex justify-center border-t border-slate-50">
+                                <button @onclick="PrepareNewWeek" disabled="@(!tempModalDraws.Any())" class="group relative bg-slate-900 text-white px-12 py-5 rounded-[2rem] font-black uppercase tracking-[0.2em] shadow-2xl shadow-slate-300 hover:bg-blue-600 transition-all flex items-center gap-4 disabled:opacity-20 disabled:grayscale disabled:pointer-events-none">
+                                    <span>Comenzar Auditoría</span>
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 transition-transform group-hover:translate-x-1" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd" />
                                     </svg>
                                 </button>
                             </div>
@@ -358,15 +415,7 @@
                             </div>
                         }
 
-                        @if (!string.IsNullOrEmpty(modalErrorMessage))
-                        {
-                            <div class="p-4 bg-rose-50 border border-rose-100 rounded-2xl flex gap-3 items-center animate-in slide-in-from-top-2">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-rose-500 shrink-0" viewBox="0 0 20 20" fill="currentColor">
-                                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
-                                </svg>
-                                <p class="text-xs font-bold text-rose-700">@modalErrorMessage</p>
-                            </div>
-                        }
+                        @* modalErrorMessage moved to top *@
                     </div>
                 }
                 else
@@ -448,6 +497,7 @@
     private List<DrawRecord>? modalDraws;
     private bool isModalLoading = false;
     private bool isNewRegistration = false;
+    private bool weekAlreadyExists = false;
     private List<Plan>? allPlans;
     private Guid? selectedPlanId;
     private List<DrawRecord> tempModalDraws = new();
@@ -631,6 +681,7 @@
     private void ShowRegisterModal()
     {
         isNewRegistration = true;
+        weekAlreadyExists = false;
         modalWeek = GetCurrentWeekNumber();
         modalDraws = null;
         selectedPlanId = allPlans?.FirstOrDefault()?.Id;
@@ -642,6 +693,7 @@
     private async Task EditDraw(DrawRecord draw)
     {
         isNewRegistration = false;
+        weekAlreadyExists = true; // Technically it exists if we are editing
         modalWeek = draw.WeekNumber;
         modalErrorMessage = null;
         showModal = true;
@@ -662,27 +714,39 @@
 
         if (existing.Any())
         {
-            isNewRegistration = false; // Forced to edit if exists
-            modalDraws = existing;
-            // Since we use AsNoTracking in repo, we might need a way to get Plan or include it.
-            // I'll update IPlanRepository to help.
-            if (modalDraws.Any())
+            weekAlreadyExists = true;
+            if (isNewRegistration)
             {
-                var plan = await PlanRepository.GetAsync(modalDraws.First().PlanId);
+                // Reset everything if we found existing data while in "New" mode
+                modalDraws = null;
+                tempModalDraws.Clear();
+            }
+            else 
+            {
+                modalDraws = existing;
+            }
+            
+            // Still need modalPlan for the header info
+            if (existing.Any())
+            {
+                var plan = await PlanRepository.GetAsync(existing.First().PlanId);
                 modalPlan = plan;
             }
-
-            foreach (var d in modalDraws)
-            {
-                if (d.Played && d.TotalCoste == 0) 
-                {
-                    RecalculateDraw(d);
-                }
-            }
         }
-        else if (!isNewRegistration)
+        else
         {
-            modalDraws = null;
+            weekAlreadyExists = false;
+            if (isNewRegistration)
+            {
+                modalDraws = null;
+                tempModalDraws.Clear();
+                // Find default plan for the year
+                selectedPlanId = allPlans?.FirstOrDefault()?.Id;
+            }
+            else 
+            {
+                modalDraws = null;
+            }
         }
 
         isModalLoading = false;

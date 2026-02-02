@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "f:\\Repositorios\\LaPrimitiva\\LaPrimitiva.Domain\\LaPrimitiva.Domain.csproj": {}
+    "F:\\Repositorios\\LaPrimitiva\\LaPrimitiva.Domain\\LaPrimitiva.Domain.csproj": {}
   },
   "projects": {
-    "f:\\Repositorios\\LaPrimitiva\\LaPrimitiva.Domain\\LaPrimitiva.Domain.csproj": {
+    "F:\\Repositorios\\LaPrimitiva\\LaPrimitiva.Domain\\LaPrimitiva.Domain.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "f:\\Repositorios\\LaPrimitiva\\LaPrimitiva.Domain\\LaPrimitiva.Domain.csproj",
+        "projectUniqueName": "F:\\Repositorios\\LaPrimitiva\\LaPrimitiva.Domain\\LaPrimitiva.Domain.csproj",
         "projectName": "LaPrimitiva.Domain",
-        "projectPath": "f:\\Repositorios\\LaPrimitiva\\LaPrimitiva.Domain\\LaPrimitiva.Domain.csproj",
+        "projectPath": "F:\\Repositorios\\LaPrimitiva\\LaPrimitiva.Domain\\LaPrimitiva.Domain.csproj",
         "packagesPath": "C:\\Users\\pedro.izquierdobueno\\.nuget\\packages\\",
-        "outputPath": "f:\\Repositorios\\LaPrimitiva\\LaPrimitiva.Domain\\obj\\",
+        "outputPath": "F:\\Repositorios\\LaPrimitiva\\LaPrimitiva.Domain\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

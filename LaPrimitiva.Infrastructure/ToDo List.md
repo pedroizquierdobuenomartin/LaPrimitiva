@@ -1,15 +1,2 @@
 - [ ] Mejorar Look & Feel
-- [X] Plan: Botón de eliminar plan, cambiar a un popup de confirmación y no una alerta
-- [X] Plan: Mostrar los sorteos del plan
-- [X] Plan: Mostrar el número de sorteos en el plan: Totales, activos e inactivos
-- [X] Plan: Si el jocker no está activo, se descativará el coste de jocker y se pondrá a 0
-- [X] Plan: Si el jocker está activo, se pondrá el coste de jocker
-- [X] Plan: Al editar el plan, debe mostrar el campo de etiqueta fija
-- [X] Plan: No gardar automáticamente los datos, solo al pulsar en guardar
-- [X] Plan: No debe dejar de guardar el plan si el nombre está vacío
-- [X] Sorteo: Botón de eliminar sorteo semanal
-- [X] Sorteo: El título del popup debe cambiar según sea nuevo o edición
-- [X] Sorteo: No añadir un sorteo si ya existe uno para la fecha
-- [X] Sorteo: No añadir un sorteo si está fuera del plan seleccionado
-- [X] Sorteo: Al dar de alta el sorteo semanal, la semana debe calcularse automáticamente según el año
-- [X] Sorteo: Poder añadir/borrar un sorteo individual de la semana. La fecha debe aparecer automáticamente según el año, y semana (lunes, jueves o sábado)
+- [ ] Sorteo: Solo permitir configurar sorteos en el plan activo y no mostrar la configuración de la semana si ya existen sorteos para esa semana.

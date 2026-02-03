@@ -15,6 +15,14 @@ main[b-g6hc6lccna] {
 	padding-right: 0.5rem;
 }
 
+aside[b-g6hc6lccna] {
+	z-index: 50;
+}
+
+aside:not(.sidebar-collapsed)[b-g6hc6lccna] {
+	z-index: 60;
+}
+
 .nav-item[b-g6hc6lccna] {
 	transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }

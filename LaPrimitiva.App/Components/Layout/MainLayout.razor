@@ -15,76 +15,81 @@
     }
 
     <!-- Sidebar -->
-    <aside class="@(_isCollapsed ? "w-20 sidebar-collapsed" : "w-72") @(_showMobileMenu ? "flex" : "hidden") md:flex bg-[var(--brand-secondary)] text-white/80 flex-shrink-0 flex flex-col transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)] fixed inset-y-0 left-0 z-50 md:relative md:my-4 md:ml-4 md:rounded-[var(--radius-sidebar)] shadow-2xl overflow-hidden border-r border-white/5">
+    <aside @onmouseenter="() => _isHovered = true" 
+           @onmouseleave="() => _isHovered = false"
+           class="@((_isCollapsed && !_isHovered) ? "w-20 sidebar-collapsed" : "w-72 shadow-2xl z-[60]") @(_showMobileMenu ? "flex" : "hidden") md:flex bg-[var(--brand-secondary)] text-white/80 flex-shrink-0 flex flex-col transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)] fixed inset-y-0 left-0 md:relative md:my-4 md:ml-4 md:rounded-[var(--radius-sidebar)] border-r border-white/5">
         <div class="h-32 flex items-center justify-center border-b border-white/10 flex-shrink-0 relative">
-            <div class="flex flex-col items-center w-full gap-3 transition-all duration-500 @(_isCollapsed ? "scale-90" : "scale-100")">
+            <div class="flex flex-col items-center w-full gap-3 transition-all duration-500 @((_isCollapsed && !_isHovered) ? "scale-90" : "scale-100")">
                 <div class="p-2.5 bg-white/5 rounded-2xl shadow-inner border border-white/5 flex items-center justify-center transition-all hover:bg-white/10 hover:scale-105 active:scale-95">
-                    <img src="/images/logo_white.png" class="@(_isCollapsed ? "h-7 w-7" : "h-8 w-8") object-contain transition-all duration-500" alt="Logo" />
+                    <img src="/images/logo_white.png" class="@((_isCollapsed && !_isHovered) ? "h-7 w-7" : "h-8 w-8") object-contain transition-all duration-500" alt="Logo" />
                 </div>
-                <div class="overflow-hidden transition-all duration-500 ease-in-out @(_isCollapsed ? "max-h-0 opacity-0" : "max-h-10 opacity-100")">
+                <div class="overflow-hidden transition-all duration-500 ease-in-out @((_isCollapsed && !_isHovered) ? "max-h-0 opacity-0" : "max-h-10 opacity-100")">
                     <span class="text-[11px] font-bold text-white uppercase tracking-[0.2em] whitespace-nowrap">
                         La <span class="text-[var(--brand-accent)]">P</span>rimitiva
                     </span>
                 </div>
             </div>
+
+            <!-- Toggle Button Inside Header -->
+            @if (!_isCollapsed || _isHovered)
+            {
+                <button @onclick="ToggleSidebar" class="absolute right-4 top-4 text-white/40 hover:text-white transition-all z-[70] p-1 rounded-lg hover:bg-white/10" aria-label="Toggle Sidebar">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                    </svg>
+                </button>
+            }
         </div>
 
-        <!-- Toggle Button -->
-        <button @onclick="ToggleSidebar" class="absolute -right-3 top-32 bg-[var(--brand-accent)] text-[var(--brand-secondary)] p-1.5 rounded-full border-2 border-[var(--brand-bg)] hover:scale-110 active:scale-95 transition-all z-[60] shadow-xl group hidden md:block" aria-label="Toggle Sidebar">
-            <div class="transition-transform duration-500 @(_isCollapsed ? "rotate-180" : "rotate-0")">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
-                </svg>
-            </div>
-        </button>
         
-        <nav class="flex-1 @(_isCollapsed ? "px-0" : "px-3") space-y-2 mt-8 overflow-x-hidden scrollbar-hide">
-            <NavLink href="" Match="NavLinkMatch.All" class="@($"nav-item w-full flex items-center {(_isCollapsed ? "justify-center px-0" : "gap-4 px-5 text-left")} py-4 rounded-xl hover:bg-white/10 transition-all duration-300 group text-white/70 relative")" ActiveClass="active-nav bg-white/15 text-white shadow-lg" title="@L["Dashboard"]">
+        
+        <nav class="flex-1 @((_isCollapsed && !_isHovered) ? "px-0" : "px-3") space-y-2 mt-8 overflow-x-hidden scrollbar-hide">
+            <NavLink href="" Match="NavLinkMatch.All" class="@($"nav-item w-full flex items-center {(_isCollapsed && !_isHovered ? "justify-center px-0" : "gap-4 px-5 text-left")} py-4 rounded-xl hover:bg-white/10 transition-all duration-300 group text-white/70 relative")" ActiveClass="active-nav bg-white/15 text-white shadow-lg" title="@L["Dashboard"]">
                 <div class="flex items-center justify-center w-10 h-10 flex-shrink-0 rounded-lg group-hover:scale-110 transition-transform duration-300">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
                     </svg>
                 </div>
-                <div class="overflow-hidden transition-all duration-500 ease-in-out @(_isCollapsed ? "w-0 opacity-0" : "w-full opacity-100")">
+                <div class="overflow-hidden transition-all duration-500 ease-in-out @((_isCollapsed && !_isHovered) ? "w-0 opacity-0" : "w-full opacity-100")">
                     <span class="font-medium tracking-wide whitespace-nowrap">@L["Dashboard"]</span>
                 </div>
             </NavLink>
 
-            <NavLink href="register" class="@($"nav-item w-full flex items-center {(_isCollapsed ? "justify-center px-0" : "gap-4 px-5 text-left")} py-4 rounded-xl hover:bg-white/10 transition-all duration-300 group text-white/70 relative")" ActiveClass="active-nav bg-white/15 text-white shadow-lg" title="@L["Registration"]">
+            <NavLink href="register" class="@($"nav-item w-full flex items-center {(_isCollapsed && !_isHovered ? "justify-center px-0" : "gap-4 px-5 text-left")} py-4 rounded-xl hover:bg-white/10 transition-all duration-300 group text-white/70 relative")" ActiveClass="active-nav bg-white/15 text-white shadow-lg" title="@L["Registration"]">
                 <div class="flex items-center justify-center w-10 h-10 flex-shrink-0 rounded-lg group-hover:scale-110 transition-transform duration-300">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
                     </svg>
                 </div>
-                <div class="overflow-hidden transition-all duration-500 ease-in-out @(_isCollapsed ? "w-0 opacity-0" : "w-full opacity-100")">
+                <div class="overflow-hidden transition-all duration-500 ease-in-out @((_isCollapsed && !_isHovered) ? "w-0 opacity-0" : "w-full opacity-100")">
                     <span class="font-medium tracking-wide whitespace-nowrap">@L["Registration"]</span>
                 </div>
             </NavLink>
 
-            <NavLink href="plans" class="@($"nav-item w-full flex items-center {(_isCollapsed ? "justify-center px-0" : "gap-4 px-5 text-left")} py-4 rounded-xl hover:bg-white/10 transition-all duration-300 group text-white/70 relative")" ActiveClass="active-nav bg-white/15 text-white shadow-lg" title="@L["Plans"]">
+            <NavLink href="plans" class="@($"nav-item w-full flex items-center {(_isCollapsed && !_isHovered ? "justify-center px-0" : "gap-4 px-5 text-left")} py-4 rounded-xl hover:bg-white/10 transition-all duration-300 group text-white/70 relative")" ActiveClass="active-nav bg-white/15 text-white shadow-lg" title="@L["Plans"]">
                 <div class="flex items-center justify-center w-10 h-10 flex-shrink-0 rounded-lg group-hover:scale-110 transition-transform duration-300">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
                     </svg>
                 </div>
-                <div class="overflow-hidden transition-all duration-500 ease-in-out @(_isCollapsed ? "w-0 opacity-0" : "w-full opacity-100")">
+                <div class="overflow-hidden transition-all duration-500 ease-in-out @((_isCollapsed && !_isHovered) ? "w-0 opacity-0" : "w-full opacity-100")">
                     <span class="font-medium tracking-wide whitespace-nowrap">@L["Plans"]</span>
                 </div>
             </NavLink>
 
-            <NavLink href="data" class="@($"nav-item w-full flex items-center {(_isCollapsed ? "justify-center px-0" : "gap-4 px-5 text-left")} py-4 rounded-xl hover:bg-white/10 transition-all duration-300 group text-white/70 relative")" ActiveClass="active-nav bg-white/15 text-white shadow-lg" title="@L["Data"]">
+            <NavLink href="data" class="@($"nav-item w-full flex items-center {(_isCollapsed && !_isHovered ? "justify-center px-0" : "gap-4 px-5 text-left")} py-4 rounded-xl hover:bg-white/10 transition-all duration-300 group text-white/70 relative")" ActiveClass="active-nav bg-white/15 text-white shadow-lg" title="@L["Data"]">
                 <div class="flex items-center justify-center w-10 h-10 flex-shrink-0 rounded-lg group-hover:scale-110 transition-transform duration-300">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                     </svg>
                 </div>
-                <div class="overflow-hidden transition-all duration-500 ease-in-out @(_isCollapsed ? "w-0 opacity-0" : "w-full opacity-100")">
+                <div class="overflow-hidden transition-all duration-500 ease-in-out @((_isCollapsed && !_isHovered) ? "w-0 opacity-0" : "w-full opacity-100")">
                     <span class="font-medium tracking-wide whitespace-nowrap">@L["Data"]</span>
                 </div>
             </NavLink>
         </nav>
 
-        <div class="px-8 pb-8 pt-4 transition-all duration-500 @(_isCollapsed ? "opacity-0 scale-50 h-0 overflow-hidden" : "opacity-100 scale-100")">
+        <div class="px-8 pb-8 pt-4 transition-all duration-500 @((_isCollapsed && !_isHovered) ? "opacity-0 scale-50 h-0 overflow-hidden" : "opacity-100 scale-100")">
             <div class="text-[10px] text-white/40 uppercase tracking-widest font-bold whitespace-nowrap">
                 &copy; 2026 La Primitiva Audit
             </div>
@@ -171,6 +176,7 @@
 
 @code {
     private bool _isCollapsed = false;
+    private bool _isHovered = false;
     private bool _showMobileMenu = false;
     private List<int>? _availableYears;
 

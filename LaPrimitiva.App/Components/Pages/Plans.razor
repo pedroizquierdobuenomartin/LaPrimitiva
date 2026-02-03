@@ -148,10 +148,10 @@
 
                         <div class="grid grid-cols-2 gap-4 col-span-2 pt-2 border-t border-slate-100">
                             <div class="space-y-1">
-                                <div class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Apuestas</div>
+                                <div class="text-[9px] font-black text-slate-400 uppercase tracking-widest">@L["Bets"]</div>
                                 <div class="text-xs font-bold text-slate-700 flex items-center gap-1.5">
-                                    <div class="h-2 w-2 rounded-full bg-blue-500"></div>
-                                    @plan.BetsPerDraw Bets/Sorteo
+                                    <div class="h-2 w-2 rounded-full bg-emerald-500"></div>
+                                    @string.Format(L["DrawsFijoAuto"], plan.BetsPerDraw)
                                 </div>
                             </div>
                             <div class="space-y-1">

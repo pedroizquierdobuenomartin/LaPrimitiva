@@ -112,4 +112,6 @@
   <data name="SessionPaused" xml:space="preserve"><value>La sesión ha sido pausada por el servidor.</value></data>
   <data name="Resume" xml:space="preserve"><value>Reanudar</value></data>
   <data name="FailedToResume" xml:space="preserve"><value>Error al reanudar la sesión. Por favor, recarga la página.</value></data>
+  <data name="Bets" xml:space="preserve"><value>Apuestas</value></data>
+  <data name="DrawsFijoAuto" xml:space="preserve"><value>{0} Sorteos (fijo + automático)</value></data>
 </root>

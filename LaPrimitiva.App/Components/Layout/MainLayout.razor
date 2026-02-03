@@ -138,12 +138,31 @@
         </header>
 
         <!-- Page Content -->
-        <div class="flex-1 overflow-auto p-8">
+        <div class="flex-1 overflow-auto p-8 pb-24 md:pb-8">
             <div class="max-w-7xl mx-auto">
                 @Body
             </div>
         </div>
     </main>
+
+    <!-- Mobile Bottom Navigation -->
+    <nav class="md:hidden fixed bottom-6 left-6 right-6 bg-slate-900/95 backdrop-blur-lg border border-slate-800 rounded-2xl shadow-2xl z-50 flex items-center justify-around p-2 gap-2">
+        <NavLink href="" Match="NavLinkMatch.All" class="flex items-center justify-center flex-1 py-3 rounded-xl transition-all text-slate-400 hover:text-white" ActiveClass="bg-blue-600 text-white shadow-lg">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+            </svg>
+        </NavLink>
+        <NavLink href="register" class="flex items-center justify-center flex-1 py-3 rounded-xl transition-all text-slate-400 hover:text-white" ActiveClass="bg-blue-600 text-white shadow-lg">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+            </svg>
+        </NavLink>
+        <NavLink href="plans" class="flex items-center justify-center flex-1 py-3 rounded-xl transition-all text-slate-400 hover:text-white" ActiveClass="bg-blue-600 text-white shadow-lg">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+            </svg>
+        </NavLink>
+    </nav>
 </div>
 
 @code {

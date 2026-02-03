@@ -17,12 +17,12 @@
 <PageTitle>@L["Plans"] - La Primitiva Audit</PageTitle>
 
 <div class="space-y-10 animate-in fade-in duration-700">
-    <div class="flex justify-between items-center">
+    <div class="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
         <div>
-            <h2 class="text-4xl font-bold text-[var(--brand-secondary)] tracking-tight">@L["PlanManagement"]</h2>
-            <p class="text-[var(--brand-text-secondary)] mt-2 font-medium">@L["ConfigurePlanRules"] <span class="text-[var(--brand-primary)] font-bold">@GlobalState.SelectedYear</span>.</p>
+            <h2 class="text-3xl md:text-4xl font-bold text-[var(--brand-secondary)] tracking-tight">@L["PlanManagement"]</h2>
+            <p class="text-[var(--brand-text-secondary)] mt-2 font-medium text-sm md:text-base">@L["ConfigurePlanRules"] <span class="text-[var(--brand-primary)] font-bold">@GlobalState.SelectedYear</span>.</p>
         </div>
-        <button @onclick="ShowCreateModal" class="bg-[var(--brand-primary)] hover:bg-[var(--brand-secondary)] text-white md:px-8 md:py-3.5 px-4 py-2.5 rounded-xl font-bold shadow-xl shadow-[var(--brand-primary)]/10 transition-all flex items-center gap-2 transform hover:scale-105 active:scale-95 whitespace-nowrap text-sm md:text-base">
+        <button @onclick="ShowCreateModal" class="bg-[var(--brand-primary)] hover:bg-[var(--brand-secondary)] text-white md:px-8 md:py-3.5 px-6 py-3 rounded-xl font-bold shadow-xl shadow-[var(--brand-primary)]/10 transition-all flex items-center justify-center gap-2 transform hover:scale-105 active:scale-95 whitespace-nowrap text-sm md:text-base w-full md:w-auto">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
             </svg>
@@ -64,25 +64,25 @@
                         </div>
                     }
 
-                    <div class="p-8 border-b @(plan.HasOverlap ? "border-rose-100 bg-rose-50/20" : "border-[var(--brand-bg)] bg-[var(--brand-bg)]/40") flex justify-between items-start">
+                    <div class="p-6 md:p-8 border-b @(plan.HasOverlap ? "border-rose-100 bg-rose-50/20" : "border-[var(--brand-bg)] bg-[var(--brand-bg)]/40") flex justify-between items-start">
                         <div>
                             <div class="flex items-center gap-2">
-                                <h3 class="text-2xl font-bold text-[var(--brand-secondary)]">@plan.Name</h3>
+                                <h3 class="text-xl md:text-2xl font-bold text-[var(--brand-secondary)]">@plan.Name</h3>
                             </div>
-                            <div class="text-sm font-bold @(plan.HasOverlap ? "text-rose-600" : "text-[var(--brand-text-secondary)]") mt-2 flex items-center gap-2">
+                            <div class="text-xs md:text-sm font-bold @(plan.HasOverlap ? "text-rose-600" : "text-[var(--brand-text-secondary)]") mt-2 flex items-center gap-2">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                 </svg>
                                 <span class="tracking-tight">@plan.EffectiveFrom.ToString("dd MMM yyyy") - @(plan.EffectiveTo?.ToString("dd MMM yyyy") ?? "∞")</span>
                             </div>
                         </div>
-                        <div class="flex gap-3">
-                            <button @onclick="() => ShowEditModal(plan)" class="h-10 w-10 bg-white text-[var(--brand-text-secondary)] rounded-xl border border-[var(--brand-borders)] hover:text-[var(--brand-secondary)] hover:border-[var(--brand-secondary)] shadow-sm transition-all flex items-center justify-center group/btn" title="@L["Edit"]">
+                        <div class="flex gap-2 md:gap-3">
+                            <button @onclick="() => ShowEditModal(plan)" class="h-9 w-9 md:h-10 md:w-10 bg-white text-[var(--brand-text-secondary)] rounded-xl border border-[var(--brand-borders)] hover:text-[var(--brand-secondary)] hover:border-[var(--brand-secondary)] shadow-sm transition-all flex items-center justify-center group/btn" title="@L["Edit"]">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                 </svg>
                             </button>
-                            <button @onclick="() => DeletePlan(plan)" class="h-10 w-10 bg-white text-rose-500 rounded-xl border border-rose-100 hover:bg-rose-500 hover:text-white shadow-sm transition-all flex items-center justify-center" title="@L["Delete"]">
+                            <button @onclick="() => DeletePlan(plan)" class="h-9 w-9 md:h-10 md:w-10 bg-white text-rose-500 rounded-xl border border-rose-100 hover:bg-rose-500 hover:text-white shadow-sm transition-all flex items-center justify-center" title="@L["Delete"]">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-4v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                 </svg>
@@ -90,14 +90,14 @@
                         </div>
                     </div>
                     
-                    <div class="p-8 grid grid-cols-2 gap-8 flex-1 bg-white">
+                    <div class="p-6 md:p-8 grid grid-cols-2 gap-6 md:gap-8 flex-1 bg-white">
                         <div class="col-span-2 space-y-6">
                             <!-- Statistics Grid -->
-                            <div class="grid grid-cols-3 gap-4">
+                            <div class="grid grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
                                 <!-- Row 1 -->
                                 <div class="p-4 bg-purple-50 rounded-2xl text-center transition-transform hover:scale-105">
                                     <div class="text-[10px] font-bold text-purple-400 uppercase tracking-widest mb-1">@L["Played"]</div>
-                                    <div class="text-xl font-bold text-purple-700">@plan.ActiveDraws</div>
+                                    <div class="text-lg md:text-xl font-bold">@plan.ActiveDraws</div>
                                 </div>
                                 <div class="p-4 bg-rose-50 rounded-2xl text-center transition-transform hover:scale-105">
                                     <div class="text-[10px] font-bold text-rose-400 uppercase tracking-widest mb-1">@L["TotalCost"]</div>
@@ -124,13 +124,13 @@
                             </div>
                             
                             <!-- Overall Performance -->
-                            <div class="p-6 @(plan.NetBalance > 0 ? "bg-[var(--brand-positive)]" : plan.NetBalance < 0 ? "bg-[var(--brand-negativo)]" : "bg-slate-500") rounded-2xl shadow-lg flex justify-between items-center transform transition-all hover:-translate-y-1">
+                            <div class="p-5 md:p-6 @(plan.NetBalance > 0 ? "bg-[var(--brand-positive)]" : plan.NetBalance < 0 ? "bg-[var(--brand-negativo)]" : "bg-slate-500") rounded-2xl shadow-lg flex justify-between items-center transform transition-all hover:-translate-y-1">
                                 <div>
                                     <div class="text-[10px] font-bold text-white/70 uppercase tracking-widest">@L["NetBalance"]</div>
-                                    <div class="text-2xl font-bold text-white tracking-tight">@plan.NetBalance.ToString("N2")€</div>
+                                    <div class="text-xl md:text-2xl font-bold text-white tracking-tight">@plan.NetBalance.ToString("N2")€</div>
                                 </div>
-                                <div class="h-12 w-12 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <div class="h-10 w-10 md:h-12 md:w-12 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 md:h-7 md:w-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         @if (plan.NetBalance > 0)
                                         {
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
@@ -148,24 +148,24 @@
                             </div>
                         </div>
 
-                        <div class="grid grid-cols-2 gap-6 col-span-2 pt-6 border-t border-[var(--brand-bg)]">
+                        <div class="grid grid-cols-2 gap-4 md:gap-6 col-span-2 pt-6 border-t border-[var(--brand-bg)]">
                             <div class="space-y-1">
                                 <div class="text-[10px] font-bold text-[var(--brand-text-secondary)] uppercase tracking-widest">@L["Bets"]</div>
-                                <div class="text-sm font-bold text-[var(--brand-secondary)] flex items-center gap-2">
+                                <div class="text-xs md:text-sm font-bold text-[var(--brand-secondary)] flex items-center gap-2">
                                     <div class="h-2.5 w-2.5 rounded-full bg-[var(--brand-positive)]"></div>
                                     @string.Format(L["DrawsFijoAuto"], plan.BetsPerDraw)
                                 </div>
                             </div>
                             <div class="space-y-1">
                                 <div class="text-[10px] font-bold text-[var(--brand-text-secondary)] uppercase tracking-widest">Joker</div>
-                                <div class="text-sm font-bold @(plan.EnableJoker ? "text-blue-700" : "text-slate-400") flex items-center gap-2">
+                                <div class="text-xs md:text-sm font-bold @(plan.EnableJoker ? "text-blue-700" : "text-slate-400") flex items-center gap-2">
                                     <div class="h-2.5 w-2.5 rounded-full @(plan.EnableJoker ? "bg-blue-600" : "bg-slate-300")"></div>
                                     @(plan.EnableJoker ? $"{L["Active"]} ({plan.JokerCostPerBet:N2}€)" : L["Inactive"])
                                 </div>
                             </div>
                             <div class="col-span-2">
                                 <div class="text-[10px] font-bold text-[var(--brand-text-secondary)] uppercase tracking-widest">@L["Label"]</div>
-                                <div class="text-sm text-[var(--brand-secondary)] italic font-medium truncate">"@plan.FixedCombinationLabel"</div>
+                                <div class="text-xs md:text-sm text-[var(--brand-secondary)] italic font-medium truncate">"@plan.FixedCombinationLabel"</div>
                             </div>
                         </div>
                     </div>
@@ -182,9 +182,9 @@
                         </div>
                     }
                     
-                    <div class="p-6 bg-[var(--brand-bg)] flex justify-between items-center">
-                        <span class="text-[10px] font-bold text-[var(--brand-text-secondary)] uppercase tracking-widest">@string.Format(L["CreatedOn"], plan.CreatedAt.ToString("g"))</span>
-                        <button @onclick="() => HandlePlanAction(plan)" class="px-6 py-2.5 rounded-xl text-xs font-bold @(plan.HasDraws ? "bg-white text-[var(--brand-primary)] border border-[var(--brand-borders)] hover:border-[var(--brand-primary)]" : "bg-[var(--brand-primary)] text-white hover:bg-[var(--brand-secondary)]") transition-all active:scale-95 shadow-sm uppercase tracking-wider">
+                    <div class="p-6 bg-[var(--brand-bg)] flex flex-col sm:flex-row justify-between items-center gap-4">
+                        <span class="text-[10px] font-bold text-[var(--brand-text-secondary)] uppercase tracking-widest text-center sm:text-left">@string.Format(L["CreatedOn"], plan.CreatedAt.ToString("g"))</span>
+                        <button @onclick="() => HandlePlanAction(plan)" class="w-full sm:w-auto px-6 py-2.5 rounded-xl text-xs font-bold @(plan.HasDraws ? "bg-white text-[var(--brand-primary)] border border-[var(--brand-borders)] hover:border-[var(--brand-primary)]" : "bg-[var(--brand-primary)] text-white hover:bg-[var(--brand-secondary)]") transition-all active:scale-95 shadow-sm uppercase tracking-wider">
                             @(plan.HasDraws ? L["ViewDraws"] : L["GenerateDraws"])
                         </button>
                     </div>

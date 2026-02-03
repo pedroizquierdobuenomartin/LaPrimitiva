@@ -1,0 +1,50 @@
+{
+	"marca": "La Primitiva",
+	"objetivo": "La Primitiva: Auditoría de lotería de La Primitiva con estética Dribbble 2025, enfocada en la claridad de datos y elegancia corporativa. Mantener consistencia visual en UI y landings.",
+	"paleta": {
+		"principal": "#007041",
+		"secundario": "#004D2D",
+		"acento": "#F3C388",
+		"fondo": "#F8F9FA",
+		"superficie": "#FFFFFF",
+		"texto": {
+			"principal": "#1A1A1A",
+			"secundario": "#6C757D",
+			"positivo": "#28A745",
+			"negativo": "#DC3545"
+		},
+		"bordes": "#E9ECEF"
+	},
+	"tipografia": {
+		"titulares": "Poppins",
+		"cuerpo": "Inter",
+		"pesos": {
+			"normal": 400,
+			"medio": 500,
+			"seminegrita": 600,
+			"negrita": 700
+		}
+	},
+	"formas": {
+		"radio_tarjeta": "16px",
+		"radio_boton": "12px",
+		"radio_input": "10px",
+		"radio_modal": "16px",
+		"radio_sidebar": "24px"
+	},
+	"espaciado": {
+		"xs": "4px",
+		"sm": "8px",
+		"md": "16px",
+		"lg": "24px",
+		"xl": "32px",
+		"xxl": "48px"
+	},
+	"componentes": {
+		"sidebar": "Verde esmeralda profundo, iconos minimalistas en línea blanca, bordes muy redondeados.",
+		"kpi_cards": "Sombras muy suaves (soft shadows), esquinas redondeadas 16px, iconos en círculos de color pastel.",
+		"graficos": "Líneas spline con degradados suaves, minimalismo en ejes, colores vibrantes para datos.",
+		"tablas": "Filas con espaciado generoso, hover sutil, tipografía legible y limpia, acciones minimalistas, filas alternas con colores suaves.",
+		"layout": "grid simple, no saturar, priorizar claridad"
+	}
+}

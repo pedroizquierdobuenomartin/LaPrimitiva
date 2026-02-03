@@ -14,25 +14,25 @@
 
 <PageTitle>Registro - La Primitiva Audit</PageTitle>
 
-<div class="space-y-6">
+<div class="space-y-10 animate-in fade-in duration-700">
     <div class="flex justify-between items-end">
         <div>
-            <h2 class="text-3xl font-extrabold text-slate-900 text-transparent bg-clip-text bg-gradient-to-r from-slate-900 to-slate-500">@L["Registration"]</h2>
-            <p class="text-slate-500">@L["DrawRecordsForYear"] @GlobalState.SelectedYear.</p>
+            <h2 class="text-4xl font-bold text-[var(--brand-secondary)] tracking-tight">@L["Registration"]</h2>
+            <p class="text-[var(--brand-text-secondary)] mt-2 font-medium">@L["DrawRecordsForYear"] @GlobalState.SelectedYear.</p>
         </div>
-        <div class="flex gap-4 items-end">
-            <button @onclick="ShowRegisterModal" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-2xl text-sm font-bold shadow-lg shadow-blue-200 transition-all flex items-center gap-2 transform hover:scale-105 active:scale-95">
+        <div class="flex gap-4 items-center">
+            <button @onclick="ShowRegisterModal" class="bg-[var(--brand-primary)] hover:bg-[var(--brand-secondary)] text-white px-8 py-3.5 rounded-2xl text-sm font-bold shadow-xl shadow-[var(--brand-primary)]/10 transition-all flex items-center gap-2 transform hover:scale-105 active:scale-95">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                     <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
                 </svg>
                 @L["AddNewDraw"]
             </button>
-            <div class="bg-white/80 backdrop-blur-md px-4 py-3 rounded-2xl border border-slate-200 shadow-sm h-full flex items-center gap-3">
-                <div class="h-2 w-2 rounded-full @(allPlans?.Any() == true ? "bg-emerald-500 animate-pulse" : "bg-rose-500")"></div>
-                <span class="text-slate-500 text-xs font-bold uppercase tracking-wider">@L["Plan"]:</span>
+            <div class="bg-white px-5 py-3 rounded-2xl border border-[var(--brand-borders)] shadow-sm flex items-center gap-3">
+                <div class="h-2.5 w-2.5 rounded-full @(allPlans?.Any() == true ? "bg-[var(--brand-positive)] animate-pulse" : "bg-rose-500")"></div>
+                <span class="text-[var(--brand-text-secondary)] text-[10px] font-bold uppercase tracking-widest">@L["Plan"]:</span>
                 @if (allPlans?.Any() == true)
                 {
-                    <select @bind="SelectedPlanId" class="text-slate-900 text-sm font-bold bg-transparent border-none p-0 focus:ring-0 cursor-pointer">
+                    <select @bind="SelectedPlanId" class="text-[var(--brand-secondary)] text-sm font-bold bg-transparent border-none p-0 focus:ring-0 cursor-pointer">
                         @foreach (var plan in allPlans)
                         {
                             <option value="@plan.Id">@plan.Name</option>
@@ -49,81 +49,80 @@
 
     @if (drawsWithCumulative == null)
     {
-        <div class="flex justify-center p-24">
+        <div class="flex justify-center p-32">
             <div class="relative">
-                <div class="h-24 w-24 rounded-full border-4 border-slate-100 border-t-blue-600 animate-spin"></div>
-                <div class="absolute inset-0 flex items-center justify-center text-blue-600 font-bold text-xs">Cargando</div>
+                <div class="h-24 w-24 rounded-full border-4 border-[var(--brand-bg)] border-t-[var(--brand-primary)] animate-spin"></div>
+                <div class="absolute inset-0 flex items-center justify-center text-[var(--brand-primary)] font-bold text-xs uppercase tracking-tighter">Cargando</div>
             </div>
         </div>
     }
     else
     {
-        <div class="bg-white rounded-3xl border border-slate-200 shadow-2xl shadow-slate-200/50 overflow-hidden">
+        <div class="bg-white rounded-[var(--radius-card)] border border-[var(--brand-borders)] shadow-sm overflow-hidden min-h-[400px]">
             <div class="overflow-x-auto">
                 <table class="w-full text-left border-separate border-spacing-0 min-w-max">
-                    <thead class="bg-slate-50 border-b border-slate-200">
+                    <thead class="bg-[var(--brand-bg)] border-b border-[var(--brand-borders)]">
                         <tr>
-                            <th class="sticky left-0 z-20 bg-slate-50/90 backdrop-blur-sm px-4 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest border-r border-slate-200">@L["Week"]</th>
-                            <th class="sticky left-[72px] z-20 bg-slate-50/90 backdrop-blur-sm px-4 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest border-r border-slate-200">@L["DrawType"]</th>
-                            <th class="sticky left-[142px] z-20 bg-slate-50/90 backdrop-blur-sm px-4 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest border-r border-slate-200">@L["Date"]</th>
-                            <th class="px-3 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">J.</th>
+                            <th class="sticky left-0 z-20 bg-[var(--brand-bg)]/90 backdrop-blur-sm px-6 py-5 text-[10px] font-bold text-[var(--brand-text-secondary)] uppercase tracking-widest border-r border-[var(--brand-borders)]">@L["Week"]</th>
+                            <th class="sticky left-[82px] z-20 bg-[var(--brand-bg)]/90 backdrop-blur-sm px-6 py-5 text-[10px] font-bold text-[var(--brand-text-secondary)] uppercase tracking-widest border-r border-[var(--brand-borders)]">@L["DrawType"]</th>
+                            <th class="sticky left-[152px] z-20 bg-[var(--brand-bg)]/90 backdrop-blur-sm px-6 py-5 text-[10px] font-bold text-[var(--brand-text-secondary)] uppercase tracking-widest border-r border-[var(--brand-borders)]">@L["Date"]</th>
+                            <th class="px-4 py-5 text-[10px] font-bold text-[var(--brand-text-secondary)] uppercase tracking-widest text-center">J.</th>
                             
-                            <!-- Detailed Audit Headers -->
-                            <th class="px-3 py-4 text-[10px] font-black text-slate-500 uppercase tracking-widest text-right bg-slate-100/30">C. Fija</th>
-                            <th class="px-3 py-4 text-[10px] font-black text-slate-500 uppercase tracking-widest text-right bg-slate-100/30">C. Auto</th>
-                            <th class="px-4 py-4 text-[10px] font-black text-slate-900 uppercase tracking-widest text-right bg-slate-100/50">Total C.</th>
+                            <th class="px-4 py-5 text-[10px] font-bold text-[var(--brand-text-secondary)] uppercase tracking-widest text-right bg-white/50">C. Fija</th>
+                            <th class="px-4 py-5 text-[10px] font-bold text-[var(--brand-text-secondary)] uppercase tracking-widest text-right bg-white/50">C. Auto</th>
+                            <th class="px-6 py-5 text-[10px] font-bold text-[var(--brand-secondary)] uppercase tracking-widest text-right bg-white">Total C.</th>
                             
-                            <th class="px-3 py-4 text-[10px] font-black text-blue-600/70 uppercase tracking-widest text-right bg-blue-50/30">P. Fija</th>
-                            <th class="px-3 py-4 text-[10px] font-black text-blue-600/70 uppercase tracking-widest text-right bg-blue-50/30">P. Auto</th>
-                            <th class="px-4 py-4 text-[10px] font-black text-blue-900 uppercase tracking-widest text-right bg-blue-100/30">Total P.</th>
+                            <th class="px-4 py-5 text-[10px] font-bold text-[var(--brand-primary)] uppercase tracking-widest text-right bg-[var(--brand-primary)]/5">P. Fija</th>
+                            <th class="px-4 py-5 text-[10px] font-bold text-[var(--brand-primary)] uppercase tracking-widest text-right bg-[var(--brand-primary)]/5">P. Auto</th>
+                            <th class="px-6 py-5 text-[10px] font-bold text-[var(--brand-secondary)] uppercase tracking-widest text-right bg-[var(--brand-primary)]/10">Total P.</th>
                             
-                            <th class="px-4 py-4 text-[10px] font-black text-slate-900 uppercase tracking-widest text-right border-l border-slate-200">@L["Net"]</th>
-                            <th class="px-4 py-4 text-[10px] font-black text-white uppercase tracking-widest text-right bg-slate-900">@L["Acumulado"]</th>
-                            <th class="px-4 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">@L["Notes"]</th>
-                            <th class="px-4 py-4"></th>
+                            <th class="px-6 py-5 text-[10px] font-bold text-[var(--brand-secondary)] uppercase tracking-widest text-right border-l border-[var(--brand-borders)]">@L["Net"]</th>
+                            <th class="px-6 py-5 text-[10px] font-bold text-white uppercase tracking-widest text-right bg-[var(--brand-secondary)]">@L["Acumulado"]</th>
+                            <th class="px-6 py-5 text-[10px] font-bold text-[var(--brand-text-secondary)] uppercase tracking-widest">@L["Notes"]</th>
+                            <th class="px-6 py-5"></th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-slate-100 font-mono text-[11px]">
+                    <tbody class="divide-y divide-[var(--brand-bg)] font-medium text-xs">
                         @foreach (var item in drawsWithCumulative)
                         {
                             var draw = item.Draw;
-                            <tr class="hover:bg-blue-50/30 transition-colors group">
-                                <td class="sticky left-0 z-10 bg-white group-hover:bg-blue-50/30 px-4 py-3 font-bold text-slate-500 border-r border-slate-100 text-center">@draw.WeekNumber</td>
-                                <td class="sticky left-[72px] z-10 bg-white group-hover:bg-blue-50/30 px-4 py-3 border-r border-slate-100 italic">@draw.DrawType</td>
-                                <td class="sticky left-[142px] z-10 bg-white group-hover:bg-blue-50/30 px-4 py-3 border-r border-slate-100">@draw.DrawDate.ToString("dd/MM/yy")</td>
-                                <td class="px-3 py-3 text-center">
+                            <tr class="hover:bg-[var(--brand-bg)]/30 transition-colors group">
+                                <td class="sticky left-0 z-10 bg-white group-hover:bg-[var(--brand-bg)]/20 px-6 py-4 font-bold text-[var(--brand-secondary)] border-r border-[var(--brand-bg)] text-center">@draw.WeekNumber</td>
+                                <td class="sticky left-[82px] z-10 bg-white group-hover:bg-[var(--brand-bg)]/20 px-6 py-4 border-r border-[var(--brand-bg)] text-[var(--brand-text-secondary)] italic">@draw.DrawType</td>
+                                <td class="sticky left-[152px] z-10 bg-white group-hover:bg-[var(--brand-bg)]/20 px-6 py-4 border-r border-[var(--brand-bg)] font-bold">@draw.DrawDate.ToString("dd/MM/yy")</td>
+                                <td class="px-4 py-4 text-center">
                                     <div class="flex justify-center">
-                                        <div class="h-4 w-4 rounded-full @(draw.Played ? "bg-blue-500" : "bg-slate-200") flex items-center justify-center text-[8px] text-white">
+                                        <div class="h-5 w-5 rounded-lg @(draw.Played ? "bg-[var(--brand-primary)]" : "bg-slate-100") flex items-center justify-center text-[10px] text-white transition-all transform @(draw.Played ? "rotate-0" : "rotate-45 opacity-50")">
                                             @(draw.Played ? "✓" : "")
                                         </div>
                                     </div>
                                 </td>
                                 
-                                <td class="px-3 py-3 text-right text-slate-400">@draw.CosteFija.ToString("N2")€</td>
-                                <td class="px-3 py-3 text-right text-slate-400">@draw.CosteAuto.ToString("N2")€</td>
-                                <td class="px-4 py-3 text-right font-bold text-slate-700 bg-slate-50/30">@draw.TotalCoste.ToString("N2")€</td>
-
-                                <td class="px-3 py-3 text-right text-blue-500">@draw.FixedPrize.ToString("N2")€</td>
-                                <td class="px-3 py-3 text-right text-blue-500">@draw.AutoPrize.ToString("N2")€</td>
-                                <td class="px-4 py-3 text-right font-bold text-blue-700 bg-blue-50/20">@draw.TotalPremios.ToString("N2")€</td>
-
-                                <td class="px-4 py-3 text-right font-bold border-l border-slate-100 @(draw.Neto >= 0 ? "text-emerald-600" : "text-rose-600")">
+                                <td class="px-4 py-4 text-right text-[var(--brand-text-secondary)]">@draw.CosteFija.ToString("N2")€</td>
+                                <td class="px-4 py-4 text-right text-[var(--brand-text-secondary)]">@draw.CosteAuto.ToString("N2")€</td>
+                                <td class="px-6 py-4 text-right font-bold text-[var(--brand-secondary)] bg-slate-50/10">@draw.TotalCoste.ToString("N2")€</td>
+                                
+                                <td class="px-4 py-4 text-right text-[var(--brand-primary)]">@draw.FixedPrize.ToString("N2")€</td>
+                                <td class="px-4 py-4 text-right text-[var(--brand-primary)]">@draw.AutoPrize.ToString("N2")€</td>
+                                <td class="px-6 py-4 text-right font-bold text-[var(--brand-secondary)] bg-[var(--brand-primary)]/5">@draw.TotalPremios.ToString("N2")€</td>
+                                
+                                <td class="px-6 py-4 text-right font-bold border-l border-[var(--brand-bg)] @(draw.Neto >= 0 ? "text-[var(--brand-positive)]" : "text-[var(--brand-negativo)]")">
                                     @draw.Neto.ToString("N2")€
                                 </td>
-                                <td class="px-4 py-3 text-right font-black bg-slate-900/5 @(draw.Acumulado >= 0 ? "text-emerald-700" : "text-rose-700")">
+                                <td class="px-6 py-4 text-right font-bold bg-[var(--brand-secondary)]/5 @(draw.Acumulado >= 0 ? "text-[var(--brand-positive)]" : "text-[var(--brand-negativo)]")">
                                     @draw.Acumulado.ToString("N2")€
                                 </td>
                                 
-                                <td class="px-4 py-3 max-w-[150px] truncate text-slate-400 italic">@draw.Notes</td>
+                                <td class="px-6 py-4 max-w-[200px] truncate text-[var(--brand-text-secondary)] italic">@draw.Notes</td>
                                 
-                                <td class="px-4 py-3 flex items-center justify-end gap-2">
-                                    <button @onclick="() => EditDraw(draw)" class="p-1.5 rounded-lg text-slate-300 hover:text-blue-600 hover:bg-blue-50 transition-all" title="Editar Semana">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <td class="px-6 py-4 flex items-center justify-end gap-3">
+                                    <button @onclick="() => EditDraw(draw)" class="h-9 w-9 rounded-xl text-slate-300 hover:text-[var(--brand-primary)] hover:bg-[var(--brand-primary)]/10 transition-all flex items-center justify-center" title="Editar Semana">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                         </svg>
                                     </button>
-                                    <button @onclick="() => ConfirmDeleteWeek(draw.WeekNumber, draw.DrawDate.Year, draw.PlanId)" class="p-1.5 rounded-lg text-slate-300 hover:text-rose-600 hover:bg-rose-50 transition-all" title="Eliminar Semana">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <button @onclick="() => ConfirmDeleteWeek(draw.WeekNumber, draw.DrawDate.Year, draw.PlanId)" class="h-9 w-9 rounded-xl text-slate-300 hover:text-rose-500 hover:bg-rose-50 transition-all flex items-center justify-center" title="Eliminar Semana">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                         </svg>
                                     </button>
@@ -140,12 +139,12 @@
 <!-- Modal Refined to match requirement list -->
 @if (showModal)
 {
-    <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/70 backdrop-blur-md transition-all">
+    <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[var(--brand-secondary)]/70 backdrop-blur-md transition-all">
         <div class="bg-white rounded-[2.5rem] shadow-2xl w-full max-w-6xl max-h-[92vh] overflow-hidden flex flex-col animate-in fade-in zoom-in duration-300">
             <!-- Modal Header -->
-            <div class="px-10 py-8 border-b border-slate-100 flex justify-between items-center bg-white">
+            <div class="px-10 py-8 border-b border-[var(--brand-borders)] flex justify-between items-center bg-white">
                 <div class="flex items-center gap-6">
-                    <div class="h-14 w-14 rounded-2xl @(isNewRegistration ? "bg-blue-600 shadow-blue-200" : "bg-indigo-600 shadow-indigo-200") flex items-center justify-center text-white shadow-xl">
+                    <div class="h-14 w-14 rounded-2xl @(isNewRegistration ? "bg-[var(--brand-primary)]" : "bg-[var(--brand-secondary)]") flex items-center justify-center text-white shadow-xl shadow-[var(--brand-primary)]/10">
                         @if (isNewRegistration)
                         {
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" viewBox="0 0 20 20" fill="currentColor">
@@ -160,11 +159,11 @@
                         }
                     </div>
                     <div>
-                        <h3 class="text-2xl font-black text-slate-900">@(isNewRegistration ? L["AddNewWeeklyDrawTitle"] : L["EditWeeklyDrawTitle"])</h3>
-                        <p class="text-slate-400 font-medium">@(isNewRegistration ? L["WeeklyDrawAuditSubtitle"] : L["WeeklyDrawEditSubtitle"])</p>
+                        <h3 class="text-2xl font-bold text-[var(--brand-secondary)]">@(isNewRegistration ? L["AddNewWeeklyDrawTitle"] : L["EditWeeklyDrawTitle"])</h3>
+                        <p class="text-[var(--brand-text-secondary)] font-medium">@(isNewRegistration ? L["WeeklyDrawAuditSubtitle"] : L["WeeklyDrawEditSubtitle"])</p>
                     </div>
                 </div>
-                <button @onclick="CloseModal" class="h-12 w-12 hover:bg-slate-100 rounded-2xl flex items-center justify-center transition-all text-slate-300 hover:text-slate-900">
+                <button @onclick="CloseModal" class="h-12 w-12 hover:bg-[var(--brand-bg)] rounded-2xl flex items-center justify-center transition-all text-slate-300 hover:text-[var(--brand-secondary)]">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                     </svg>
@@ -172,16 +171,16 @@
             </div>
 
             <!-- Modal Content -->
-            <div class="flex-1 overflow-auto p-10 bg-slate-50/50">
+            <div class="flex-1 overflow-auto p-10 bg-[var(--brand-bg)]/30">
                 <!-- Week & Plan Info -->
                 <div class="flex flex-wrap gap-8 mb-10">
-                    <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 flex-1 min-w-[200px]">
-                        <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3">@L["WeekNumberLabel"]</label>
+                    <div class="bg-white p-6 rounded-[2rem] shadow-sm border border-[var(--brand-borders)] flex-1 min-w-[200px]">
+                        <label class="block text-[10px] font-bold text-[var(--brand-text-secondary)] uppercase tracking-widest mb-3">@L["WeekNumberLabel"]</label>
                         <div class="flex items-center gap-4">
-                            <input type="number" @bind="modalWeek" disabled="@(!isNewRegistration)" class="w-24 text-3xl font-black @(isNewRegistration ? "text-blue-600" : "text-slate-400") bg-transparent border-none p-0 focus:ring-0" />
+                            <input type="number" @bind="modalWeek" disabled="@(!isNewRegistration)" class="w-24 text-4xl font-black @(isNewRegistration ? "text-[var(--brand-primary)]" : "text-slate-300") bg-transparent border-none p-0 focus:ring-0" />
                             @if (isNewRegistration)
                             {
-                                <button @onclick="LoadWeekDataInModal" class="text-xs font-bold text-blue-600 hover:text-blue-700 flex items-center gap-1 group">
+                                <button @onclick="LoadWeekDataInModal" class="text-xs font-bold text-[var(--brand-primary)] hover:text-[var(--brand-secondary)] flex items-center gap-1 group">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 transition-transform group-hover:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                                     </svg>
@@ -190,15 +189,15 @@
                             }
                         </div>
                     </div>
-                    <div class="bg-blue-600 p-6 rounded-3xl shadow-xl shadow-blue-200 flex-[2] min-w-[300px] text-white overflow-hidden relative">
+                    <div class="bg-[var(--brand-secondary)] p-7 rounded-[2.5rem] shadow-xl shadow-[var(--brand-secondary)]/10 flex-[2] min-w-[300px] text-white overflow-hidden relative">
                         <div class="relative z-10">
-                            <label class="block text-[10px] font-black text-blue-200 uppercase tracking-widest mb-2">@L["ActivePlanDetected"]</label>
-                            <div class="text-2xl font-black">@activePlanName</div>
-                            <div class="mt-2 text-[10px] font-bold text-blue-100">
+                            <label class="block text-[10px] font-bold text-white/60 uppercase tracking-widest mb-2">@L["ActivePlanDetected"]</label>
+                            <div class="text-3xl font-black">@activePlanName</div>
+                            <div class="mt-2 text-xs font-medium text-white/50">
                                 @(modalPlan?.BetsPerDraw ?? 0) @L["BetsPerDraw"] • Joker @(modalPlan?.EnableJoker == true ? L["Yes"] : L["No"])
                             </div>
                         </div>
-                        <svg class="absolute -right-4 -bottom-4 h-32 w-32 text-blue-500 opacity-20" fill="currentColor" viewBox="0 0 20 20"><path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z"/></svg>
+                        <svg class="absolute -right-4 -bottom-4 h-32 w-32 text-white opacity-5" fill="currentColor" viewBox="0 0 20 20"><path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z"/></svg>
                     </div>
                 </div>
 
@@ -211,8 +210,8 @@
                             </svg>
                         </div>
                         <div>
-                            <p class="text-sm font-black text-rose-900 uppercase tracking-tight">Error Detectado</p>
-                            <p class="text-xs font-bold text-rose-700/80">@modalErrorMessage</p>
+                            <p class="text-xs font-bold text-rose-900 uppercase tracking-widest">Error Detectado</p>
+                            <p class="text-[13px] font-medium text-rose-700/80">@modalErrorMessage</p>
                         </div>
                     </div>
                 }
@@ -220,16 +219,16 @@
                 @if (weekAlreadyExists && isNewRegistration)
                 {
                     <div class="mb-8 p-8 bg-amber-50 border border-amber-100 rounded-[2.5rem] flex flex-col md:flex-row gap-6 items-center animate-in fade-in zoom-in duration-500">
-                        <div class="h-16 w-16 bg-amber-100 rounded-2xl flex items-center justify-center text-amber-600 shrink-0 shadow-sm">
+                        <div class="h-16 w-16 bg-amber-100 rounded-[1.25rem] flex items-center justify-center text-amber-600 shrink-0 shadow-sm">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" viewBox="0 0 20 20" fill="currentColor">
                                 <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
                             </svg>
                         </div>
                         <div class="text-center md:text-left space-y-2">
-                            <h4 class="text-xl font-black text-amber-900 uppercase tracking-tighter">Semana ya registrada</h4>
-                            <p class="text-sm font-bold text-amber-800/70 leading-relaxed">
-                                La semana <span class="text-amber-900">@modalWeek</span> ya tiene sorteos registrados en el sistema. 
-                                Si deseas modificarlos, por favor cierra este asistente y pulsa el botón de edición en la lista de sorteos.
+                            <h4 class="text-xl font-bold text-amber-900 tracking-tight">Semana ya registrada</h4>
+                            <p class="text-sm font-medium text-amber-800/70 leading-relaxed">
+                                La semana <span class="font-bold text-amber-900">@modalWeek</span> ya tiene sorteos registrados. 
+                                Si deseas modificarlos, por favor pulsa el botón de edición en la lista principal.
                             </p>
                         </div>
                     </div>
@@ -237,37 +236,37 @@
 
                 @if (isModalLoading)
                 {
-                    <div class="flex justify-center p-20">
-                        <div class="h-12 w-12 rounded-full border-4 border-slate-100 border-t-blue-600 animate-spin"></div>
+                    <div class="flex justify-center p-24">
+                        <div class="h-14 w-14 rounded-full border-4 border-[var(--brand-bg)] border-t-[var(--brand-primary)] animate-spin"></div>
                     </div>
                 }
                 else if (isNewRegistration && modalDraws == null && !weekAlreadyExists)
                 {
-                    <div class="bg-white rounded-[3.5rem] border border-slate-100 shadow-xl shadow-slate-200/20 p-12 overflow-hidden relative">
+                    <div class="bg-white rounded-[3rem] border border-[var(--brand-borders)] shadow-sm p-12 overflow-hidden relative">
                         <div class="absolute top-0 right-0 p-8 opacity-5">
-                            <svg class="h-64 w-64 text-slate-900" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0L7.43 7.52H3.07c-1.61 0-2.28 2.06-.98 3.02l3.53 2.56-1.35 4.35c-.48 1.56 1.31 2.87 2.61 1.91l3.58-2.62 3.58 2.62c1.3 0.96 3.09-0.35 2.61-1.91l-1.35-4.35 3.53-2.56c1.3-.96.63-3.02-.98-3.02h-4.36l-1.08-4.35z" clip-rule="evenodd"/></svg>
+                            <svg class="h-64 w-64 text-[var(--brand-secondary)]" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0L7.43 7.52H3.07c-1.61 0-2.28 2.06-.98 3.02l3.53 2.56-1.35 4.35c-.48 1.56 1.31 2.87 2.61 1.91l3.58-2.62 3.58 2.62c1.3 0.96 3.09-0.35 2.61-1.91l-1.35-4.35 3.53-2.56c1.3-.96.63-3.02-.98-3.02h-4.36l-1.08-4.35z" clip-rule="evenodd"/></svg>
                         </div>
                         
                         <div class="max-w-4xl mx-auto space-y-12 relative z-10">
                             <div class="text-center space-y-2">
-                                <span class="inline-block px-4 py-1.5 rounded-full bg-blue-50 text-blue-600 text-[10px] font-black uppercase tracking-widest mb-2">Configurador Inteligente</span>
-                                <h4 class="text-4xl font-black text-slate-900 tracking-tight">Personaliza tu Semana</h4>
-                                <p class="text-slate-400 font-bold text-lg">Configura el plan de apuestas y los días de sorteo para la semana @modalWeek.</p>
+                                <span class="inline-block px-4 py-1.5 rounded-full bg-[var(--brand-bg)] text-[var(--brand-primary)] text-[10px] font-bold uppercase tracking-widest mb-2">Configurador Inteligente</span>
+                                <h4 class="text-4xl font-bold text-[var(--brand-secondary)] tracking-tight">Personaliza tu Semana</h4>
+                                <p class="text-[var(--brand-text-secondary)] font-medium text-lg">Configura el plan de apuestas y los días de sorteo para la semana @modalWeek.</p>
                             </div>
 
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
                                 <!-- Plan Selection -->
                                 <div class="space-y-6">
                                     <div class="flex items-center gap-3 px-1">
-                                        <div class="h-8 w-8 rounded-lg bg-slate-900 text-white flex items-center justify-center">
+                                        <div class="h-8 w-8 rounded-lg bg-[var(--brand-secondary)] text-white flex items-center justify-center">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                                             </svg>
                                         </div>
-                                        <label class="text-xs font-black text-slate-900 uppercase tracking-widest">Modelo de Plan</label>
+                                        <label class="text-xs font-bold text-[var(--brand-secondary)] uppercase tracking-widest">Modelo de Plan</label>
                                     </div>
                                     <div class="relative group">
-                                        <select @bind="selectedPlanId" class="w-full bg-slate-50 border-2 border-slate-50 rounded-[1.5rem] p-5 text-base font-black text-slate-800 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500/20 transition-all appearance-none cursor-pointer">
+                                        <select @bind="selectedPlanId" class="w-full bg-[var(--brand-bg)] border-2 border-[var(--brand-bg)] rounded-[1.5rem] p-5 text-base font-bold text-[var(--brand-secondary)] focus:ring-4 focus:ring-[var(--brand-primary)]/10 focus:border-[var(--brand-primary)]/20 transition-all appearance-none cursor-pointer">
                                             @if (allPlans != null)
                                             {
                                                 @foreach (var plan in allPlans)
@@ -276,7 +275,7 @@
                                                 }
                                             }
                                         </select>
-                                        <div class="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
+                                        <div class="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-[var(--brand-text-secondary)]">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                                                 <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
                                             </svg>
@@ -287,17 +286,17 @@
                                 <!-- Custom Draw Addition -->
                                 <div class="space-y-6">
                                     <div class="flex items-center gap-3 px-1">
-                                        <div class="h-8 w-8 rounded-lg bg-blue-600 text-white flex items-center justify-center shadow-lg shadow-blue-100">
+                                        <div class="h-8 w-8 rounded-lg bg-[var(--brand-primary)] text-white flex items-center justify-center shadow-lg shadow-[var(--brand-primary)]/10">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                                             </svg>
                                         </div>
-                                        <label class="text-xs font-black text-slate-900 uppercase tracking-widest">Añadir Sorteos</label>
+                                        <label class="text-xs font-bold text-[var(--brand-secondary)] uppercase tracking-widest">Añadir Sorteos</label>
                                     </div>
                                     <div class="flex flex-wrap gap-3">
-                                        <button @onclick='() => AddDrawTemplate(DayOfWeek.Monday)' class="flex-1 bg-white border-2 border-slate-100 text-slate-600 px-6 py-4 rounded-2xl text-[11px] font-black uppercase tracking-wider hover:border-blue-500 hover:text-blue-600 hover:bg-blue-50/50 transition-all active:scale-95">Lunes</button>
-                                        <button @onclick='() => AddDrawTemplate(DayOfWeek.Thursday)' class="flex-1 bg-white border-2 border-slate-100 text-slate-600 px-6 py-4 rounded-2xl text-[11px] font-black uppercase tracking-wider hover:border-blue-500 hover:text-blue-600 hover:bg-blue-50/50 transition-all active:scale-95">Jueves</button>
-                                        <button @onclick='() => AddDrawTemplate(DayOfWeek.Saturday)' class="flex-1 bg-white border-2 border-slate-100 text-slate-600 px-6 py-4 rounded-2xl text-[11px] font-black uppercase tracking-wider hover:border-blue-500 hover:text-blue-600 hover:bg-blue-50/50 transition-all active:scale-95">Sábado</button>
+                                        <button @onclick='() => AddDrawTemplate(DayOfWeek.Monday)' class="flex-1 bg-white border-2 border-[var(--brand-bg)] text-[var(--brand-text-secondary)] px-6 py-4 rounded-2xl text-[11px] font-bold uppercase tracking-wider hover:border-[var(--brand-primary)] hover:text-[var(--brand-primary)] hover:bg-[var(--brand-primary)]/5 transition-all active:scale-95">Lunes</button>
+                                        <button @onclick='() => AddDrawTemplate(DayOfWeek.Thursday)' class="flex-1 bg-white border-2 border-[var(--brand-bg)] text-[var(--brand-text-secondary)] px-6 py-4 rounded-2xl text-[11px] font-bold uppercase tracking-wider hover:border-[var(--brand-primary)] hover:text-[var(--brand-primary)] hover:bg-[var(--brand-primary)]/5 transition-all active:scale-95">Jueves</button>
+                                        <button @onclick='() => AddDrawTemplate(DayOfWeek.Saturday)' class="flex-1 bg-white border-2 border-[var(--brand-bg)] text-[var(--brand-text-secondary)] px-6 py-4 rounded-2xl text-[11px] font-bold uppercase tracking-wider hover:border-[var(--brand-primary)] hover:text-[var(--brand-primary)] hover:bg-[var(--brand-primary)]/5 transition-all active:scale-95">Sábado</button>
                                     </div>
                                     
                                     @if (tempModalDraws.Any())
@@ -305,14 +304,14 @@
                                         <div class="mt-8 grid grid-cols-1 gap-3">
                                             @foreach (var d in tempModalDraws)
                                             {
-                                                <div class="bg-slate-50/50 border-2 border-dashed border-slate-200 p-4 rounded-2xl flex justify-between items-center group/item hover:border-blue-200 hover:bg-blue-50/30 transition-all">
+                                                <div class="bg-[var(--brand-bg)]/50 border-2 border-dashed border-[var(--brand-borders)] p-4 rounded-2xl flex justify-between items-center group/item hover:border-[var(--brand-primary)]/30 hover:bg-[var(--brand-primary)]/5 transition-all">
                                                     <div class="flex items-center gap-4">
-                                                        <div class="h-10 w-10 rounded-xl bg-white flex items-center justify-center text-blue-600 font-black text-xs shadow-sm shadow-slate-100">
+                                                        <div class="h-10 w-10 rounded-xl bg-white flex items-center justify-center text-[var(--brand-primary)] font-bold text-xs shadow-sm">
                                                             @d.DrawDate.Day
                                                         </div>
                                                         <div>
-                                                            <div class="text-xs font-black text-slate-900 uppercase tracking-tight">@d.DrawType</div>
-                                                            <div class="text-[10px] text-slate-400 font-bold">@d.DrawDate.ToString("MMMM yyyy")</div>
+                                                            <div class="text-xs font-bold text-[var(--brand-secondary)] uppercase tracking-tight">@d.DrawType</div>
+                                                            <div class="text-[10px] text-[var(--brand-text-secondary)] font-medium">@d.DrawDate.ToString("MMMM yyyy")</div>
                                                         </div>
                                                     </div>
                                                     <button @onclick="() => tempModalDraws.Remove(d)" class="h-10 w-10 text-slate-300 hover:text-rose-500 hover:bg-rose-50 rounded-xl transition-all flex items-center justify-center">
@@ -327,8 +326,8 @@
                                 </div>
                             </div>
 
-                            <div class="pt-8 flex justify-center border-t border-slate-50">
-                                <button @onclick="PrepareNewWeek" disabled="@(!tempModalDraws.Any())" class="group relative bg-slate-900 text-white px-12 py-5 rounded-[2rem] font-black uppercase tracking-[0.2em] shadow-2xl shadow-slate-300 hover:bg-blue-600 transition-all flex items-center gap-4 disabled:opacity-20 disabled:grayscale disabled:pointer-events-none">
+                            <div class="pt-8 flex justify-center border-t border-[var(--brand-bg)]">
+                                <button @onclick="PrepareNewWeek" disabled="@(!tempModalDraws.Any())" class="group relative bg-[var(--brand-secondary)] text-white px-12 py-5 rounded-[2rem] font-bold uppercase tracking-[0.2em] shadow-xl shadow-[var(--brand-secondary)]/10 hover:bg-black transition-all flex items-center gap-4 disabled:opacity-20 disabled:grayscale disabled:pointer-events-none active:scale-95">
                                     <span>Comenzar Auditoría</span>
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 transition-transform group-hover:translate-x-1" viewBox="0 0 20 20" fill="currentColor">
                                         <path fill-rule="evenodd" d="M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd" />
@@ -343,15 +342,15 @@
                     <div class="space-y-6">
                         @foreach (var draw in modalDraws.OrderBy(d => d.DrawDate))
                         {
-                            <div class="bg-white rounded-[2rem] border border-slate-100 shadow-sm overflow-hidden p-8 flex flex-col lg:flex-row gap-8 items-start lg:items-center">
+                            <div class="bg-white rounded-[2rem] border border-[var(--brand-borders)] shadow-sm overflow-hidden p-8 flex flex-col lg:flex-row gap-8 items-start lg:items-center animate-in slide-in-from-bottom-2 duration-300">
                                 <!-- Draw Identity -->
                                 <div class="w-full lg:w-48 space-y-2">
-                                    <div class="text-xs font-black text-slate-400 uppercase tracking-widest">@L["DrawType"]</div>
-                                    <div class="text-2xl font-black text-slate-900">@draw.DrawType</div>
-                                    <div class="text-sm font-bold text-slate-500 font-mono">@draw.DrawDate.ToString("dd/MM/yyyy")</div>
-                                    <label class="flex items-center gap-3 mt-4 p-3 rounded-2xl cursor-pointer transition-all @(draw.Played ? "bg-blue-50 text-blue-600" : "bg-slate-50 text-slate-400 hover:bg-slate-100")">
-                                        <input type="checkbox" @bind="draw.Played" @bind:after="() => RecalculateDraw(draw, forceDefaults: true)" class="h-5 w-5 rounded-lg border-current focus:ring-0" />
-                                        <span class="text-sm font-black uppercase tracking-wider">@L["PlayedLabel"]</span>
+                                    <div class="text-[10px] font-bold text-[var(--brand-text-secondary)] uppercase tracking-widest">@L["DrawType"]</div>
+                                    <div class="text-2xl font-bold text-[var(--brand-secondary)]">@draw.DrawType</div>
+                                    <div class="text-sm font-bold text-[var(--brand-text-secondary)]/60 font-mono">@draw.DrawDate.ToString("dd/MM/yyyy")</div>
+                                    <label class="flex items-center gap-3 mt-4 p-3 rounded-2xl cursor-pointer transition-all @(draw.Played ? "bg-[var(--brand-primary)]/10 text-[var(--brand-primary)]" : "bg-[var(--brand-bg)] text-[var(--brand-text-secondary)] hover:bg-[var(--brand-borders)]")">
+                                        <input type="checkbox" @bind="draw.Played" @bind:after="() => RecalculateDraw(draw, forceDefaults: true)" class="h-5 w-5 rounded-lg border-current focus:ring-0 text-[var(--brand-primary)]" />
+                                        <span class="text-[11px] font-bold uppercase tracking-wider">@L["PlayedLabel"]</span>
                                     </label>
                                 </div>
 
@@ -359,94 +358,92 @@
                                 <div class="flex-1 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                                     <!-- Costs Summary -->
                                     <div class="space-y-4">
-                                        <div class="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">@L["AuditedCostsTitle"]</div>
+                                        <div class="text-[10px] font-bold text-[var(--brand-text-secondary)] uppercase tracking-widest px-1">@L["AuditedCostsTitle"]</div>
                                         <div class="space-y-3">
                                             <div class="group">
-                                                <label class="text-[9px] font-bold text-slate-400 uppercase ml-1">@L["FixedCostLabel"]</label>
-                                                <input type="number" step="0.01" @bind="draw.CosteFija" @bind:after="() => RecalculateDraw(draw)" disabled="@(!draw.Played)" class="w-full bg-slate-50 border-none rounded-xl p-3 text-sm font-bold focus:ring-2 focus:ring-blue-500/20 disabled:opacity-50 disabled:cursor-not-allowed" />
+                                                <label class="text-[9px] font-bold text-[var(--brand-text-secondary)]/50 uppercase ml-1">@L["FixedCostLabel"]</label>
+                                                <input type="number" step="0.01" @bind="draw.CosteFija" @bind:after="() => RecalculateDraw(draw)" disabled="@(!draw.Played)" class="w-full bg-[var(--brand-bg)] border-none rounded-xl p-3 text-sm font-bold focus:ring-2 focus:ring-[var(--brand-primary)]/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all" />
                                             </div>
                                             <div class="group">
-                                                <label class="text-[9px] font-bold text-slate-400 uppercase ml-1">@L["AutoCostLabel"]</label>
-                                                <input type="number" step="0.01" @bind="draw.CosteAuto" @bind:after="() => RecalculateDraw(draw)" disabled="@(!draw.Played)" class="w-full bg-slate-50 border-none rounded-xl p-3 text-sm font-bold focus:ring-2 focus:ring-blue-500/20 disabled:opacity-50 disabled:cursor-not-allowed" />
+                                                <label class="text-[9px] font-bold text-[var(--brand-text-secondary)]/50 uppercase ml-1">@L["AutoCostLabel"]</label>
+                                                <input type="number" step="0.01" @bind="draw.CosteAuto" @bind:after="() => RecalculateDraw(draw)" disabled="@(!draw.Played)" class="w-full bg-[var(--brand-bg)] border-none rounded-xl p-3 text-sm font-bold focus:ring-2 focus:ring-[var(--brand-primary)]/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all" />
                                             </div>
                                         </div>
                                     </div>
 
                                     <!-- Prizes Entry -->
                                     <div class="space-y-4">
-                                        <div class="text-[10px] font-black text-blue-400 uppercase tracking-widest px-1">Premios Registrados</div>
+                                        <div class="text-[10px] font-bold text-[var(--brand-primary)] uppercase tracking-widest px-1">Premios Registrados</div>
                                         <div class="space-y-3">
                                             <div class="group">
-                                                <label class="text-[9px] font-bold text-blue-400 uppercase ml-1">Premio Fija (€)</label>
-                                                <input type="number" step="0.01" @bind="draw.FixedPrize" @bind:after="() => RecalculateDraw(draw)" disabled="@(!draw.Played || draw.CosteFija == 0)" class="w-full bg-blue-50/50 border-none rounded-xl p-3 text-sm font-bold text-blue-700 focus:ring-2 focus:ring-blue-500/20 disabled:opacity-50 disabled:cursor-not-allowed" />
+                                                <label class="text-[9px] font-bold text-[var(--brand-primary)]/50 uppercase ml-1">Premio Fija (€)</label>
+                                                <input type="number" step="0.01" @bind="draw.FixedPrize" @bind:after="() => RecalculateDraw(draw)" disabled="@(!draw.Played || draw.CosteFija == 0)" class="w-full bg-[var(--brand-primary)]/5 border-none rounded-xl p-3 text-sm font-bold text-[var(--brand-primary)] focus:ring-2 focus:ring-[var(--brand-primary)]/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all" />
                                             </div>
                                             <div class="group">
-                                                <label class="text-[9px] font-bold text-blue-400 uppercase ml-1">Premio Auto (€)</label>
-                                                <input type="number" step="0.01" @bind="draw.AutoPrize" @bind:after="() => RecalculateDraw(draw)" disabled="@(!draw.Played || draw.CosteAuto == 0)" class="w-full bg-blue-50/50 border-none rounded-xl p-3 text-sm font-bold text-blue-700 focus:ring-2 focus:ring-blue-500/20 disabled:opacity-50 disabled:cursor-not-allowed" />
+                                                <label class="text-[9px] font-bold text-[var(--brand-primary)]/50 uppercase ml-1">Premio Auto (€)</label>
+                                                <input type="number" step="0.01" @bind="draw.AutoPrize" @bind:after="() => RecalculateDraw(draw)" disabled="@(!draw.Played || draw.CosteAuto == 0)" class="w-full bg-[var(--brand-primary)]/5 border-none rounded-xl p-3 text-sm font-bold text-[var(--brand-primary)] focus:ring-2 focus:ring-[var(--brand-primary)]/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all" />
                                             </div>
                                         </div>
                                     </div>
 
                                     <!-- Results (Computed persistence) -->
                                     <div class="space-y-4 md:col-span-2 lg:col-span-1">
-                                        <div class="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">@L["FinalResultsTitle"]</div>
-                                        <div class="bg-slate-50/80 rounded-2xl p-4 space-y-4">
+                                        <div class="text-[10px] font-bold text-[var(--brand-text-secondary)] uppercase tracking-widest px-1">@L["FinalResultsTitle"]</div>
+                                        <div class="bg-[var(--brand-bg)] rounded-2xl p-4 space-y-4">
                                             <div class="flex justify-between items-center text-[10px] font-bold">
-                                                <span class="text-slate-400">@L["TotalCostLabel"]:</span>
-                                                <span class="text-slate-900">@draw.TotalCoste.ToString("N2")€</span>
+                                                <span class="text-[var(--brand-text-secondary)]/50">@L["TotalCostLabel"]:</span>
+                                                <span class="text-[var(--brand-secondary)]">@draw.TotalCoste.ToString("N2")€</span>
                                             </div>
                                             <div class="flex justify-between items-center text-[10px] font-bold">
-                                                <span class="text-blue-500">@L["TotalPrizesLabel"]:</span>
-                                                <span class="text-blue-700">@draw.TotalPremios.ToString("N2")€</span>
+                                                <span class="text-[var(--brand-primary)]">@L["TotalPrizesLabel"]:</span>
+                                                <span class="text-[var(--brand-primary)]">@draw.TotalPremios.ToString("N2")€</span>
                                             </div>
-                                            <div class="pt-2 border-t border-slate-200 flex justify-between items-center">
-                                                <span class="text-[10px] font-black text-slate-500">@L["NetDrawLabel"]:</span>
-                                                <span class="text-lg font-black @(draw.Neto >= 0 ? "text-emerald-600" : "text-rose-600")">@draw.Neto.ToString("N2")€</span>
+                                            <div class="pt-2 border-t border-[var(--brand-borders)] flex justify-between items-center">
+                                                <span class="text-[10px] font-bold text-[var(--brand-text-secondary)]">@L["NetDrawLabel"]:</span>
+                                                <span class="text-xl font-bold @(draw.Neto >= 0 ? "text-[var(--brand-positive)]" : "text-[var(--brand-negativo)]")">@draw.Neto.ToString("N2")€</span>
                                             </div>
                                         </div>
                                     </div>
 
                                     <!-- Notes -->
                                     <div class="space-y-4">
-                                        <div class="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1 text-right">Observaciones</div>
-                                        <textarea @bind="draw.Notes" class="w-full bg-slate-50 border-none rounded-2xl p-4 text-[11px] font-medium text-slate-600 focus:ring-2 focus:ring-blue-500/20 h-28 resize-none" placeholder="Añade notas de auditoría aquí..."></textarea>
+                                        <div class="text-[10px] font-bold text-[var(--brand-text-secondary)] uppercase tracking-widest px-1 text-right">Observaciones</div>
+                                        <textarea @bind="draw.Notes" class="w-full bg-[var(--brand-bg)] border-none rounded-2xl p-4 text-[11px] font-medium text-[var(--brand-text-secondary)] focus:ring-2 focus:ring-[var(--brand-primary)]/20 h-28 resize-none transition-all" placeholder="Añade notas de auditoría aquí..."></textarea>
                                     </div>
                                 </div>
                             </div>
                         }
-
-                        @* modalErrorMessage moved to top *@
                     </div>
                 }
                 else
                 {
-                    <div class="text-center py-20 bg-slate-100/50 rounded-[3rem] border-4 border-dashed border-slate-100 flex flex-col items-center">
-                        <div class="h-24 w-24 rounded-full bg-white flex items-center justify-center text-slate-200 mb-6 shadow-sm">
+                    <div class="text-center py-24 bg-[var(--brand-bg)] rounded-[3rem] border-4 border-dashed border-[var(--brand-borders)] flex flex-col items-center">
+                        <div class="h-24 w-24 rounded-full bg-white flex items-center justify-center text-[var(--brand-borders)] mb-8 shadow-sm">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
                             </svg>
                         </div>
-                        <p class="text-lg font-black text-slate-300 uppercase tracking-widest">@L["EnterWeekNumberPrompt"]</p>
-                        <p class="text-slate-400 mt-2 font-medium">@L["ClickLoadDataPrompt"]</p>
+                        <p class="text-lg font-bold text-[var(--brand-text-secondary)] uppercase tracking-widest">@L["EnterWeekNumberPrompt"]</p>
+                        <p class="text-[var(--brand-text-secondary)]/50 mt-2 font-medium">@L["ClickLoadDataPrompt"]</p>
                     </div>
                 }
             </div>
 
             <!-- Modal Footer -->
-            <div class="px-10 py-8 border-t border-slate-100 bg-white flex justify-end gap-5">
-                <button @onclick="CloseModal" class="px-8 py-4 rounded-2xl text-sm font-black text-slate-500 hover:bg-slate-100 transition-all uppercase tracking-widest">
+            <div class="px-10 py-8 border-t border-[var(--brand-borders)] bg-white flex justify-end gap-5">
+                <button @onclick="CloseModal" class="px-8 py-4 rounded-2xl text-sm font-bold text-[var(--brand-text-secondary)] hover:bg-[var(--brand-bg)] transition-all uppercase tracking-widest">
                     @L["CancelButton"]
                 </button>
                 @if (!isNewRegistration && modalDraws != null && modalDraws.Any())
                 {
-                    <button @onclick="() => ConfirmDeleteWeek(modalWeek, GlobalState.SelectedYear, modalPlan?.Id ?? Guid.Empty)" class="px-8 py-4 rounded-2xl text-sm font-black text-rose-500 hover:bg-rose-50 hover:text-rose-600 transition-all uppercase tracking-widest flex items-center gap-2">
+                    <button @onclick="() => ConfirmDeleteWeek(modalWeek, GlobalState.SelectedYear, modalPlan?.Id ?? Guid.Empty)" class="px-8 py-4 rounded-2xl text-sm font-bold text-rose-500 hover:bg-rose-50 hover:text-rose-600 transition-all uppercase tracking-widest flex items-center gap-2">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                         </svg>
                         @L["DeleteButton"]
                     </button>
                 }
-                <button @onclick="SaveModalChanges" disabled="@(modalDraws == null || !modalDraws.Any())" class="px-12 py-4 rounded-[1.5rem] text-sm font-black bg-slate-900 text-white hover:bg-black shadow-2xl shadow-slate-200 transition-all disabled:opacity-30 uppercase tracking-widest">
+                <button @onclick="SaveModalChanges" disabled="@(modalDraws == null || !modalDraws.Any())" class="px-12 py-4 rounded-[1.5rem] text-sm font-bold bg-[var(--brand-secondary)] text-white hover:bg-black shadow-xl shadow-[var(--brand-secondary)]/10 transition-all disabled:opacity-30 uppercase tracking-widest active:scale-95">
                     @L["SaveAuditedWeekButton"]
                 </button>
             </div>
@@ -457,28 +454,29 @@
 <!-- Confirmation Modal -->
 @if (showDeleteArgs != null)
 {
-    <div class="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-sm transition-all animate-in fade-in duration-200">
-        <div class="bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden animate-in zoom-in duration-200 p-8 text-center space-y-6">
-            <div class="h-20 w-20 bg-rose-100 rounded-full flex items-center justify-center mx-auto text-rose-600">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <div class="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-[var(--brand-secondary)]/80 backdrop-blur-sm transition-all animate-in fade-in duration-300">
+        <div class="bg-white rounded-[2.5rem] shadow-2xl w-full max-w-md overflow-hidden animate-in zoom-in duration-300 p-10 text-center space-y-8 border border-[var(--brand-borders)]">
+            <div class="h-24 w-24 bg-rose-50 rounded-full flex items-center justify-center mx-auto text-rose-500 shadow-inner">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                 </svg>
             </div>
             
-            <div>
-                <h3 class="text-xl font-black text-slate-900">@L["DeleteWeekConfirmTitle"] @showDeleteArgs.Value.WeekNumber?</h3>
-                <p class="text-slate-500 mt-2 text-sm leading-relaxed">
+            <div class="space-y-4">
+                <h3 class="text-2xl font-bold text-[var(--brand-secondary)] tracking-tight">@L["DeleteWeekConfirmTitle"] @showDeleteArgs.Value.WeekNumber?</h3>
+                <p class="text-[var(--brand-text-secondary)] text-base leading-relaxed font-medium">
                     @L["DeleteWeekWarningText"] <strong>@L["Week"] @showDeleteArgs.Value.WeekNumber</strong> @L["Date"] @showDeleteArgs.Value.Year.
-                    <br/><br/>
-                    <span class="text-rose-600 font-bold">@L["NoUndoWarning"]</span>
                 </p>
+                <div class="bg-rose-50 px-4 py-2 rounded-xl inline-block">
+                    <span class="text-rose-600 font-bold text-sm">@L["NoUndoWarning"]</span>
+                </div>
             </div>
 
-            <div class="grid grid-cols-2 gap-4 pt-2">
-                <button @onclick="CancelDelete" class="px-4 py-3 rounded-xl text-sm font-bold text-slate-500 bg-slate-100 hover:bg-slate-200 transition-colors">
+            <div class="grid grid-cols-2 gap-4 pt-4">
+                <button @onclick="CancelDelete" class="px-6 py-4 rounded-2xl text-sm font-bold text-[var(--brand-text-secondary)] bg-[var(--brand-bg)] hover:bg-[var(--brand-borders)] transition-all uppercase tracking-widest active:scale-95">
                     @L["CancelButton"]
                 </button>
-                <button @onclick="ExecuteDelete" class="px-4 py-3 rounded-xl text-sm font-bold text-white bg-rose-600 hover:bg-rose-700 shadow-lg shadow-rose-200 transition-transform active:scale-95">
+                <button @onclick="ExecuteDelete" class="px-6 py-4 rounded-2xl text-sm font-bold text-white bg-rose-600 hover:bg-rose-700 shadow-xl shadow-rose-200 transition-all active:scale-95 uppercase tracking-widest">
                     @L["ConfirmDeleteButton"]
                 </button>
             </div>

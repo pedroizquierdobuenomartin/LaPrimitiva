@@ -273,4 +273,4 @@ F:\Repositorios\LaPrimitiva\LaPrimitiva.App\obj\Debug\net10.0\compressed\arl85wt
 F:\Repositorios\LaPrimitiva\LaPrimitiva.App\obj\Debug\net10.0\compressed\2jgqtlotj2-{0}-iz83ucvm53-iz83ucvm53.gz
 F:\Repositorios\LaPrimitiva\LaPrimitiva.App\bin\Debug\net10.0\es\LaPrimitiva.Domain.resources.dll
 F:\Repositorios\LaPrimitiva\LaPrimitiva.App\bin\Debug\net10.0\reconnection.json
-F:\Repositorios\LaPrimitiva\LaPrimitiva.App\obj\Debug\net10.0\compressed\ra9y9d4166-{0}-fpbme0iz07-fpbme0iz07.gz
+F:\Repositorios\LaPrimitiva\LaPrimitiva.App\obj\Debug\net10.0\compressed\ra9y9d4166-{0}-demdibb52b-demdibb52b.gz

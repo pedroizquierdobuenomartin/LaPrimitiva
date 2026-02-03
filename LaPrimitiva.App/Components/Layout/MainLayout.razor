@@ -7,138 +7,150 @@
 @inject IStringLocalizer<PrimitivaResource> L
 @implements IDisposable
 
-<div class="h-full flex relative">
+<div class="h-full flex relative bg-[var(--brand-bg)]">
     @if (_showMobileMenu)
     {
         <!-- Mobile Backdrop -->
-        <div class="fixed inset-0 bg-slate-900/50 z-40 md:hidden backdrop-blur-sm" @onclick="ToggleMobileMenu"></div>
+        <div class="fixed inset-0 bg-black/40 z-40 md:hidden backdrop-blur-sm" @onclick="ToggleMobileMenu"></div>
     }
 
     <!-- Sidebar -->
-    <aside class="@(_isCollapsed ? "w-20" : "w-64") @(_showMobileMenu ? "flex" : "hidden") md:flex bg-slate-900 text-slate-300 flex-shrink-0 flex flex-col transition-all duration-300 ease-in-out fixed inset-y-0 left-0 z-50 md:relative">
-        <div class="h-16 flex items-center @(_isCollapsed ? "justify-center" : "px-6") border-b border-slate-800 flex-shrink-0">
+    <aside class="@(_isCollapsed ? "w-20" : "w-72") @(_showMobileMenu ? "flex" : "hidden") md:flex bg-[var(--brand-secondary)] text-white/80 flex-shrink-0 flex flex-col transition-all duration-300 ease-in-out fixed inset-y-0 left-0 z-50 md:relative md:my-4 md:ml-4 md:rounded-[var(--radius-sidebar)] shadow-xl overflow-hidden">
+        <div class="h-32 flex items-center @(_isCollapsed ? "justify-center" : "px-8") border-b border-white/10 flex-shrink-0">
             @if (!_isCollapsed)
             {
-                <h1 class="text-xl font-bold text-white flex items-center gap-2 overflow-hidden whitespace-nowrap">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-blue-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                    </svg>
-                    <span>Primitiva Audit</span>
-                </h1>
+                <div class="flex flex-col items-center w-full gap-3">
+                    <div class="p-2 bg-white/5 rounded-2xl shadow-inner border border-white/5 flex items-center justify-center transition-all hover:bg-white/10">
+                        <img src="/images/logo_white.png" class="h-8 w-8 object-contain" alt="Logo" />
+                    </div>
+                    <span class="text-[11px] font-bold text-white uppercase tracking-[0.2em] whitespace-nowrap">
+                        La <span class="text-[var(--brand-accent)]">P</span>rimitiva
+                    </span>
+                </div>
             }
             else
             {
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                </svg>
+                <div class="p-3 bg-white/5 rounded-2xl shadow-inner border border-white/5 flex items-center justify-center">
+                    <img src="/images/logo_white.png" class="h-7 w-7 object-contain" alt="Logo" />
+                </div>
             }
         </div>
 
         <!-- Toggle Button -->
-        <button @onclick="ToggleSidebar" class="absolute -right-4 top-20 bg-blue-600 text-white p-1.5 rounded-full border-2 border-slate-50 hover:bg-blue-700 transition-all z-50 shadow-md group" aria-label="Toggle Sidebar">
+        <button @onclick="ToggleSidebar" class="absolute -right-3 top-32 bg-[var(--brand-accent)] text-[var(--brand-secondary)] p-1.5 rounded-full border-2 border-[var(--brand-bg)] hover:scale-110 transition-all z-50 shadow-lg group hidden md:block" aria-label="Toggle Sidebar">
             @if (_isCollapsed)
             {
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 transform group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7" />
                 </svg>
             }
             else
             {
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 transform group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
                 </svg>
             }
         </button>
         
-        <nav class="flex-1 px-4 space-y-2 mt-4 overflow-x-hidden">
-            <NavLink href="" Match="NavLinkMatch.All" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-slate-800 transition-colors" ActiveClass="bg-blue-600 text-white hover:bg-blue-600" title="@L["Dashboard"]">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <nav class="flex-1 px-4 space-y-2 mt-8 overflow-x-hidden">
+            <NavLink href="" Match="NavLinkMatch.All" class="flex items-center gap-4 px-5 py-4 rounded-xl hover:bg-white/10 transition-all duration-200 group text-white/70" ActiveClass="bg-white/20 text-white shadow-sm" title="@L["Dashboard"]">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 flex-shrink-0 group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
                 </svg>
                 @if (!_isCollapsed)
                 {
-                    <span class="whitespace-nowrap transition-opacity duration-300">@L["Dashboard"]</span>
+                    <span class="font-medium tracking-wide">@L["Dashboard"]</span>
                 }
             </NavLink>
-            <NavLink href="register" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-slate-800 transition-colors" ActiveClass="bg-blue-600 text-white hover:bg-blue-600" title="@L["Registration"]">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <NavLink href="register" class="flex items-center gap-4 px-5 py-4 rounded-xl hover:bg-white/10 transition-all duration-200 group text-white/70" ActiveClass="bg-white/20 text-white shadow-sm" title="@L["Registration"]">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 flex-shrink-0 group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
                 </svg>
                 @if (!_isCollapsed)
                 {
-                    <span class="whitespace-nowrap transition-opacity duration-300">@L["Registration"]</span>
+                    <span class="font-medium tracking-wide">@L["Registration"]</span>
                 }
             </NavLink>
-            <NavLink href="plans" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-slate-800 transition-colors" ActiveClass="bg-blue-600 text-white hover:bg-blue-600" title="@L["Plans"]">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <NavLink href="plans" class="flex items-center gap-4 px-5 py-4 rounded-xl hover:bg-white/10 transition-all duration-200 group text-white/70" ActiveClass="bg-white/20 text-white shadow-sm" title="@L["Plans"]">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 flex-shrink-0 group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
                 </svg>
                 @if (!_isCollapsed)
                 {
-                    <span class="whitespace-nowrap transition-opacity duration-300">@L["Plans"]</span>
+                    <span class="font-medium tracking-wide">@L["Plans"]</span>
                 }
             </NavLink>
-            <NavLink href="data" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-slate-800 transition-colors" ActiveClass="bg-blue-600 text-white hover:bg-blue-600" title="@L["Data"]">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <NavLink href="data" class="flex items-center gap-4 px-5 py-4 rounded-xl hover:bg-white/10 transition-all duration-200 group text-white/70" ActiveClass="bg-white/20 text-white shadow-sm" title="@L["Data"]">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 flex-shrink-0 group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                 </svg>
                 @if (!_isCollapsed)
                 {
-                    <span class="whitespace-nowrap transition-opacity duration-300">@L["Data"]</span>
+                    <span class="font-medium tracking-wide">@L["Data"]</span>
                 }
             </NavLink>
         </nav>
 
         @if (!_isCollapsed)
         {
-            <div class="p-6 text-xs text-slate-500 whitespace-nowrap overflow-hidden">
-                &copy; 2026 La Primitiva Audit.
+            <div class="p-8 text-[10px] text-white/40 uppercase tracking-widest font-bold">
+                &copy; 2026 La Primitiva Audit
             </div>
         }
     </aside>
 
     <!-- Main Content -->
-    <main class="flex-1 flex flex-col min-h-0 bg-slate-50 transition-all duration-300 ease-in-out">
+    <main class="flex-1 flex flex-col min-h-0 transition-all duration-300 ease-in-out">
         <!-- Header -->
-        <header class="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-8 flex-shrink-0 z-10 shadow-sm">
-            <div class="flex items-center gap-4">
-                <button @onclick="ToggleMobileMenu" class="md:hidden p-2 text-slate-600 hover:bg-slate-100 rounded-lg transition-colors" aria-label="Open Menu">
+        <header class="h-20 bg-transparent flex items-center justify-between px-10 flex-shrink-0 z-10">
+            <div class="flex items-center gap-6">
+                <button @onclick="ToggleMobileMenu" class="md:hidden p-3 text-[var(--brand-secondary)] hover:bg-white/50 rounded-xl transition-all shadow-sm" aria-label="Open Menu">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
                     </svg>
                 </button>
-                <div class="text-sm font-medium text-slate-500 uppercase tracking-wider">
-                    @L["SelectedYear"]:
+                <div class="flex items-center gap-3">
+                    <div class="text-xs font-bold text-[var(--brand-text-secondary)] uppercase tracking-[0.2em]">
+                        @L["SelectedYear"]:
+                    </div>
+                    <div class="relative group">
+                        <select @bind="GlobalState.SelectedYear" disabled="@GlobalState.IsHistoricalView" 
+                                class="appearance-none bg-white border border-[var(--brand-borders)] text-[var(--brand-secondary)] font-bold text-sm rounded-xl focus:ring-2 focus:ring-[var(--brand-primary)] focus:border-transparent block py-2 px-4 pr-10 disabled:opacity-50 shadow-sm cursor-pointer transition-all hover:border-[var(--brand-primary)]">
+                            @if (_availableYears != null)
+                            {
+                                @foreach (var y in _availableYears)
+                                {
+                                    <option value="@y">@y</option>
+                                }
+                            }
+                        </select>
+                        <div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-[var(--brand-secondary)]">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </div>
+                    </div>
                 </div>
-                <select @bind="GlobalState.SelectedYear" disabled="@GlobalState.IsHistoricalView" class="bg-slate-50 border border-slate-200 text-slate-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2 disabled:opacity-50">
-                    @if (_availableYears != null)
-                    {
-                        @foreach (var y in _availableYears)
-                        {
-                            <option value="@y">@y</option>
-                        }
-                    }
-                </select>
 
-                <div class="flex items-center bg-slate-100 p-1 rounded-lg ml-4">
-                    <button @onclick="() => SetHistorical(false)" class="px-3 py-1.5 text-xs font-bold rounded-md transition-all @(!GlobalState.IsHistoricalView ? "bg-white text-blue-600 shadow-sm" : "text-slate-500 hover:text-slate-700")">
+                <div class="flex items-center bg-white/50 p-1.5 rounded-xl ml-2 shadow-inner border border-white/40 backdrop-blur-sm">
+                    <button @onclick="() => SetHistorical(false)" class="px-5 py-2 text-xs font-bold rounded-lg transition-all @(!GlobalState.IsHistoricalView ? "bg-[var(--brand-primary)] text-white shadow-lg" : "text-[var(--brand-text-secondary)] hover:text-[var(--brand-secondary)]")">
                         @L["Yearly"]
                     </button>
-                    <button @onclick="() => SetHistorical(true)" class="px-3 py-1.5 text-xs font-bold rounded-md transition-all @(GlobalState.IsHistoricalView ? "bg-white text-blue-600 shadow-sm" : "text-slate-500 hover:text-slate-700")">
+                    <button @onclick="() => SetHistorical(true)" class="px-5 py-2 text-xs font-bold rounded-lg transition-all @(GlobalState.IsHistoricalView ? "bg-[var(--brand-primary)] text-white shadow-lg" : "text-[var(--brand-text-secondary)] hover:text-[var(--brand-secondary)]")">
                         @L["Historical"]
                     </button>
                 </div>
             </div>
             
             <div class="flex items-center gap-4">
-                <div class="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold">
+                <div class="h-10 w-10 rounded-xl bg-white border border-[var(--brand-borders)] shadow-sm flex items-center justify-center text-[var(--brand-primary)] font-bold hover:scale-105 transition-transform cursor-pointer">
                     P
                 </div>
             </div>
         </header>
 
         <!-- Page Content -->
-        <div class="flex-1 overflow-auto p-8 pb-24 md:pb-8">
+        <div class="flex-1 overflow-auto p-10 pb-24 md:pb-10">
             <div class="max-w-7xl mx-auto">
                 @Body
             </div>
@@ -146,18 +158,18 @@
     </main>
 
     <!-- Mobile Bottom Navigation -->
-    <nav class="md:hidden fixed bottom-6 left-6 right-6 bg-slate-900/95 backdrop-blur-lg border border-slate-800 rounded-2xl shadow-2xl z-50 flex items-center justify-around p-2 gap-2">
-        <NavLink href="" Match="NavLinkMatch.All" class="flex items-center justify-center flex-1 py-3 rounded-xl transition-all text-slate-400 hover:text-white" ActiveClass="bg-blue-600 text-white shadow-lg">
+    <nav class="md:hidden fixed bottom-8 left-8 right-8 bg-[var(--brand-secondary)]/95 backdrop-blur-xl border border-white/10 rounded-3xl shadow-2xl z-50 flex items-center justify-around p-3 gap-3">
+        <NavLink href="" Match="NavLinkMatch.All" class="flex items-center justify-center flex-1 py-4 rounded-2xl transition-all text-white/50 hover:text-white" ActiveClass="bg-[var(--brand-primary)] text-white shadow-xl scale-110 -translate-y-1">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
             </svg>
         </NavLink>
-        <NavLink href="register" class="flex items-center justify-center flex-1 py-3 rounded-xl transition-all text-slate-400 hover:text-white" ActiveClass="bg-blue-600 text-white shadow-lg">
+        <NavLink href="register" class="flex items-center justify-center flex-1 py-4 rounded-2xl transition-all text-white/50 hover:text-white" ActiveClass="bg-[var(--brand-primary)] text-white shadow-xl scale-110 -translate-y-1">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
             </svg>
         </NavLink>
-        <NavLink href="plans" class="flex items-center justify-center flex-1 py-3 rounded-xl transition-all text-slate-400 hover:text-white" ActiveClass="bg-blue-600 text-white shadow-lg">
+        <NavLink href="plans" class="flex items-center justify-center flex-1 py-4 rounded-2xl transition-all text-white/50 hover:text-white" ActiveClass="bg-[var(--brand-primary)] text-white shadow-xl scale-110 -translate-y-1">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
             </svg>

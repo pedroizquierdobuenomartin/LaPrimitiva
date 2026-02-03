@@ -1,32 +1,56 @@
-<div class="relative overflow-hidden p-6 rounded-3xl border shadow-sm flex flex-col gap-1 transition-all duration-300 hover:shadow-md @GetCardStyles()">
-    <div class="text-xs font-bold uppercase tracking-wider opacity-60">@Title</div>
-    <div class="text-3xl font-black">@Value</div>
+<div class="kpi-card p-6 flex flex-col gap-2 relative overflow-hidden group">
+    <div class="flex justify-between items-start">
+        <div class="flex flex-col gap-1">
+            <span class="text-xs font-bold text-[var(--brand-text-secondary)] uppercase tracking-wider">@Title</span>
+            <span class="text-3xl font-bold text-[var(--brand-text-primary)]">@Value</span>
+        </div>
+        <div class="w-12 h-12 rounded-xl flex items-center justify-center @GetIconBgStyles() shadow-sm transition-transform group-hover:scale-110">
+            <div class="w-6 h-6 @GetIconTextStyles()">
+                @Icon
+            </div>
+        </div>
+    </div>
+    
     @if (!string.IsNullOrEmpty(SubValue))
     {
-        <div class="text-sm font-semibold opacity-80">
+        <div class="text-sm font-medium text-[var(--brand-text-secondary)] flex items-center gap-2">
+            <div class="w-1.5 h-1.5 rounded-full @GetIndicatorStyles()"></div>
             @SubValue
         </div>
     }
-    
-    <div class="absolute -bottom-2 -right-2 w-20 h-20 opacity-10 transform -rotate-12">
-        @Icon
-    </div>
 </div>
 
 @code {
     [Parameter] public string Title { get; set; } = "";
     [Parameter] public string Value { get; set; } = "";
     [Parameter] public string? SubValue { get; set; }
-    [Parameter] public bool IsPositive { get; set; } = true;
     [Parameter] public string Color { get; set; } = "blue";
     [Parameter] public RenderFragment? Icon { get; set; }
 
-    private string GetCardStyles() => Color.ToLower() switch
+    private string GetIconBgStyles() => Color.ToLower() switch
     {
-        "red" => "bg-rose-50 border-rose-200 text-rose-900",
-        "emerald" => "bg-emerald-50 border-emerald-200 text-emerald-900",
-        "orange" => "bg-orange-50 border-orange-200 text-orange-900",
-        "violet" => "bg-violet-50 border-violet-200 text-violet-900",
-        _ => "bg-white border-slate-100 text-slate-900"
+        "red" => "bg-rose-100",
+        "emerald" => "bg-emerald-100",
+        "orange" => "bg-amber-100",
+        "violet" => "bg-purple-100",
+        _ => "bg-slate-100"
+    };
+
+    private string GetIconTextStyles() => Color.ToLower() switch
+    {
+        "red" => "text-rose-600",
+        "emerald" => "text-emerald-600",
+        "orange" => "text-amber-600",
+        "violet" => "text-purple-600",
+        _ => "text-slate-600"
+    };
+
+    private string GetIndicatorStyles() => Color.ToLower() switch
+    {
+        "red" => "bg-rose-500",
+        "emerald" => "bg-emerald-500",
+        "orange" => "bg-amber-500",
+        "violet" => "bg-purple-500",
+        _ => "bg-slate-500"
     };
 }

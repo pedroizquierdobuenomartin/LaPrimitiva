@@ -114,4 +114,39 @@
   <data name="FailedToResume" xml:space="preserve"><value>Error al reanudar la sesión. Por favor, recarga la página.</value></data>
   <data name="Bets" xml:space="preserve"><value>Apuestas</value></data>
   <data name="DrawsFijoAuto" xml:space="preserve"><value>{0} Sorteos (fijo + automático)</value></data>
+  <data name="Totals" xml:space="preserve"><value>Totales</value></data>
+  <data name="Played" xml:space="preserve"><value>Jugados</value></data>
+  <data name="Pending" xml:space="preserve"><value>Pendientes</value></data>
+  <data name="TotalCost" xml:space="preserve"><value>Coste Total</value></data>
+  <data name="Prizes" xml:space="preserve"><value>Premios</value></data>
+  <data name="WinningBets" xml:space="preserve"><value>Apuestas Ganadoras</value></data>
+  <data name="NetBalance" xml:space="preserve"><value>Balance Neto</value></data>
+  <data name="NoPlansForYear" xml:space="preserve"><value>No hay planes para {0}</value></data>
+  <data name="NoPlansForYearDesc" xml:space="preserve"><value>Crea un nuevo plan o cambia el año seleccionado para ver otros planes.</value></data>
+  <data name="OverlappingDates" xml:space="preserve"><value>Fechas Superpuestas</value></data>
+  <data name="Active" xml:space="preserve"><value>Activo</value></data>
+  <data name="Inactive" xml:space="preserve"><value>Inactivo</value></data>
+  <data name="Label" xml:space="preserve"><value>Etiqueta</value></data>
+  <data name="OverlapWarning" xml:space="preserve"><value>Este plan se solapa con otro en el mismo periodo. Las reglas de negocio y costes podrían no ser coherentes para los sorteos en estas fechas.</value></data>
+  <data name="CreatedOn" xml:space="preserve"><value>Creado {0}</value></data>
+  <data name="EditPlan" xml:space="preserve"><value>Editar Plan</value></data>
+  <data name="PlanConfigSubtitle" xml:space="preserve"><value>Configuración de periodo y costes</value></data>
+  <data name="SavePlanError" xml:space="preserve"><value>Ha ocurrido un error inesperado al guardar el plan.</value></data>
+  <data name="Name" xml:space="preserve"><value>Nombre</value></data>
+  <data name="From" xml:space="preserve"><value>Desde</value></data>
+  <data name="To" xml:space="preserve"><value>Hasta</value></data>
+  <data name="CostPerBetLabel" xml:space="preserve"><value>Coste Apuesta (€)</value></data>
+  <data name="CostJokerLabel" xml:space="preserve"><value>Coste Joker (€)</value></data>
+  <data name="FixedCombinationLabelPrompt" xml:space="preserve"><value>Combinación Fija (Etiqueta)</value></data>
+  <data name="FixedCombinationPlaceholder" xml:space="preserve"><value>Ej: Mis números de toda la vida</value></data>
+  <data name="EnableJokerLabel" xml:space="preserve"><value>Activar Joker</value></data>
+  <data name="SavePlan" xml:space="preserve"><value>Guardar Plan</value></data>
+  <data name="DeletePlanConfirmTitle" xml:space="preserve"><value>¿Eliminar {0}?</value></data>
+  <data name="CannotDeletePlan" xml:space="preserve"><value>No se puede borrar el plan</value></data>
+  <data name="CannotDeletePlanDesc" xml:space="preserve"><value>Primero debes borrar todos los sorteos asociados a este plan en la sección de Registro.</value></data>
+  <data name="Error" xml:space="preserve"><value>Error</value></data>
+  <data name="DeletePlanWarningText" xml:space="preserve"><value>Estás a punto de eliminar permanentemente este plan y todas sus configuraciones asociadas.</value></data>
+  <data name="DeletePlanIrreversible" xml:space="preserve"><value>Esta acción es irreversible.</value></data>
+  <data name="Understood" xml:space="preserve"><value>Entendido</value></data>
+  <data name="UnexpectedDeleteError" xml:space="preserve"><value>Ha ocurrido un error inesperado al intentar borrar el plan.</value></data>
 </root>

@@ -31,16 +31,32 @@
         <!-- KPI Row -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <div class="transform transition-all duration-300 hover:scale-[1.02]">
-                <KpiCard Title="@L["TotalSpent"]" Value="@($"{summary.TotalSpent:N2}€")" SubValue="@($"{summary.PlayedDraws} {L["PlayedDraws"]}")" />
+                <KpiCard Title="@L["TotalSpent"]" Value="@($"{summary.TotalSpent:N2}€")" SubValue="@($"{summary.PlayedDraws} {L["PlayedDraws"]}")" Color="red">
+                    <Icon>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/></svg>
+                    </Icon>
+                </KpiCard>
             </div>
             <div class="transform transition-all duration-300 hover:scale-[1.02]">
-                <KpiCard Title="@L["TotalWon"]" Value="@($"{summary.TotalWon:N2}€")" SubValue="@($"{summary.WinningDraws} {L["WithPrize"]}")" IsPositive="true" />
+                <KpiCard Title="@L["TotalWon"]" Value="@($"{summary.TotalWon:N2}€")" SubValue="@($"{summary.WinningDraws} {L["WithPrize"]}")" Color="emerald">
+                    <Icon>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>
+                    </Icon>
+                </KpiCard>
             </div>
             <div class="transform transition-all duration-300 hover:scale-[1.02]">
-                <KpiCard Title="@L["Net"]" Value="@($"{summary.NetResult:N2}€")" SubValue="@($"{summary.ROI:N1}% ROI")" IsPositive="@(summary.NetResult >= 0)" />
+                <KpiCard Title="@L["Net"]" Value="@($"{summary.NetResult:N2}€")" SubValue="@($"{summary.ROI:N1}% ROI")" Color="orange">
+                    <Icon>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>
+                    </Icon>
+                </KpiCard>
             </div>
             <div class="transform transition-all duration-300 hover:scale-[1.02]">
-                <KpiCard Title="@L["Effectiveness"]" Value="@($"{summary.WinningPercentage:N1}%")" SubValue="@L["WinningDrawsDesc"]" IsPositive="true" />
+                <KpiCard Title="@L["Effectiveness"]" Value="@($"{summary.WinningPercentage:N1}%")" SubValue="@L["WinningDrawsDesc"]" Color="violet">
+                    <Icon>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+                    </Icon>
+                </KpiCard>
             </div>
         </div>
 

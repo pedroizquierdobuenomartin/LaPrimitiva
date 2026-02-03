@@ -8,9 +8,9 @@ namespace LaPrimitiva.Application.DTOs
         public decimal TotalSpent { get; set; }
         public decimal TotalWon { get; set; }
         public decimal NetResult => TotalWon - TotalSpent;
-        public decimal ROI => TotalSpent > 0 ? (TotalWon / TotalSpent) * 100 : 0;
+        public decimal ROI => TotalSpent > 0 ? (NetResult / TotalSpent) * 100 : 0;
         public int WinningDraws { get; set; }
-        public double WinningPercentage => TotalDraws > 0 ? (double)WinningDraws / TotalDraws * 100 : 0;
+        public double WinningPercentage => PlayedDraws > 0 ? (double)WinningDraws / PlayedDraws * 100 : 0;
 
         // Breakdown
         public decimal FixedSpent { get; set; }

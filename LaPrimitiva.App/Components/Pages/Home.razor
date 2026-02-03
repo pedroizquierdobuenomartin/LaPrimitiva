@@ -66,8 +66,14 @@
                                 @((summary.FixedWon - summary.FixedSpent).ToString("N2"))€
                             </span>
                         </div>
-                        <div class="w-full bg-slate-100 rounded-full h-2.5 overflow-hidden">
-                            <div class="bg-blue-600 h-full rounded-full transition-all duration-1000 ease-out shadow-[0_0_8px_rgba(37,99,235,0.4)]" style="width: @(GetBarWidthPercent(summary.FixedWon, summary.TotalWon))%"></div>
+                        <div class="w-full bg-slate-100 rounded-full h-2.5 flex overflow-hidden">
+                            @{
+                                var fixedVol = summary.FixedSpent + summary.FixedWon;
+                            }
+                            <div class="bg-rose-500 h-full transition-all duration-1000 ease-out" 
+                                 style="width: @(GetBarWidthPercent(summary.FixedSpent, fixedVol).ToString("0.##", System.Globalization.CultureInfo.InvariantCulture))%"></div>
+                            <div class="bg-emerald-500 h-full transition-all duration-1000 ease-out" 
+                                 style="width: @(GetBarWidthPercent(summary.FixedWon, fixedVol).ToString("0.##", System.Globalization.CultureInfo.InvariantCulture))%"></div>
                         </div>
                         <div class="flex justify-between text-xs font-medium text-slate-400 mt-2">
                             <span>@L["Expense"]: @summary.FixedSpent.ToString("N2")€</span>
@@ -82,8 +88,14 @@
                                 @((summary.AutoWon - summary.AutoSpent).ToString("N2"))€
                             </span>
                         </div>
-                        <div class="w-full bg-slate-100 rounded-full h-2.5 overflow-hidden">
-                            <div class="bg-indigo-600 h-full rounded-full transition-all duration-1000 ease-out shadow-[0_0_8px_rgba(79,70,229,0.4)]" style="width: @(GetBarWidthPercent(summary.AutoWon, summary.TotalWon))%"></div>
+                        <div class="w-full bg-slate-100 rounded-full h-2.5 flex overflow-hidden">
+                            @{
+                                var autoVol = summary.AutoSpent + summary.AutoWon;
+                            }
+                            <div class="bg-rose-500 h-full transition-all duration-1000 ease-out" 
+                                 style="width: @(GetBarWidthPercent(summary.AutoSpent, autoVol).ToString("0.##", System.Globalization.CultureInfo.InvariantCulture))%"></div>
+                            <div class="bg-emerald-500 h-full transition-all duration-1000 ease-out" 
+                                 style="width: @(GetBarWidthPercent(summary.AutoWon, autoVol).ToString("0.##", System.Globalization.CultureInfo.InvariantCulture))%"></div>
                         </div>
                         <div class="flex justify-between text-xs font-medium text-slate-400 mt-2">
                             <span>@L["Expense"]: @summary.AutoSpent.ToString("N2")€</span>
@@ -98,8 +110,16 @@
                                 @(((summary.JokerFixedWon + summary.JokerAutoWon) - (summary.JokerFixedSpent + summary.JokerAutoSpent)).ToString("N2"))€
                             </span>
                         </div>
-                        <div class="w-full bg-slate-100 rounded-full h-2.5 overflow-hidden">
-                            <div class="bg-purple-600 h-full rounded-full transition-all duration-1000 ease-out shadow-[0_0_8px_rgba(147,51,234,0.4)]" style="width: @(GetBarWidthPercent(summary.JokerFixedWon + summary.JokerAutoWon, summary.TotalWon))%"></div>
+                        <div class="w-full bg-slate-100 rounded-full h-2.5 flex overflow-hidden">
+                            @{
+                                var js = summary.JokerFixedSpent + summary.JokerAutoSpent;
+                                var jw = summary.JokerFixedWon + summary.JokerAutoWon;
+                                var jokerVol = js + jw;
+                            }
+                            <div class="bg-rose-500 h-full transition-all duration-1000 ease-out" 
+                                 style="width: @(GetBarWidthPercent(js, jokerVol).ToString("0.##", System.Globalization.CultureInfo.InvariantCulture))%"></div>
+                            <div class="bg-emerald-500 h-full transition-all duration-1000 ease-out" 
+                                 style="width: @(GetBarWidthPercent(jw, jokerVol).ToString("0.##", System.Globalization.CultureInfo.InvariantCulture))%"></div>
                         </div>
                         <div class="flex justify-between text-xs font-medium text-slate-400 mt-2">
                             <span>@L["Expense"]: @((summary.JokerFixedSpent + summary.JokerAutoSpent).ToString("N2"))€</span>

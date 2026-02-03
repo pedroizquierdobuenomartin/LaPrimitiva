@@ -122,20 +122,24 @@
                             </div>
                             
                             <!-- Overall Performance -->
-                            <div class="p-4 @(plan.TotalPrizesAmount >= plan.TotalInvested ? "bg-emerald-600 shadow-emerald-200" : "bg-slate-900 shadow-slate-200") rounded-2xl shadow-lg flex justify-between items-center transform transition-all">
+                            <div class="p-4 @(plan.NetBalance > 0 ? "bg-emerald-600 shadow-emerald-200" : plan.NetBalance < 0 ? "bg-red-600 shadow-red-200" : "bg-slate-500 shadow-slate-200") rounded-2xl shadow-lg flex justify-between items-center transform transition-all hover:scale-[1.02]">
                                 <div>
                                     <div class="text-[9px] font-black text-white/60 uppercase tracking-widest">Balance Neto</div>
-                                    <div class="text-xl font-black text-white">@((plan.TotalPrizesAmount - plan.TotalInvested).ToString("N2"))€</div>
+                                    <div class="text-xl font-black text-white">@plan.NetBalance.ToString("N2")€</div>
                                 </div>
-                                <div class="h-10 w-10 @(plan.TotalPrizesAmount >= plan.TotalInvested ? "bg-white/20" : "bg-white/10") rounded-xl flex items-center justify-center">
+                                <div class="h-10 w-10 @(plan.NetBalance != 0 ? "bg-white/20" : "bg-white/10") rounded-xl flex items-center justify-center">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        @if (plan.TotalPrizesAmount >= plan.TotalInvested)
+                                        @if (plan.NetBalance > 0)
                                         {
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
                                         }
-                                        else
+                                        else if (plan.NetBalance < 0)
                                         {
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 17h8m0 0v-8m0 8l-8-8-4 4-6-6" />
+                                        }
+                                        else
+                                        {
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M20 12H4" />
                                         }
                                     </svg>
                                 </div>

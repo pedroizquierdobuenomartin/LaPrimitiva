@@ -75,6 +75,8 @@ namespace LaPrimitiva.Tests
             Assert.Equal(2, result.Count);
             Assert.False(result[0].HasDraws);
             Assert.True(result[1].HasDraws);
+            Assert.Equal(result[0].TotalPrizesAmount - result[0].TotalInvested, result[0].NetBalance);
+            Assert.Equal(result[1].TotalPrizesAmount - result[1].TotalInvested, result[1].NetBalance);
         }
 
         [Fact]

@@ -23,5 +23,6 @@ namespace LaPrimitiva.Application.DTOs
         public decimal TotalInvested { get; init; }
         public decimal TotalPrizesAmount { get; init; }
         public int WinningBetsCount { get; init; }
+        public decimal NetBalance => TotalPrizesAmount - TotalInvested;
     }
 }

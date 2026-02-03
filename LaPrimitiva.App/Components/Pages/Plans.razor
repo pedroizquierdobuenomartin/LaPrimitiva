@@ -88,40 +88,79 @@
                     </div>
                     
                     <div class="p-6 grid grid-cols-2 gap-6 flex-1">
-                        <div class="p-4 bg-slate-50/50 rounded-xl space-y-1">
-                            <div class="text-[10px] font-black text-slate-400 uppercase tracking-widest">@L["CostPerBet"]</div>
-                            <div class="text-xl font-black text-slate-900">@plan.CostPerBet.ToString("N2")€</div>
-                        </div>
-                        <div class="p-4 bg-slate-50/50 rounded-xl space-y-1">
-                            <div class="text-[10px] font-black text-slate-400 uppercase tracking-widest">@L["BetsPerDraw"]</div>
-                            <div class="text-xl font-black text-slate-900">@plan.BetsPerDraw (@L["FixedLabel"] + Auto)</div>
-                        </div>
-                        <div class="p-4 bg-blue-50/30 rounded-xl space-y-1">
-                            <div class="text-[10px] font-black text-blue-400 uppercase tracking-widest">@L["JokerActive"]</div>
-                            <div class="text-xl font-black text-blue-700">@(plan.EnableJoker ? L["Yes"] : L["No"])</div>
-                        </div>
-                        <div class="p-4 bg-blue-50/30 rounded-xl space-y-1">
-                            <div class="text-[10px] font-black text-blue-400 uppercase tracking-widest">@L["JokerCost"]</div>
-                            <div class="text-xl font-black text-blue-700">@plan.JokerCostPerBet.ToString("N2")€</div>
-                        </div>
-                        <!-- Draw Statistics -->
-                        <div class="col-span-2 grid grid-cols-3 gap-4 pt-2">
-                            <div class="p-3 bg-slate-50 border border-slate-100 rounded-xl text-center">
-                                <div class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Totales</div>
-                                <div class="text-lg font-black text-slate-700">@plan.TotalDraws</div>
+                        <div class="col-span-2 space-y-4">
+                            <!-- Draw Statistics -->
+                            <div class="grid grid-cols-3 gap-3">
+                                <div class="p-3 bg-slate-50 border border-slate-100 rounded-xl text-center shadow-sm">
+                                    <div class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Totales</div>
+                                    <div class="text-lg font-black text-slate-700">@plan.TotalDraws</div>
+                                </div>
+                                <div class="p-3 bg-emerald-50 border border-emerald-100 rounded-xl text-center shadow-sm">
+                                    <div class="text-[9px] font-black text-emerald-500 uppercase tracking-widest mb-1">Jugados</div>
+                                    <div class="text-lg font-black text-emerald-700">@plan.ActiveDraws</div>
+                                </div>
+                                <div class="p-3 bg-rose-50 border border-rose-100 rounded-xl text-center shadow-sm">
+                                    <div class="text-[9px] font-black text-rose-400 uppercase tracking-widest mb-1">Pendientes</div>
+                                    <div class="text-lg font-black text-rose-700">@plan.InactiveDraws</div>
+                                </div>
                             </div>
-                            <div class="p-3 bg-emerald-50 border border-emerald-100 rounded-xl text-center">
-                                <div class="text-[9px] font-black text-emerald-500 uppercase tracking-widest">Jugados</div>
-                                <div class="text-lg font-black text-emerald-700">@plan.ActiveDraws</div>
+
+                            <!-- Financial Statistics -->
+                            <div class="grid grid-cols-3 gap-3">
+                                <div class="p-3 bg-blue-50/50 border border-blue-100/50 rounded-xl flex flex-col items-center justify-center shadow-sm group hover:scale-[1.02] transition-transform">
+                                    <div class="text-[8px] font-black text-blue-400 uppercase tracking-widest mb-1">Coste Total</div>
+                                    <div class="text-md font-black text-blue-700">@plan.TotalInvested.ToString("N2")€</div>
+                                </div>
+                                <div class="p-3 bg-amber-50/50 border border-amber-100/50 rounded-xl flex flex-col items-center justify-center shadow-sm group hover:scale-[1.02] transition-transform">
+                                    <div class="text-[8px] font-black text-amber-500 uppercase tracking-widest mb-1">Premios</div>
+                                    <div class="text-md font-black text-amber-700">@plan.TotalPrizesAmount.ToString("N2")€</div>
+                                </div>
+                                <div class="p-3 bg-indigo-50/50 border border-indigo-100/50 rounded-xl flex flex-col items-center justify-center shadow-sm group hover:scale-[1.02] transition-transform">
+                                    <div class="text-[8px] font-black text-indigo-400 uppercase tracking-widest mb-1">Apuestas Ganadoras</div>
+                                    <div class="text-md font-black text-indigo-700">@plan.WinningBetsCount</div>
+                                </div>
                             </div>
-                            <div class="p-3 bg-rose-50 border border-rose-100 rounded-xl text-center">
-                                <div class="text-[9px] font-black text-rose-400 uppercase tracking-widest">Pendientes</div>
-                                <div class="text-lg font-black text-rose-700">@plan.InactiveDraws</div>
+                            
+                            <!-- Overall Performance -->
+                            <div class="p-4 @(plan.TotalPrizesAmount >= plan.TotalInvested ? "bg-emerald-600 shadow-emerald-200" : "bg-slate-900 shadow-slate-200") rounded-2xl shadow-lg flex justify-between items-center transform transition-all">
+                                <div>
+                                    <div class="text-[9px] font-black text-white/60 uppercase tracking-widest">Balance Neto</div>
+                                    <div class="text-xl font-black text-white">@((plan.TotalPrizesAmount - plan.TotalInvested).ToString("N2"))€</div>
+                                </div>
+                                <div class="h-10 w-10 @(plan.TotalPrizesAmount >= plan.TotalInvested ? "bg-white/20" : "bg-white/10") rounded-xl flex items-center justify-center">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        @if (plan.TotalPrizesAmount >= plan.TotalInvested)
+                                        {
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                                        }
+                                        else
+                                        {
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 17h8m0 0v-8m0 8l-8-8-4 4-6-6" />
+                                        }
+                                    </svg>
+                                </div>
                             </div>
                         </div>
-                        <div class="col-span-2 pt-2">
-                            <div class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">@L["FixedLabel"]</div>
-                            <div class="text-sm text-slate-600 italic font-medium">"@plan.FixedCombinationLabel"</div>
+
+                        <div class="grid grid-cols-2 gap-4 col-span-2 pt-2 border-t border-slate-100">
+                            <div class="space-y-1">
+                                <div class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Apuestas</div>
+                                <div class="text-xs font-bold text-slate-700 flex items-center gap-1.5">
+                                    <div class="h-2 w-2 rounded-full bg-blue-500"></div>
+                                    @plan.BetsPerDraw Bets/Sorteo
+                                </div>
+                            </div>
+                            <div class="space-y-1">
+                                <div class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Joker</div>
+                                <div class="text-xs font-bold @(plan.EnableJoker ? "text-blue-700" : "text-slate-400") flex items-center gap-1.5">
+                                    <div class="h-2 w-2 rounded-full @(plan.EnableJoker ? "bg-blue-600" : "bg-slate-300")"></div>
+                                    @(plan.EnableJoker ? $"Activo ({plan.JokerCostPerBet:N2}€)" : "Inactivo")
+                                </div>
+                            </div>
+                            <div class="col-span-2">
+                                <div class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Etiqueta</div>
+                                <div class="text-xs text-slate-600 italic font-medium truncate">"@plan.FixedCombinationLabel"</div>
+                            </div>
                         </div>
                     </div>
 

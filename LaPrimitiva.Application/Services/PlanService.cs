@@ -180,7 +180,14 @@ namespace LaPrimitiva.Application.Services
             HasDraws = p.Draws != null && p.Draws.Any(),
             TotalDraws = p.Draws?.Count ?? 0,
             ActiveDraws = p.Draws?.Count(d => d.Played) ?? 0,
-            InactiveDraws = p.Draws?.Count(d => !d.Played) ?? 0
+            InactiveDraws = p.Draws?.Count(d => !d.Played) ?? 0,
+            TotalInvested = p.Draws?.Where(d => d.Played).Sum(d => d.TotalCoste) ?? 0,
+            TotalPrizesAmount = p.Draws?.Where(d => d.Played).Sum(d => d.TotalPremios) ?? 0,
+            WinningBetsCount = p.Draws?.Where(d => d.Played).Sum(d => 
+                (d.FixedPrize > 0 ? 1 : 0) + 
+                (d.AutoPrize > 0 ? 1 : 0) + 
+                (d.JokerFixedPrize > 0 ? 1 : 0) + 
+                (d.JokerAutoPrize > 0 ? 1 : 0)) ?? 0
         };
     }
 }

@@ -19,5 +19,9 @@ namespace LaPrimitiva.Application.DTOs
         public int TotalDraws { get; init; }
         public int ActiveDraws { get; init; }
         public int InactiveDraws { get; init; }
+
+        public decimal TotalInvested { get; init; }
+        public decimal TotalPrizesAmount { get; init; }
+        public int WinningBetsCount { get; init; }
     }
 }

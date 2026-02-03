@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("LaPrimitiva.Application")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+da0fb6a1526e7d1c9760a2d37c8020dae81a9bd5")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+5c36d0189a5a2fd1be00dbfb8d05794efea52750")]
 [assembly: System.Reflection.AssemblyProductAttribute("LaPrimitiva.Application")]
 [assembly: System.Reflection.AssemblyTitleAttribute("LaPrimitiva.Application")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

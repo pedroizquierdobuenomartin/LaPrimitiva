@@ -211,7 +211,6 @@ F:\Repositorios\LaPrimitiva\LaPrimitiva.App\obj\Debug\net10.0\scopedcss\Componen
 F:\Repositorios\LaPrimitiva\LaPrimitiva.App\obj\Debug\net10.0\scopedcss\Components\Layout\ReconnectModal.razor.rz.scp.css
 F:\Repositorios\LaPrimitiva\LaPrimitiva.App\obj\Debug\net10.0\scopedcss\bundle\LaPrimitiva.App.styles.css
 F:\Repositorios\LaPrimitiva\LaPrimitiva.App\obj\Debug\net10.0\scopedcss\projectbundle\LaPrimitiva.App.bundle.scp.css
-F:\Repositorios\LaPrimitiva\LaPrimitiva.App\obj\Debug\net10.0\compressed\ra9y9d4166-{0}-khy4lop6wu-khy4lop6wu.gz
 F:\Repositorios\LaPrimitiva\LaPrimitiva.App\obj\Debug\net10.0\compressed\uorvxa80n8-{0}-bqjiyaj88i-bqjiyaj88i.gz
 F:\Repositorios\LaPrimitiva\LaPrimitiva.App\obj\Debug\net10.0\compressed\d0zxx1dog1-{0}-c2jlpeoesf-c2jlpeoesf.gz
 F:\Repositorios\LaPrimitiva\LaPrimitiva.App\obj\Debug\net10.0\compressed\lr21gkgwv5-{0}-erw9l3u2r3-erw9l3u2r3.gz
@@ -274,3 +273,4 @@ F:\Repositorios\LaPrimitiva\LaPrimitiva.App\obj\Debug\net10.0\compressed\arl85wt
 F:\Repositorios\LaPrimitiva\LaPrimitiva.App\obj\Debug\net10.0\compressed\2jgqtlotj2-{0}-iz83ucvm53-iz83ucvm53.gz
 F:\Repositorios\LaPrimitiva\LaPrimitiva.App\bin\Debug\net10.0\es\LaPrimitiva.Domain.resources.dll
 F:\Repositorios\LaPrimitiva\LaPrimitiva.App\bin\Debug\net10.0\reconnection.json
+F:\Repositorios\LaPrimitiva\LaPrimitiva.App\obj\Debug\net10.0\compressed\ra9y9d4166-{0}-fpbme0iz07-fpbme0iz07.gz

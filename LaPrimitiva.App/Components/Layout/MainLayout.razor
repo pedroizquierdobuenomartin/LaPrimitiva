@@ -110,7 +110,7 @@
                 <div class="text-sm font-medium text-slate-500 uppercase tracking-wider">
                     @L["SelectedYear"]:
                 </div>
-                <select @bind="GlobalState.SelectedYear" class="bg-slate-50 border border-slate-200 text-slate-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2">
+                <select @bind="GlobalState.SelectedYear" disabled="@GlobalState.IsHistoricalView" class="bg-slate-50 border border-slate-200 text-slate-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2 disabled:opacity-50">
                     @if (_availableYears != null)
                     {
                         @foreach (var y in _availableYears)
@@ -119,6 +119,15 @@
                         }
                     }
                 </select>
+
+                <div class="flex items-center bg-slate-100 p-1 rounded-lg ml-4">
+                    <button @onclick="() => SetHistorical(false)" class="px-3 py-1.5 text-xs font-bold rounded-md transition-all @(!GlobalState.IsHistoricalView ? "bg-white text-blue-600 shadow-sm" : "text-slate-500 hover:text-slate-700")">
+                        @L["Yearly"]
+                    </button>
+                    <button @onclick="() => SetHistorical(true)" class="px-3 py-1.5 text-xs font-bold rounded-md transition-all @(GlobalState.IsHistoricalView ? "bg-white text-blue-600 shadow-sm" : "text-slate-500 hover:text-slate-700")">
+                        @L["Historical"]
+                    </button>
+                </div>
             </div>
             
             <div class="flex items-center gap-4">
@@ -172,6 +181,11 @@
     private void ToggleMobileMenu()
     {
         _showMobileMenu = !_showMobileMenu;
+    }
+
+    private void SetHistorical(bool historical)
+    {
+        GlobalState.IsHistoricalView = historical;
     }
 
 

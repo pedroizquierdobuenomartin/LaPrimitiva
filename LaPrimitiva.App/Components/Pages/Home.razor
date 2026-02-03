@@ -13,70 +13,97 @@
 
 <PageTitle>@L["Dashboard"] - La Primitiva Audit</PageTitle>
 
-<div class="space-y-8">
+<div class="space-y-8 animate-in fade-in duration-700">
     <div class="flex flex-col gap-2">
-        <h2 class="text-3xl font-extrabold text-slate-900">@L["Dashboard"]</h2>
-        <p class="text-slate-500">@L["SummaryAndKPIs"] @GlobalState.SelectedYear.</p>
+        <h2 class="text-3xl font-extrabold text-slate-900 tracking-tight">@L["Dashboard"]</h2>
+        <p class="text-slate-500 font-medium">@(GlobalState.IsHistoricalView ? L["HistoricalSummary"] : $"{L["SummaryAndKPIs"]} {GlobalState.SelectedYear}.")</p>
     </div>
 
     @if (summary == null)
     {
-        <div class="flex justify-center p-12">
-            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        <div class="flex flex-col items-center justify-center p-24 bg-white rounded-3xl border border-slate-100 shadow-sm">
+            <div class="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 mb-4"></div>
+            <p class="text-slate-400 font-medium">Cargando datos...</p>
         </div>
     }
     else
     {
         <!-- KPI Row -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <KpiCard Title="@L["TotalSpent"]" Value="@($"{summary.TotalSpent:N2}€")" SubValue="@($"{summary.PlayedDraws} {L["PlayedDraws"]}")" />
-            <KpiCard Title="@L["TotalWon"]" Value="@($"{summary.TotalWon:N2}€")" SubValue="@($"{summary.WinningDraws} {L["WithPrize"]}")" IsPositive="true" />
-            <KpiCard Title="@L["Net"]" Value="@($"{summary.NetResult:N2}€")" SubValue="@($"{summary.ROI:N1}% ROI")" IsPositive="@(summary.NetResult >= 0)" />
-            <KpiCard Title="@L["Effectiveness"]" Value="@($"{summary.WinningPercentage:N1}%")" SubValue="@L["WinningDrawsDesc"]" IsPositive="true" />
+            <div class="transform transition-all duration-300 hover:scale-[1.02]">
+                <KpiCard Title="@L["TotalSpent"]" Value="@($"{summary.TotalSpent:N2}€")" SubValue="@($"{summary.PlayedDraws} {L["PlayedDraws"]}")" />
+            </div>
+            <div class="transform transition-all duration-300 hover:scale-[1.02]">
+                <KpiCard Title="@L["TotalWon"]" Value="@($"{summary.TotalWon:N2}€")" SubValue="@($"{summary.WinningDraws} {L["WithPrize"]}")" IsPositive="true" />
+            </div>
+            <div class="transform transition-all duration-300 hover:scale-[1.02]">
+                <KpiCard Title="@L["Net"]" Value="@($"{summary.NetResult:N2}€")" SubValue="@($"{summary.ROI:N1}% ROI")" IsPositive="@(summary.NetResult >= 0)" />
+            </div>
+            <div class="transform transition-all duration-300 hover:scale-[1.02]">
+                <KpiCard Title="@L["Effectiveness"]" Value="@($"{summary.WinningPercentage:N1}%")" SubValue="@L["WinningDrawsDesc"]" IsPositive="true" />
+            </div>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <!-- Chart Placeholder -->
-            <div class="bg-white p-8 rounded-2xl border border-slate-100 shadow-sm h-96 flex flex-col items-center justify-center text-slate-400">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mb-4 opacity-20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z" />
-                </svg>
-                <div class="text-lg font-medium">Gráfico de Neto Acumulado</div>
-                <div class="text-xs uppercase tracking-widest mt-2">[ Chart.js - JS Interop ]</div>
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Chart Section -->
+            <div class="lg:col-span-2 bg-white p-8 rounded-3xl border border-slate-100 shadow-sm flex flex-col min-h-[450px]">
+                <div class="flex justify-between items-center mb-8">
+                    <h3 class="text-lg font-bold text-slate-900">@L["NetEvolution"]</h3>
+                </div>
+                <div class="flex-1 min-h-0">
+                    <ChartComponent Id="netEvolutionChart" Config="@chartConfig" @ref="chartComponent" />
+                </div>
             </div>
 
             <!-- Breakdown -->
-            <div class="bg-white p-8 rounded-2xl border border-slate-100 shadow-sm">
-                <h3 class="text-lg font-bold text-slate-900 mb-6 border-b border-slate-50 pb-4">@L["BreakdownByType"]</h3>
-                <div class="space-y-6">
-                    <div>
-                        <div class="flex justify-between text-sm mb-2">
-                            <span class="font-semibold text-slate-700">@L["FixedCombination"]</span>
-                            <span class="@(summary.FixedWon - summary.FixedSpent >= 0 ? "text-emerald-600" : "text-rose-600") font-bold">
+            <div class="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm h-full flex flex-col">
+                <h3 class="text-lg font-bold text-slate-900 mb-8 border-b border-slate-50 pb-4">@L["BreakdownByType"]</h3>
+                <div class="space-y-8 flex-1">
+                    <div class="group px-1">
+                        <div class="flex justify-between text-sm mb-3">
+                            <span class="font-bold text-slate-700 group-hover:text-blue-600 transition-colors">@L["FixedCombination"]</span>
+                            <span class="@(summary.FixedWon - summary.FixedSpent >= 0 ? "text-emerald-600" : "text-rose-600") font-extrabold text-base">
                                 @((summary.FixedWon - summary.FixedSpent).ToString("N2"))€
                             </span>
                         </div>
-                        <div class="w-full bg-slate-100 rounded-full h-2">
-                            <div class="bg-blue-600 h-2 rounded-full" style="width: @(GetBarWidth(summary.FixedWon, summary.TotalWon))%"></div>
+                        <div class="w-full bg-slate-100 rounded-full h-2.5 overflow-hidden">
+                            <div class="bg-blue-600 h-full rounded-full transition-all duration-1000 ease-out shadow-[0_0_8px_rgba(37,99,235,0.4)]" style="width: @(GetBarWidthPercent(summary.FixedWon, summary.TotalWon))%"></div>
                         </div>
-                        <div class="flex justify-between text-xs text-slate-400 mt-1">
+                        <div class="flex justify-between text-xs font-medium text-slate-400 mt-2">
                             <span>@L["Expense"]: @summary.FixedSpent.ToString("N2")€</span>
                             <span>@L["Prize"]: @summary.FixedWon.ToString("N2")€</span>
                         </div>
                     </div>
-                    <div>
-                        <div class="flex justify-between text-sm mb-2">
-                            <span class="font-semibold text-slate-700">@L["AutoCombination"]</span>
-                            <span class="@(summary.AutoWon - summary.AutoSpent >= 0 ? "text-emerald-600" : "text-rose-600") font-bold">
+
+                    <div class="group px-1">
+                        <div class="flex justify-between text-sm mb-3">
+                            <span class="font-bold text-slate-700 group-hover:text-indigo-600 transition-colors">@L["AutoCombination"]</span>
+                            <span class="@(summary.AutoWon - summary.AutoSpent >= 0 ? "text-emerald-600" : "text-rose-600") font-extrabold text-base">
                                 @((summary.AutoWon - summary.AutoSpent).ToString("N2"))€
                             </span>
                         </div>
-                        <div class="w-full bg-slate-100 rounded-full h-2">
-                            <div class="bg-indigo-600 h-2 rounded-full" style="width: @(GetBarWidth(summary.AutoWon, summary.TotalWon))%"></div>
+                        <div class="w-full bg-slate-100 rounded-full h-2.5 overflow-hidden">
+                            <div class="bg-indigo-600 h-full rounded-full transition-all duration-1000 ease-out shadow-[0_0_8px_rgba(79,70,229,0.4)]" style="width: @(GetBarWidthPercent(summary.AutoWon, summary.TotalWon))%"></div>
                         </div>
-                        <div class="flex justify-between text-xs text-slate-400 mt-1">
+                        <div class="flex justify-between text-xs font-medium text-slate-400 mt-2">
                             <span>@L["Expense"]: @summary.AutoSpent.ToString("N2")€</span>
                             <span>@L["Prize"]: @summary.AutoWon.ToString("N2")€</span>
+                        </div>
+                    </div>
+
+                    <div class="group px-1">
+                        <div class="flex justify-between text-sm mb-3">
+                            <span class="font-bold text-slate-700 group-hover:text-purple-600 transition-colors">Joker (Total)</span>
+                            <span class="@((summary.JokerFixedWon + summary.JokerAutoWon) - (summary.JokerFixedSpent + summary.JokerAutoSpent) >= 0 ? "text-emerald-600" : "text-rose-600") font-extrabold text-base">
+                                @(((summary.JokerFixedWon + summary.JokerAutoWon) - (summary.JokerFixedSpent + summary.JokerAutoSpent)).ToString("N2"))€
+                            </span>
+                        </div>
+                        <div class="w-full bg-slate-100 rounded-full h-2.5 overflow-hidden">
+                            <div class="bg-purple-600 h-full rounded-full transition-all duration-1000 ease-out shadow-[0_0_8px_rgba(147,51,234,0.4)]" style="width: @(GetBarWidthPercent(summary.JokerFixedWon + summary.JokerAutoWon, summary.TotalWon))%"></div>
+                        </div>
+                        <div class="flex justify-between text-xs font-medium text-slate-400 mt-2">
+                            <span>@L["Expense"]: @((summary.JokerFixedSpent + summary.JokerAutoSpent).ToString("N2"))€</span>
+                            <span>@L["Prize"]: @((summary.JokerFixedWon + summary.JokerAutoWon).ToString("N2"))€</span>
                         </div>
                     </div>
                 </div>
@@ -87,6 +114,8 @@
 
 @code {
     private SummaryDto? summary;
+    private ChartComponent? chartComponent;
+    private object chartConfig = new { };
 
     protected override async Task OnInitializedAsync()
     {
@@ -101,6 +130,10 @@
             try 
             {
                 await LoadData();
+                if (chartComponent != null)
+                {
+                    await chartComponent.UpdateChartAsync(chartConfig);
+                }
             }
             finally 
             {
@@ -111,18 +144,100 @@
 
     private async Task LoadData()
     {
-        var year = GlobalState.SelectedYear;
-        // In a real app we would Include(d => d.Plan) if needed, 
-        // but SummaryService only needs the draw values.
-        var draws = await DrawRepository.GetListAsync(d => d.DrawDate.Year == year);
+        IEnumerable<LaPrimitiva.Domain.Entities.DrawRecord> draws;
+        
+        if (GlobalState.IsHistoricalView)
+        {
+            draws = await DrawRepository.GetListAsync(_ => true);
+        }
+        else
+        {
+            var year = GlobalState.SelectedYear;
+            draws = await DrawRepository.GetListAsync(d => d.DrawDate.Year == year);
+        }
             
         summary = SummaryService.GetSummary(draws);
+        PrepareChartConfig(draws);
     }
 
-    private double GetBarWidth(decimal val, decimal total)
+    private void PrepareChartConfig(IEnumerable<LaPrimitiva.Domain.Entities.DrawRecord> draws)
+    {
+        var monthlySummaries = SummaryService.GetMonthlySummaries(draws);
+        
+        // Calculate cumulative net
+        decimal cumulativeNet = 0;
+        var labels = new List<string>();
+        var dataPoints = new List<decimal>();
+
+        foreach (var m in monthlySummaries)
+        {
+            cumulativeNet += m.Net;
+            labels.Add(GlobalState.IsHistoricalView ? $"{m.Month}/{m.Year}" : m.MonthName);
+            dataPoints.Add(cumulativeNet);
+        }
+
+        chartConfig = new
+        {
+            type = "line",
+            data = new
+            {
+                labels = labels,
+                datasets = new[]
+                {
+                    new
+                    {
+                        label = L["NetEvolution"].Value,
+                        data = dataPoints,
+                        borderColor = "rgb(37, 99, 235)",
+                        backgroundColor = "rgba(37, 99, 235, 0.1)",
+                        fill = true,
+                        tension = 0.4,
+                        pointRadius = 4,
+                        pointHoverRadius = 6,
+                        borderWidth = 3
+                    }
+                }
+            },
+            options = new
+            {
+                responsive = true,
+                maintainAspectRatio = false,
+                animation = new { duration = 2000, easing = "easeOutQuart" },
+                plugins = new
+                {
+                    legend = new { display = false },
+                    tooltip = new { 
+                        mode = "index", 
+                        intersect = false,
+                        padding = 12,
+                        backgroundColor = "rgba(15, 23, 42, 0.9)",
+                        titleFont = new { size = 14, weight = "bold" },
+                        bodyFont = new { size = 13 },
+                        displayColors = false
+                    }
+                },
+                scales = new
+                {
+                    y = new
+                    {
+                        beginAtZero = false,
+                        grid = new { color = "rgba(241, 245, 249, 1)" }
+                    },
+                    x = new
+                    {
+                        grid = new { display = false },
+                        ticks = new { font = new { size = 11 } }
+                    }
+                }
+            }
+        };
+    }
+
+    private double GetBarWidthPercent(decimal val, decimal total)
     {
         if (total == 0) return 0;
-        return (double)(val / total * 100);
+        var percent = (double)(val / total * 100);
+        return Math.Min(100, Math.Abs(percent));
     }
 
     public void Dispose()

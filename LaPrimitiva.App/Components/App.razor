@@ -19,6 +19,7 @@
     <Routes @rendermode="InteractiveServer" />
     <ReconnectModal />
     <script src="@Assets["_framework/blazor.web.js"]"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         window.downloadFile = (fileName, base64Data) => {
             const link = document.createElement('a');
@@ -27,6 +28,18 @@
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
+        }
+
+        window.renderChart = (canvasId, config) => {
+            const ctx = document.getElementById(canvasId).getContext('2d');
+            
+            // Check if chart already exists and destroy it
+            const existingChart = Chart.getChart(canvasId);
+            if (existingChart) {
+                existingChart.destroy();
+            }
+
+            new Chart(ctx, config);
         }
     </script>
 </body>

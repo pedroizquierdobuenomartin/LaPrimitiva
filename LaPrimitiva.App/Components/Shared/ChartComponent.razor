@@ -1,0 +1,22 @@
+@using Microsoft.JSInterop
+@inject IJSRuntime JSRuntime
+
+<div class="relative w-full h-full">
+    <canvas id="@Id"></canvas>
+</div>
+
+@code {
+    [Parameter] public string Id { get; set; } = $"chart-{Guid.NewGuid():N}";
+    [Parameter] public object Config { get; set; } = new();
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await JSRuntime.InvokeVoidAsync("renderChart", Id, Config);
+    }
+
+    public async Task UpdateChartAsync(object newConfig)
+    {
+        Config = newConfig;
+        await JSRuntime.InvokeVoidAsync("renderChart", Id, Config);
+    }
+}

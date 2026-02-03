@@ -32,6 +32,20 @@ namespace LaPrimitiva.Application.Services
             }
         }
 
+        private bool _isHistoricalView;
+        public bool IsHistoricalView
+        {
+            get => _isHistoricalView;
+            set
+            {
+                if (_isHistoricalView != value)
+                {
+                    _isHistoricalView = value;
+                    NotifyStateChanged();
+                }
+            }
+        }
+
         public event Action? OnChange;
 
         private void NotifyStateChanged() => OnChange?.Invoke();

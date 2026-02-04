@@ -99,7 +99,7 @@
   <data name="CancelButton" xml:space="preserve"><value>Cancelar</value></data>
   <data name="DeleteButton" xml:space="preserve"><value>Eliminar</value></data>
   <data name="SaveAuditedWeekButton" xml:space="preserve"><value>Guardar Semana Auditada</value></data>
-  <data name="DeleteWeekConfirmTitle" xml:space="preserve"><value>¿Eliminar Semana?</value></data>
+  <data name="DeleteWeekConfirmTitle" xml:space="preserve"><value>¿Eliminar la semana {0}?</value></data>
   <data name="DeleteWeekWarningText" xml:space="preserve"><value>Estás a punto de eliminar todos los registros de sorteos asociados a la semana</value></data>
   <data name="NoUndoWarning" xml:space="preserve"><value>Esta acción no se puede deshacer.</value></data>
   <data name="ConfirmDeleteButton" xml:space="preserve"><value>Sí, Eliminar</value></data>

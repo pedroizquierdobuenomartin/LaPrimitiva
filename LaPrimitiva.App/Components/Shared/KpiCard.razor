@@ -1,20 +1,18 @@
-<div class="kpi-card p-6 flex flex-col gap-2 relative overflow-hidden group">
-    <div class="flex justify-between items-start">
-        <div class="flex flex-col gap-1">
-            <span class="text-xs font-bold text-[var(--brand-text-secondary)] uppercase tracking-wider">@Title</span>
-            <span class="text-3xl font-bold text-[var(--brand-text-primary)]">@Value</span>
-        </div>
-        <div class="w-12 h-12 rounded-xl flex items-center justify-center @GetIconBgStyles() shadow-sm transition-transform group-hover:scale-110">
-            <div class="w-6 h-6 @GetIconTextStyles()">
-                @Icon
-            </div>
-        </div>
+<div class="kpi-card p-6 flex flex-col gap-2 relative overflow-hidden group @GetCardBgStyles() border-none shadow-sm h-full">
+    <!-- Background Icon Wrapper -->
+    <div class="absolute -right-4 -bottom-4 w-32 h-32 opacity-[0.08] transition-all duration-500 group-hover:scale-110 group-hover:-rotate-12 pointer-events-none @GetIconTextStyles()">
+        @Icon
+    </div>
+
+    <div class="relative z-10 flex flex-col gap-1">
+        <span class="text-xs font-bold @GetTitleTextStyles() uppercase tracking-wider opacity-80">@Title</span>
+        <span class="text-3xl font-bold @GetValueTextStyles()">@Value</span>
     </div>
     
     @if (!string.IsNullOrEmpty(SubValue))
     {
-        <div class="text-sm font-medium text-[var(--brand-text-secondary)] flex items-center gap-2">
-            <div class="w-1.5 h-1.5 rounded-full @GetIndicatorStyles()"></div>
+        <div class="relative z-10 mt-auto pt-2 text-sm font-semibold @GetSubValueTextStyles() flex items-center gap-2">
+            <div class="w-1.5 h-1.5 rounded-full @GetIndicatorStyles() shadow-sm"></div>
             @SubValue
         </div>
     }
@@ -27,22 +25,49 @@
     [Parameter] public string Color { get; set; } = "blue";
     [Parameter] public RenderFragment? Icon { get; set; }
 
-    private string GetIconBgStyles() => Color.ToLower() switch
+    private string GetCardBgStyles() => Color.ToLower() switch
     {
-        "red" => "bg-rose-100",
-        "emerald" => "bg-emerald-100",
-        "orange" => "bg-amber-100",
-        "violet" => "bg-purple-100",
-        _ => "bg-slate-100"
+        "red" => "bg-rose-50/80",
+        "emerald" => "bg-emerald-50/80",
+        "orange" => "bg-amber-50/80",
+        "violet" => "bg-purple-50/80",
+        _ => "bg-slate-50/80"
+    };
+
+    private string GetTitleTextStyles() => Color.ToLower() switch
+    {
+        "red" => "text-rose-900",
+        "emerald" => "text-emerald-900",
+        "orange" => "text-amber-900",
+        "violet" => "text-purple-900",
+        _ => "text-slate-900"
+    };
+
+    private string GetValueTextStyles() => Color.ToLower() switch
+    {
+        "red" => "text-rose-700",
+        "emerald" => "text-emerald-700",
+        "orange" => "text-amber-700",
+        "violet" => "text-purple-700",
+        _ => "text-slate-700"
+    };
+
+    private string GetSubValueTextStyles() => Color.ToLower() switch
+    {
+        "red" => "text-rose-600/80",
+        "emerald" => "text-emerald-600/80",
+        "orange" => "text-amber-600/80",
+        "violet" => "text-purple-600/80",
+        _ => "text-slate-600/80"
     };
 
     private string GetIconTextStyles() => Color.ToLower() switch
     {
-        "red" => "text-rose-600",
-        "emerald" => "text-emerald-600",
-        "orange" => "text-amber-600",
-        "violet" => "text-purple-600",
-        _ => "text-slate-600"
+        "red" => "text-rose-500",
+        "emerald" => "text-emerald-500",
+        "orange" => "text-amber-500",
+        "violet" => "text-purple-500",
+        _ => "text-slate-500"
     };
 
     private string GetIndicatorStyles() => Color.ToLower() switch

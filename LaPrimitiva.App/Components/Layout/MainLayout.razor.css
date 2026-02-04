@@ -78,8 +78,8 @@ aside {
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
-	aside.fixed {
-		height: calc(100vh - 64px);
+	aside {
+		height: calc(100vh - 64px) !important;
 	}
 }
 

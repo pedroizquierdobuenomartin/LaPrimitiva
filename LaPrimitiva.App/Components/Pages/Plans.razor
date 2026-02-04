@@ -196,15 +196,15 @@
 
 @if (showModal)
 {
-    <div class="fixed inset-0 bg-[var(--brand-secondary)]/60 backdrop-blur-md z-50 flex items-center justify-center p-4 animate-in fade-in duration-300">
-        <div class="bg-white rounded-[2rem] shadow-2xl w-full max-w-lg overflow-hidden border border-[var(--brand-borders)] transform animate-in zoom-in-95 duration-300">
-            <div class="p-10 border-b border-[var(--brand-bg)] flex justify-between items-center bg-white relative">
+    <div class="fixed inset-0 bg-[var(--brand-secondary)]/60 backdrop-blur-md z-[100] flex items-center justify-center p-2 md:p-4 animate-in fade-in duration-300">
+        <div class="bg-white rounded-[1.5rem] md:rounded-[2rem] shadow-2xl w-full max-w-lg overflow-hidden border border-[var(--brand-borders)] transform animate-in zoom-in-95 duration-300 flex flex-col max-h-[100dvh] md:max-h-[92vh]">
+            <div class="p-6 md:p-10 border-b border-[var(--brand-bg)] flex justify-between items-center bg-white relative">
                 <div>
-                    <h3 class="text-3xl font-bold text-[var(--brand-secondary)]">@(isEditing ? L["EditPlan"] : L["NewPlan"])</h3>
-                    <p class="text-[var(--brand-text-secondary)] text-xs font-bold uppercase tracking-[0.2em] mt-2">@L["PlanConfigSubtitle"]</p>
+                    <h3 class="text-2xl md:text-3xl font-bold text-[var(--brand-secondary)]">@(isEditing ? L["EditPlan"] : L["NewPlan"])</h3>
+                    <p class="text-[10px] md:text-xs font-bold uppercase tracking-[0.2em] mt-1 md:mt-2">@L["PlanConfigSubtitle"]</p>
                 </div>
-                <button @onclick="() => showModal = false" class="h-12 w-12 rounded-2xl flex items-center justify-center text-slate-300 hover:text-[var(--brand-secondary)] hover:bg-[var(--brand-bg)] transition-all">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <button @onclick="() => showModal = false" class="h-10 w-10 md:h-12 md:w-12 rounded-xl md:rounded-2xl flex items-center justify-center text-slate-300 hover:text-[var(--brand-secondary)] hover:bg-[var(--brand-bg)] transition-all">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 md:h-7 md:w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                     </svg>
                 </button>
@@ -219,46 +219,46 @@
                     <p class="text-sm font-bold text-rose-800">@errorMessage</p>
                 </div>
             }
-            <div class="p-10 space-y-8 bg-[var(--brand-bg)]/30 max-h-[60vh] overflow-auto">
+            <div class="p-6 md:p-10 space-y-6 md:space-y-8 bg-[var(--brand-bg)]/30 overflow-auto flex-1">
                 <div>
-                    <label class="block text-[10px] font-bold text-[var(--brand-text-secondary)] uppercase tracking-[0.2em] mb-3 px-1">@L["Name"]</label>
-                    <input @bind="newPlan.Name" class="w-full bg-white border border-[var(--brand-borders)] rounded-2xl p-5 text-base font-bold text-[var(--brand-secondary)] focus:ring-4 focus:ring-[var(--brand-primary)]/10 focus:border-[var(--brand-primary)] outline-none transition-all shadow-sm" placeholder="@L["FixedCombinationPlaceholder"]" />
+                    <label class="block text-[9px] md:text-[10px] font-bold text-[var(--brand-text-secondary)] uppercase tracking-[0.2em] mb-2 md:mb-3 px-1">@L["Name"]</label>
+                    <input @bind="newPlan.Name" class="w-full bg-white border border-[var(--brand-borders)] rounded-xl md:rounded-2xl p-4 md:p-5 text-sm md:text-base font-bold text-[var(--brand-secondary)] focus:ring-4 focus:ring-[var(--brand-primary)]/10 focus:border-[var(--brand-primary)] outline-none transition-all shadow-sm" placeholder="@L["FixedCombinationPlaceholder"]" />
                 </div>
-                <div class="grid grid-cols-2 gap-8">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
                     <div>
-                        <label class="block text-[10px] font-bold text-[var(--brand-text-secondary)] uppercase tracking-[0.2em] mb-3 px-1">@L["From"]</label>
-                        <input type="date" @bind="newPlan.EffectiveFrom" class="w-full bg-white border border-[var(--brand-borders)] rounded-2xl p-5 text-sm font-bold text-[var(--brand-secondary)] focus:border-[var(--brand-primary)] outline-none transition-all shadow-sm" />
+                        <label class="block text-[9px] md:text-[10px] font-bold text-[var(--brand-text-secondary)] uppercase tracking-[0.2em] mb-2 md:mb-3 px-1">@L["From"]</label>
+                        <input type="date" @bind="newPlan.EffectiveFrom" class="w-full bg-white border border-[var(--brand-borders)] rounded-xl md:rounded-2xl p-4 md:p-5 text-sm font-bold text-[var(--brand-secondary)] focus:border-[var(--brand-primary)] outline-none transition-all shadow-sm" />
                     </div>
                     <div>
-                        <label class="block text-[10px] font-bold text-[var(--brand-text-secondary)] uppercase tracking-[0.2em] mb-3 px-1">@L["To"]</label>
-                        <input type="date" @bind="newPlan.EffectiveTo" class="w-full bg-white border border-[var(--brand-borders)] rounded-2xl p-5 text-sm font-bold text-[var(--brand-secondary)] focus:border-[var(--brand-primary)] outline-none transition-all shadow-sm" />
+                        <label class="block text-[9px] md:text-[10px] font-bold text-[var(--brand-text-secondary)] uppercase tracking-[0.2em] mb-2 md:mb-3 px-1">@L["To"]</label>
+                        <input type="date" @bind="newPlan.EffectiveTo" class="w-full bg-white border border-[var(--brand-borders)] rounded-xl md:rounded-2xl p-4 md:p-5 text-sm font-bold text-[var(--brand-secondary)] focus:border-[var(--brand-primary)] outline-none transition-all shadow-sm" />
                     </div>
                 </div>
-                <div class="grid grid-cols-2 gap-8">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
                     <div>
-                        <label class="block text-[10px] font-bold text-[var(--brand-text-secondary)] uppercase tracking-[0.2em] mb-3 px-1">@L["CostPerBetLabel"]</label>
-                        <input type="number" step="0.01" @bind="newPlan.CostPerBet" class="w-full bg-white border border-[var(--brand-borders)] rounded-2xl p-5 text-sm font-bold text-[var(--brand-secondary)] focus:border-[var(--brand-primary)] outline-none transition-all shadow-sm" />
+                        <label class="block text-[9px] md:text-[10px] font-bold text-[var(--brand-text-secondary)] uppercase tracking-[0.2em] mb-2 md:mb-3 px-1">@L["CostPerBetLabel"]</label>
+                        <input type="number" step="0.01" @bind="newPlan.CostPerBet" class="w-full bg-white border border-[var(--brand-borders)] rounded-xl md:rounded-2xl p-4 md:p-5 text-sm font-bold text-[var(--brand-secondary)] focus:border-[var(--brand-primary)] outline-none transition-all shadow-sm" />
                     </div>
                     <div>
-                        <label class="block text-[10px] font-bold text-[var(--brand-text-secondary)] uppercase tracking-[0.2em] mb-3 px-1">@L["CostJokerLabel"]</label>
-                        <input type="number" step="0.01" @bind="newPlan.JokerCostPerBet" disabled="@(!newPlan.EnableJoker)" class="w-full bg-white border border-[var(--brand-borders)] rounded-2xl p-5 text-sm font-bold text-[var(--brand-secondary)] focus:border-[var(--brand-primary)] outline-none transition-all shadow-sm disabled:bg-[var(--brand-bg)] disabled:text-slate-400" />
+                        <label class="block text-[9px] md:text-[10px] font-bold text-[var(--brand-text-secondary)] uppercase tracking-[0.2em] mb-2 md:mb-3 px-1">@L["CostJokerLabel"]</label>
+                        <input type="number" step="0.01" @bind="newPlan.JokerCostPerBet" disabled="@(!newPlan.EnableJoker)" class="w-full bg-white border border-[var(--brand-borders)] rounded-xl md:rounded-2xl p-4 md:p-5 text-sm font-bold text-[var(--brand-secondary)] focus:border-[var(--brand-primary)] outline-none transition-all shadow-sm disabled:bg-[var(--brand-bg)] disabled:text-slate-400" />
                     </div>
                 </div>
                 <div>
-                    <label class="block text-[10px] font-bold text-[var(--brand-text-secondary)] uppercase tracking-[0.2em] mb-3 px-1">@L["FixedCombinationLabelPrompt"]</label>
-                    <input @bind="newPlan.FixedCombinationLabel" class="w-full bg-white border border-[var(--brand-borders)] rounded-2xl p-5 text-base font-bold text-[var(--brand-secondary)] focus:border-[var(--brand-primary)] outline-none transition-all shadow-sm" placeholder="@L["FixedCombinationPlaceholder"]" />
+                    <label class="block text-[9px] md:text-[10px] font-bold text-[var(--brand-text-secondary)] uppercase tracking-[0.2em] mb-2 md:mb-3 px-1">@L["FixedCombinationLabelPrompt"]</label>
+                    <input @bind="newPlan.FixedCombinationLabel" class="w-full bg-white border border-[var(--brand-borders)] rounded-xl md:rounded-2xl p-4 md:p-5 text-sm md:text-base font-bold text-[var(--brand-secondary)] focus:border-[var(--brand-primary)] outline-none transition-all shadow-sm" placeholder="@L["FixedCombinationPlaceholder"]" />
                 </div>
                 <div class="flex items-center gap-4 py-2 px-1">
                     <label class="relative inline-flex items-center cursor-pointer group">
                         <input type="checkbox" @bind="newPlan.EnableJoker" class="sr-only peer">
-                        <div class="w-14 h-8 bg-slate-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-[var(--brand-primary)]/20 rounded-full peer peer-checked:after:translate-x-6 peer-checked:after:border-white after:content-[''] after:absolute after:top-[4px] after:left-[4px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-[var(--brand-primary)] shadow-inner"></div>
-                        <span class="ml-4 text-sm font-bold text-[var(--brand-secondary)] uppercase tracking-wider group-hover:text-[var(--brand-primary)] transition-colors">@L["EnableJokerLabel"]</span>
+                        <div class="w-12 md:w-14 h-7 md:h-8 bg-slate-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-[var(--brand-primary)]/20 rounded-full peer peer-checked:after:translate-x-5 md:peer-checked:after:translate-x-6 peer-checked:after:border-white after:content-[''] after:absolute after:top-[4px] after:left-[4px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 md:after:h-6 after:w-5 md:after:w-6 after:transition-all peer-checked:bg-[var(--brand-primary)] shadow-inner"></div>
+                        <span class="ml-4 text-xs md:text-sm font-bold text-[var(--brand-secondary)] uppercase tracking-wider group-hover:text-[var(--brand-primary)] transition-colors">@L["EnableJokerLabel"]</span>
                     </label>
                 </div>
             </div>
-            <div class="p-10 bg-white flex gap-6 border-t border-[var(--brand-bg)]">
-                <button @onclick="SavePlan" class="flex-1 bg-[var(--brand-secondary)] hover:bg-black text-white font-bold py-5 rounded-2xl shadow-xl transition-all uppercase tracking-widest text-sm active:scale-95">@L["SavePlan"]</button>
-                <button @onclick="() => showModal = false" class="flex-1 bg-[var(--brand-bg)] text-[var(--brand-text-secondary)] font-bold py-5 rounded-2xl hover:bg-[var(--brand-borders)] transition-all uppercase tracking-widest text-sm active:scale-95">@L["CancelButton"]</button>
+            <div class="p-6 md:p-10 bg-white flex flex-col md:flex-row gap-4 md:gap-6 border-t border-[var(--brand-bg)]">
+                <button @onclick="SavePlan" class="w-full md:flex-1 bg-[var(--brand-secondary)] hover:bg-black text-white font-bold py-4 md:py-5 rounded-xl md:rounded-2xl shadow-xl transition-all uppercase tracking-widest text-xs md:text-sm active:scale-95 order-1 md:order-1">@L["SavePlan"]</button>
+                <button @onclick="() => showModal = false" class="w-full md:flex-1 bg-[var(--brand-bg)] text-[var(--brand-text-secondary)] font-bold py-4 md:py-5 rounded-xl md:rounded-2xl hover:bg-[var(--brand-borders)] transition-all uppercase tracking-widest text-xs md:text-sm active:scale-95 order-2 md:order-2">@L["CancelButton"]</button>
             </div>
         </div>
     </div>
@@ -266,55 +266,55 @@
 
 @if (_planToDelete != null)
 {
-    <div class="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-[var(--brand-secondary)]/80 backdrop-blur-sm transition-all animate-in fade-in duration-300">
-        <div class="bg-white rounded-[2rem] shadow-2xl w-full max-w-md overflow-hidden animate-in zoom-in duration-300 p-10 text-center space-y-8 border border-[var(--brand-borders)]">
-            <div class="h-24 w-24 bg-rose-50 rounded-full flex items-center justify-center mx-auto text-rose-500 shadow-inner">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <div class="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-[var(--brand-secondary)]/80 backdrop-blur-sm transition-all animate-in fade-in duration-300">
+        <div class="bg-white rounded-[1.5rem] md:rounded-[2rem] shadow-2xl w-full max-w-md overflow-hidden animate-in zoom-in duration-300 p-6 md:p-10 text-center space-y-6 md:space-y-8 border border-[var(--brand-borders)]">
+            <div class="h-20 w-20 md:h-24 md:w-24 bg-rose-50 rounded-full flex items-center justify-center mx-auto text-rose-500 shadow-inner">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 md:h-12 md:w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                 </svg>
             </div>
             
-            <div class="space-y-4">
-                <h3 class="text-2xl font-bold text-[var(--brand-secondary)] tracking-tight">@string.Format(L["DeletePlanConfirmTitle"], _planToDelete.Name)</h3>
+            <div class="space-y-2 md:space-y-4">
+                <h3 class="text-xl md:text-2xl font-bold text-[var(--brand-secondary)] tracking-tight">@string.Format(L["DeletePlanConfirmTitle"], _planToDelete.Name)</h3>
                 
                 @if (_hasLinkedDraws)
                 {
-                    <div class="p-6 bg-amber-50 border border-amber-100 rounded-2xl flex flex-col gap-3 items-center animate-in slide-in-from-top-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-amber-500" viewBox="0 0 20 20" fill="currentColor">
+                    <div class="p-4 md:p-6 bg-amber-50 border border-amber-100 rounded-xl md:rounded-2xl flex flex-col gap-2 md:gap-3 items-center animate-in slide-in-from-top-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 md:h-10 md:w-10 text-amber-500" viewBox="0 0 20 20" fill="currentColor">
                             <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
                         </svg>
-                        <p class="text-base font-bold text-amber-800 leading-snug">@L["CannotDeletePlan"]</p>
-                        <p class="text-sm text-amber-700 font-medium">@L["CannotDeletePlanDesc"]</p>
+                        <p class="text-sm md:text-base font-bold text-amber-800 leading-snug">@L["CannotDeletePlan"]</p>
+                        <p class="text-xs md:text-sm text-amber-700 font-medium">@L["CannotDeletePlanDesc"]</p>
                     </div>
                 }
                 else if (!string.IsNullOrEmpty(_deleteErrorMessage))
                 {
-                    <div class="p-6 bg-rose-50 border border-rose-100 rounded-2xl flex flex-col gap-3 items-center animate-in slide-in-from-top-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-rose-500" viewBox="0 0 20 20" fill="currentColor">
+                    <div class="p-4 md:p-6 bg-rose-50 border border-rose-100 rounded-xl md:rounded-2xl flex flex-col gap-2 md:gap-3 items-center animate-in slide-in-from-top-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 md:h-10 md:w-10 text-rose-500" viewBox="0 0 20 20" fill="currentColor">
                             <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
                         </svg>
-                        <p class="text-base font-bold text-rose-800 leading-snug">@L["Error"]</p>
-                        <p class="text-sm text-rose-700 font-medium">@_deleteErrorMessage</p>
+                        <p class="text-sm md:text-base font-bold text-rose-800 leading-snug">@L["Error"]</p>
+                        <p class="text-xs md:text-sm text-rose-700 font-medium">@_deleteErrorMessage</p>
                     </div>
                 }
                 else
                 {
-                    <p class="text-[var(--brand-text-secondary)] text-base leading-relaxed font-medium">
+                    <p class="text-[var(--brand-text-secondary)] text-sm md:text-base leading-relaxed font-medium">
                         @L["DeletePlanWarningText"]
                     </p>
-                    <div class="bg-rose-50 px-4 py-2 rounded-xl inline-block">
-                        <span class="text-rose-600 font-bold text-sm">@L["DeletePlanIrreversible"]</span>
+                    <div class="bg-rose-50 px-3 py-1.5 md:px-4 md:py-2 rounded-xl inline-block">
+                        <span class="text-rose-600 font-bold text-[10px] md:text-sm">@L["DeletePlanIrreversible"]</span>
                     </div>
                 }
             </div>
 
-            <div class="grid @(_hasLinkedDraws ? "grid-cols-1" : "grid-cols-2") gap-4 pt-4">
-                <button @onclick="CancelDelete" class="px-6 py-4 rounded-2xl text-sm font-bold text-[var(--brand-text-secondary)] bg-[var(--brand-bg)] hover:bg-[var(--brand-borders)] transition-all uppercase tracking-widest active:scale-95">
+            <div class="grid @(_hasLinkedDraws ? "grid-cols-1" : "grid-cols-2") gap-3 md:gap-4 pt-2 md:pt-4">
+                <button @onclick="CancelDelete" class="px-4 md:px-6 py-3 md:py-4 rounded-xl md:rounded-2xl text-xs md:text-sm font-bold text-[var(--brand-text-secondary)] bg-[var(--brand-bg)] hover:bg-[var(--brand-borders)] transition-all uppercase tracking-widest active:scale-95">
                     @(_hasLinkedDraws ? L["Understood"] : L["CancelButton"])
                 </button>
                 @if (!_hasLinkedDraws)
                 {
-                    <button @onclick="ConfirmDelete" class="px-6 py-4 rounded-2xl text-sm font-bold text-white bg-rose-600 hover:bg-rose-700 shadow-xl shadow-rose-200 transition-all active:scale-95 uppercase tracking-widest">
+                    <button @onclick="ConfirmDelete" class="px-4 md:px-6 py-3 md:py-4 rounded-xl md:rounded-2xl text-xs md:text-sm font-bold text-white bg-rose-600 hover:bg-rose-700 shadow-xl shadow-rose-200 transition-all active:scale-95 uppercase tracking-widest">
                         @L["ConfirmDeleteButton"]
                     </button>
                 }

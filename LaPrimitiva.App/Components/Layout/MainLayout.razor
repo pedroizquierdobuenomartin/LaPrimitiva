@@ -135,9 +135,47 @@
             <!-- Main Workspace -->
             <main class="flex-1 flex flex-col min-w-0 bg-[#f8fafc] relative overflow-hidden">
                 <!-- Scrollable Content -->
-                <div class="flex-1 overflow-y-auto p-4 md:p-8 scroll-smooth">
+                <div class="flex-1 overflow-y-auto p-4 md:p-8 scroll-smooth pb-20 md:pb-8">
                     @Body
                 </div>
+
+                <!-- Mobile Bottom Navigation -->
+                <nav class="fixed bottom-0 left-0 right-0 h-16 bg-white border-t border-gray-100 md:hidden flex items-center justify-around z-[60] px-2 shadow-[0_-4px_12px_rgba(0,0,0,0.05)]">
+                    <NavLink href="" Match="NavLinkMatch.All" class="flex flex-col items-center justify-center gap-1 text-gray-400 transition-all hover:text-[var(--brand-primary)]" ActiveClass="!text-[var(--brand-primary)]">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 transition-transform active:scale-90" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                        </svg>
+                        <span class="text-[9px] font-bold uppercase tracking-tighter">@L["Dashboard"]</span>
+                    </NavLink>
+
+                    <NavLink href="register" class="flex flex-col items-center justify-center gap-1 text-gray-400 transition-all hover:text-[var(--brand-primary)]" ActiveClass="!text-[var(--brand-primary)]">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 transition-transform active:scale-90" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 100 4m0-4a2 2 0 110 4m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+                        </svg>
+                        <span class="text-[9px] font-bold uppercase tracking-tighter">@L["Registration"]</span>
+                    </NavLink>
+
+                    <NavLink href="plans" class="flex flex-col items-center justify-center gap-1 text-gray-400 transition-all hover:text-[var(--brand-primary)]" ActiveClass="!text-[var(--brand-primary)]">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 transition-transform active:scale-90" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+                        </svg>
+                        <span class="text-[9px] font-bold uppercase tracking-tighter">@L["Plans"]</span>
+                    </NavLink>
+
+                    <button @onclick="ToggleRightMobileMenu" class="flex flex-col items-center justify-center gap-1 transition-all @(_showRightMobileMenu ? "text-[var(--brand-primary)]" : "text-gray-400")">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 transition-transform active:scale-90" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                        </svg>
+                        <span class="text-[9px] font-bold uppercase tracking-tighter">USER</span>
+                    </button>
+
+                    <button @onclick="ToggleMobileMenu" class="flex flex-col items-center justify-center gap-1 transition-all @(_showMobileMenu ? "text-[var(--brand-primary)]" : "text-gray-400")">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 transition-transform active:scale-90" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                        <span class="text-[9px] font-bold uppercase tracking-tighter">MENU</span>
+                    </button>
+                </nav>
 
                 <!-- Footer -->
                 <footer class="h-12 border-t border-gray-200/50 bg-[#f8fafc] flex items-center justify-between px-8 text-[10px] text-gray-400 font-medium tracking-wider flex-shrink-0">
@@ -156,7 +194,7 @@
     <div class="hidden md:block w-16 flex-shrink-0 transition-all duration-300"></div>
 
     <!-- Sidebar Right (User/Config) -->
-    <aside class="w-16 bg-white border-l border-gray-200 transition-all duration-300 ease-in-out flex flex-col overflow-hidden fixed inset-y-0 right-0 z-50">
+    <aside class="w-16 md:w-16 bg-white border-l border-gray-200 transition-all duration-300 ease-in-out flex flex-col overflow-hidden fixed inset-y-0 right-0 z-[70] md:z-50 @(_showRightMobileMenu ? "translate-x-0 shadow-2xl" : "translate-x-full md:translate-x-0")">
         
         <!-- User Section -->
         <div class="h-32 flex flex-col items-center justify-center border-b border-gray-100 flex-shrink-0">
@@ -232,9 +270,9 @@
     </aside>
 
     <!-- Mobile Navigation Overlay -->
-    @if (_showMobileMenu)
+    @if (_showMobileMenu || _showRightMobileMenu)
     {
-        <div class="fixed inset-0 bg-black/50 z-[55] md:hidden backdrop-blur-sm" @onclick="ToggleMobileMenu"></div>
+        <div class="fixed inset-0 bg-black/50 z-[55] md:hidden backdrop-blur-sm transition-opacity duration-300" @onclick="CloseAllMenus"></div>
     }
 </div>
 
@@ -242,6 +280,7 @@
     private bool _isCollapsed = false;
     private bool _isHovered = false;
     private bool _showMobileMenu = false;
+    private bool _showRightMobileMenu = false;
     private bool _isDashboard = false;
     private List<int>? _availableYears;
 
@@ -299,6 +338,19 @@
     private void ToggleMobileMenu()
     {
         _showMobileMenu = !_showMobileMenu;
+        if (_showMobileMenu) _showRightMobileMenu = false;
+    }
+
+    private void ToggleRightMobileMenu()
+    {
+        _showRightMobileMenu = !_showRightMobileMenu;
+        if (_showRightMobileMenu) _showMobileMenu = false;
+    }
+
+    private void CloseAllMenus()
+    {
+        _showMobileMenu = false;
+        _showRightMobileMenu = false;
     }
 
     private void ToggleRightSidebar()

@@ -78,8 +78,8 @@ aside[b-g6hc6lccna] {
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
-	aside.fixed[b-g6hc6lccna] {
-		height: calc(100vh - 64px);
+	aside[b-g6hc6lccna] {
+		height: calc(100vh - 64px) !important;
 	}
 }
 

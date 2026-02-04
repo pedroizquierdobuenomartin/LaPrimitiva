@@ -1,28 +1,10 @@
 /* /Components/Layout/MainLayout.razor.rz.scp.css */
-.page[b-g6hc6lccna] {
-	position: relative;
-	display: flex;
-	flex-direction: column;
-}
-
-main[b-g6hc6lccna] {
-	flex: 1;
+/* Layout Base */
+.h-screen[b-g6hc6lccna] {
+	height: 100vh;
 }
 
 /* Sidebar transitions and layout */
-.sidebar-collapsed nav[b-g6hc6lccna] {
-	padding-left: 0.5rem;
-	padding-right: 0.5rem;
-}
-
-aside[b-g6hc6lccna] {
-	z-index: 50;
-}
-
-aside:not(.sidebar-collapsed)[b-g6hc6lccna] {
-	z-index: 60;
-}
-
 .nav-item[b-g6hc6lccna] {
 	transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -35,23 +17,47 @@ aside:not(.sidebar-collapsed)[b-g6hc6lccna] {
 	transform: scale(1.1);
 }
 
+/* Sidebar Active Item with Inner Rounding (Inverted Corners) */
+.active-nav[b-g6hc6lccna] {
+	background-color: #f8fafc !important;
+	/* Matches workspace background */
+	color: var(--brand-accent) !important;
+	border-radius: 2rem 0 0 2rem;
+	box-shadow: none;
+	position: relative;
+}
+
 .active-nav[b-g6hc6lccna]::before {
-	content: '';
+	content: "";
 	position: absolute;
-	left: 0;
-	top: 25%;
-	height: 50%;
-	width: 4px;
-	background: var(--brand-accent);
-	border-radius: 0 4px 4px 0;
-	box-shadow: 0 0 10px var(--brand-accent);
+	top: -2rem;
+	right: 0;
+	width: 2rem;
+	height: 2rem;
+	background-color: transparent;
+	border-bottom-right-radius: 2rem;
+	box-shadow: 1rem 1rem 0 0 #f8fafc;
+	pointer-events: none;
 }
 
-.sidebar-collapsed .active-nav[b-g6hc6lccna]::before {
-	height: 40%;
-	top: 30%;
+.active-nav[b-g6hc6lccna]::after {
+	content: "";
+	position: absolute;
+	bottom: -2rem;
+	right: 0;
+	width: 2rem;
+	height: 2rem;
+	background-color: transparent;
+	border-top-right-radius: 2rem;
+	box-shadow: 1rem -1rem 0 0 #f8fafc;
+	pointer-events: none;
 }
 
+.active-nav svg[b-g6hc6lccna] {
+	color: var(--brand-accent) !important;
+}
+
+/* Custom Scrollbar */
 .scrollbar-hide[b-g6hc6lccna]::-webkit-scrollbar {
 	display: none;
 }
@@ -61,20 +67,20 @@ aside:not(.sidebar-collapsed)[b-g6hc6lccna] {
 	scrollbar-width: none;
 }
 
-/* Base Layout */
-.page[b-g6hc6lccna] {
-	position: relative;
-	display: flex;
-	flex-direction: column;
+/* Transitions */
+aside[b-g6hc6lccna] {
+	transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), border-radius 0.3s ease;
 }
 
-main[b-g6hc6lccna] {
-	flex: 1;
+.sidebar-overlay-effect[b-g6hc6lccna] {
+	box-shadow: 10px 0 30px -5px rgba(0, 0, 0, 0.4);
+	border-right: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-@media (min-width: 641px) {
-	.page[b-g6hc6lccna] {
-		flex-direction: row;
+/* Responsive adjustments */
+@media (max-width: 768px) {
+	aside.fixed[b-g6hc6lccna] {
+		height: calc(100vh - 64px);
 	}
 }
 

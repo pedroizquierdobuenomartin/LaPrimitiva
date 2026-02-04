@@ -153,4 +153,6 @@
   <data name="Yearly" xml:space="preserve"><value>Por Año</value></data>
   <data name="HistoricalSummary" xml:space="preserve"><value>Resumen y KPIs históricos globales.</value></data>
   <data name="NetEvolution" xml:space="preserve"><value>Evolución de Neto Acumulado</value></data>
+  <data name="Settings" xml:space="preserve"><value>Configuración</value></data>
+  <data name="Home" xml:space="preserve"><value>Inicio</value></data>
 </root>

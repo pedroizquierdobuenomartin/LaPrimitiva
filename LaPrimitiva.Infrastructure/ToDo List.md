@@ -1,0 +1,4 @@
+- [ ] - Nueva tabla con todas las combinaciones históricas
+- [ ] - Sección con las combinaciónes históricas
+- [ ] - Sección con los 3 últimos sorteos ganadores sacados de una API a Loterias y Apuestas del estado.
+- [ ] - Sección para crear una combinación automática - Según un algoritmo que se debe programar.

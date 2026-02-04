@@ -26,6 +26,7 @@ builder.Services.AddDbContext<PrimitivaDbContext>(options =>
 // Register Repositories
 builder.Services.AddScoped<IPlanRepository, PlanRepository>();
 builder.Services.AddScoped<IDrawRepository, DrawRepository>();
+builder.Services.AddScoped<IWinningDrawRepository, WinningDrawRepository>();
 
 // Register Application Services
 builder.Services.AddScoped<PlanService>();
@@ -33,6 +34,7 @@ builder.Services.AddScoped<DrawGenerationService>();
 builder.Services.AddScoped<SummaryService>();
 builder.Services.AddScoped<GlobalState>();
 builder.Services.AddScoped<IDrawService, DrawService>();
+builder.Services.AddScoped<IWinningDrawService, WinningDrawService>();
 builder.Services.AddScoped<WinningDrawSeeder>();
 
 var app = builder.Build();

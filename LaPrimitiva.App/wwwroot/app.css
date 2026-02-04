@@ -21,7 +21,7 @@
 
 html,
 body {
-	font-family: 'Inter', sans-serif;
+	font-family: 'Poppins', 'Inter', sans-serif;
 	background-color: var(--brand-bg);
 	color: var(--brand-text-primary);
 }

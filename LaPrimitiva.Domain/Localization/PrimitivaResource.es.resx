@@ -155,4 +155,12 @@
   <data name="NetEvolution" xml:space="preserve"><value>Evolución de Neto Acumulado</value></data>
   <data name="Settings" xml:space="preserve"><value>Configuración</value></data>
   <data name="Home" xml:space="preserve"><value>Inicio</value></data>
+  <data name="HistoricalCombinations" xml:space="preserve"><value>Combinaciones Históricas</value></data>
+  <data name="HistoricalCombinationsDesc" xml:space="preserve"><value>Listado histórico de combinaciones ganadoras de La Primitiva.</value></data>
+  <data name="AddNewWinningDraw" xml:space="preserve"><value>Añadir Resultado Histórico</value></data>
+  <data name="EditWinningDraw" xml:space="preserve"><value>Editar Resultado Histórico</value></data>
+  <data name="Numbers" xml:space="preserve"><value>Números</value></data>
+  <data name="Comp" xml:space="preserve"><value>C</value></data>
+  <data name="Rein" xml:space="preserve"><value>R</value></data>
+  <data name="SaveWinningDraw" xml:space="preserve"><value>Guardar Resultado</value></data>
 </root>

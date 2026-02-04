@@ -1,4 +1,6 @@
-- [X] - Nueva tabla con todas las combinaciones históricas basadas en el csv.
-- [ ] - Sección con las combinaciónes históricas
-- [ ] - Sección con los 3 últimos sorteos ganadores sacados de una API a Loterias y Apuestas del estado.
-- [ ] - Sección para crear una combinación automática - Según un algoritmo que se debe programar.
+- [ ] - Página con las combinaciónes históricas
+- [ ] - Nav Superior en español por recursos
+- [ ] - Dividir los recursos en archivos por global, páginas, componentes.
+- [ ] - Notificación a la derecha cuando haya una combinación ganadora nueva sacada de una API a Loterias y Apuestas del estado. Comprobación una vez al día.
+- [ ] - Si hay una combinación ganadora nueva, poder ver el detalle de la combinación ganadora y dar la opción de añadirla.
+- [ ] - Botón a la derecha para crear una combinación automática - Según un algoritmo que se debe programar.

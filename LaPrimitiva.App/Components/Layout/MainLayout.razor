@@ -130,10 +130,10 @@
                 </div>
 
                 <div class="flex items-center bg-white/50 p-1.5 rounded-xl ml-2 shadow-inner border border-white/40 backdrop-blur-sm">
-                    <button @onclick="() => SetHistorical(false)" class="px-5 py-2 text-xs font-bold rounded-lg transition-all @(!GlobalState.IsHistoricalView ? "bg-[var(--brand-primary)] text-white shadow-lg" : "text-[var(--brand-text-secondary)] hover:text-[var(--brand-secondary)]")">
+                    <button @onclick="() => SetHistorical(false)" class="px-5 py-2 text-xs font-bold rounded-lg transition-all @(!GlobalState.IsHistoricalView ? "bg-[var(--brand-accent)] text-white shadow-lg" : "text-[var(--brand-text-secondary)] hover:text-[var(--brand-secondary)]")">
                         @L["Yearly"]
                     </button>
-                    <button @onclick="() => SetHistorical(true)" class="px-5 py-2 text-xs font-bold rounded-lg transition-all @(GlobalState.IsHistoricalView ? "bg-[var(--brand-primary)] text-white shadow-lg" : "text-[var(--brand-text-secondary)] hover:text-[var(--brand-secondary)]")">
+                    <button @onclick="() => SetHistorical(true)" class="px-5 py-2 text-xs font-bold rounded-lg transition-all @(GlobalState.IsHistoricalView ? "bg-[var(--brand-accent)] text-white shadow-lg" : "text-[var(--brand-text-secondary)] hover:text-[var(--brand-secondary)]")">
                         @L["Historical"]
                     </button>
                 </div>

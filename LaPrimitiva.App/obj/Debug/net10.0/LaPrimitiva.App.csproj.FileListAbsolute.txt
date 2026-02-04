@@ -274,3 +274,5 @@ F:\Repositorios\LaPrimitiva\LaPrimitiva.App\bin\Debug\net10.0\reconnection.json
 F:\Repositorios\LaPrimitiva\LaPrimitiva.App\obj\Debug\net10.0\compressed\ra9y9d4166-{0}-zhabx50far-zhabx50far.gz
 F:\Repositorios\LaPrimitiva\LaPrimitiva.App\obj\Debug\net10.0\compressed\adz9kk55kt-{0}-n3gksg5wsh-n3gksg5wsh.gz
 F:\Repositorios\LaPrimitiva\LaPrimitiva.App\obj\Debug\net10.0\compressed\m49roka59d-{0}-n3gksg5wsh-n3gksg5wsh.gz
+F:\Repositorios\LaPrimitiva\LaPrimitiva.App\bin\Debug\net10.0\SeedData\Histórico de Resultados - Primitiva - 1985 a 2012.csv
+F:\Repositorios\LaPrimitiva\LaPrimitiva.App\bin\Debug\net10.0\SeedData\Histórico de Resultados - Primitiva - 2013 a 2025.csv

@@ -11,6 +11,7 @@ namespace LaPrimitiva.Infrastructure.Persistence
 
         public DbSet<Plan> Plans { get; set; } = null!;
         public DbSet<DrawRecord> DrawRecords { get; set; } = null!;
+        public DbSet<WinningDraw> WinningDraws { get; set; } = null!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -51,6 +52,13 @@ namespace LaPrimitiva.Infrastructure.Persistence
                 
                 entity.HasIndex(e => e.DrawDate);
                 entity.HasIndex(e => e.WeekNumber);
+            });
+
+            modelBuilder.Entity<WinningDraw>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.HasIndex(e => e.DrawDate).IsUnique();
+                entity.Property(e => e.Joker).HasMaxLength(10);
             });
         }
     }

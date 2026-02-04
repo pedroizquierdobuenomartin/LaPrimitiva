@@ -1,4 +1,5 @@
 using LaPrimitiva.Domain.Repositories;
+using LaPrimitiva.Infrastructure.Persistence.Seed;
 using LaPrimitiva.App.Models;
 using LaPrimitiva.Infrastructure.Repositories;
 using LaPrimitiva.Infrastructure.Persistence;
@@ -32,6 +33,7 @@ builder.Services.AddScoped<DrawGenerationService>();
 builder.Services.AddScoped<SummaryService>();
 builder.Services.AddScoped<GlobalState>();
 builder.Services.AddScoped<IDrawService, DrawService>();
+builder.Services.AddScoped<WinningDrawSeeder>();
 
 var app = builder.Build();
 
@@ -54,30 +56,24 @@ app.MapRazorComponents<App>()
 // Seed data
 using (var scope = app.Services.CreateScope())
 {
-    var context = scope.ServiceProvider.GetRequiredService<PrimitivaDbContext>();
-    var genService = scope.ServiceProvider.GetRequiredService<DrawGenerationService>();
+    // Base Table and Data Initialization (Robust Check)
+    var winningSeeder = scope.ServiceProvider.GetRequiredService<WinningDrawSeeder>();
+    var seedPath = Path.Combine(AppContext.BaseDirectory, "SeedData");
     
-    context.Database.EnsureCreated();
+    // This creates Tables if missing and seeds historical results
+    await winningSeeder.SeedFromDirectoryAsync(seedPath);
 
+    // Initial Plan Seed (Optional, currently disabled to ensure "sin datos" as requested)
+    /*
     if (!context.Plans.Any())
     {
         var plan = new LaPrimitiva.Domain.Entities.Plan
         {
             Name = "Plan 2026",
-            EffectiveFrom = new DateTime(2026, 1, 1),
-            EffectiveTo = new DateTime(2026, 12, 31),
-            EnableJoker = true,
-            CostPerBet = 1.00m,
-            JokerCostPerBet = 1.00m,
-            FixedCombinationLabel = "Combinación Fija Estándar"
-        };
-        context.Plans.Add(plan);
-        await context.SaveChangesAsync();
-
-        var draws = genService.GenerateDrawsForRange(plan.Id, plan.EffectiveFrom, plan.EffectiveTo.Value);
-        context.DrawRecords.AddRange(draws);
-        await context.SaveChangesAsync();
+            // ...
+        }
     }
+    */
 }
 
 app.Run();

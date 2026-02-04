@@ -1,5 +1,4 @@
-- [ ] - Rediseño del popup de reconexión para que sea del estilo de la marca.
-- [ ] - Nueva tabla con todas las combinaciones históricas basadas en el csv.
+- [X] - Nueva tabla con todas las combinaciones históricas basadas en el csv.
 - [ ] - Sección con las combinaciónes históricas
 - [ ] - Sección con los 3 últimos sorteos ganadores sacados de una API a Loterias y Apuestas del estado.
 - [ ] - Sección para crear una combinación automática - Según un algoritmo que se debe programar.

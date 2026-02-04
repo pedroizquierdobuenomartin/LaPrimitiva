@@ -517,3 +517,5 @@ F:\Repositorios\LaPrimitiva\LaPrimitiva.Tests\bin\Debug\net10.0\LaPrimitiva.App.
 F:\Repositorios\LaPrimitiva\LaPrimitiva.Tests\bin\Debug\net10.0\es\LaPrimitiva.Domain.resources.dll
 F:\Repositorios\LaPrimitiva\LaPrimitiva.Tests\bin\Debug\net10.0\Respawn.dll
 f:\Repositorios\LaPrimitiva\LaPrimitiva.Tests\bin\Debug\net10.0\reconnection.json
+F:\Repositorios\LaPrimitiva\LaPrimitiva.Tests\bin\Debug\net10.0\SeedData\Histórico de Resultados - Primitiva - 1985 a 2012.csv
+F:\Repositorios\LaPrimitiva\LaPrimitiva.Tests\bin\Debug\net10.0\SeedData\Histórico de Resultados - Primitiva - 2013 a 2025.csv

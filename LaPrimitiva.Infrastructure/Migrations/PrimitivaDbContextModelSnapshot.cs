@@ -28,7 +28,27 @@ namespace LaPrimitiva.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<decimal>("Acumulado")
+                        .HasPrecision(12, 2)
+                        .HasColumnType("decimal(12,2)");
+
                     b.Property<decimal>("AutoPrize")
+                        .HasPrecision(10, 2)
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<decimal>("CosteAuto")
+                        .HasPrecision(10, 2)
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<decimal>("CosteFija")
+                        .HasPrecision(10, 2)
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<decimal>("CosteJokerAuto")
+                        .HasPrecision(10, 2)
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<decimal>("CosteJokerFija")
                         .HasPrecision(10, 2)
                         .HasColumnType("decimal(10,2)");
 
@@ -53,6 +73,10 @@ namespace LaPrimitiva.Infrastructure.Migrations
                         .HasPrecision(10, 2)
                         .HasColumnType("decimal(10,2)");
 
+                    b.Property<decimal>("Neto")
+                        .HasPrecision(10, 2)
+                        .HasColumnType("decimal(10,2)");
+
                     b.Property<string>("Notes")
                         .HasColumnType("nvarchar(max)");
 
@@ -61,6 +85,14 @@ namespace LaPrimitiva.Infrastructure.Migrations
 
                     b.Property<bool>("Played")
                         .HasColumnType("bit");
+
+                    b.Property<decimal>("TotalCoste")
+                        .HasPrecision(10, 2)
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<decimal>("TotalPremios")
+                        .HasPrecision(10, 2)
+                        .HasColumnType("decimal(10,2)");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime2");
@@ -125,6 +157,54 @@ namespace LaPrimitiva.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Plans");
+                });
+
+            modelBuilder.Entity("LaPrimitiva.Domain.Entities.WinningDraw", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Complementario")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("DrawDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Joker")
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)");
+
+                    b.Property<int>("Number1")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Number2")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Number3")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Number4")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Number5")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Number6")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Reintegro")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DrawDate")
+                        .IsUnique();
+
+                    b.ToTable("WinningDraws");
                 });
 
             modelBuilder.Entity("LaPrimitiva.Domain.Entities.DrawRecord", b =>

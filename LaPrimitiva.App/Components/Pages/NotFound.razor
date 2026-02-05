@@ -1,5 +1,78 @@
-﻿@page "/not-found"
+﻿@page "/404"
+@page "/not-found"
 @layout MainLayout
+@using Microsoft.Extensions.Localization
+@using LaPrimitiva.Domain.Localization
+@inject IStringLocalizer<PrimitivaResource> L
 
-<h3>Not Found</h3>
-<p>Sorry, the content you are looking for does not exist.</p>
+<div class="flex flex-col items-center justify-center min-h-[60vh] text-center px-4 animate-in fade-in">
+    <!-- Visual Element: Large styled 404 -->
+    <div class="mb-2 relative">
+        <h1 class="text-9xl md:text-[12rem] font-black text-[var(--brand-primary)] opacity-10 select-none leading-none">
+            404
+        </h1>
+    </div>
+
+    <!-- Animated SVG Face below 404 -->
+    <div class="mb-8 relative z-10 floating-animation">
+        <div class="p-6 bg-white rounded-3xl shadow-xl border border-[var(--brand-borders)]">
+            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="text-[var(--brand-accent)] ">
+                <!-- Outer circle -->
+                <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.5" />
+                
+                <!-- Eyes with blink animation -->
+                <circle cx="9" cy="10" r="1" fill="currentColor" class="eye-blink" />
+                <circle cx="15" cy="10" r="1" fill="currentColor" class="eye-blink" />
+                
+                <!-- Sad mouth with subtle movement -->
+                <path d="M9 16C9.85038 15.3691 10.8846 15 12 15C13.1154 15 14.1496 15.3691 15 16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" class="mouth-sigh" />
+            </svg>
+        </div>
+    </div>
+
+    <!-- Content -->
+    <h2 class="text-3xl md:text-4xl font-bold text-[var(--brand-secondary)] mb-4">
+        @L["NotFoundTitle"]
+    </h2>
+    <p class="text-[var(--brand-text-secondary)] text-lg mb-10 max-w-md mx-auto">
+        @L["NotFoundDescription"]
+    </p>
+
+    <!-- Action -->
+    <NavLink href="" class="px-8 py-4 bg-[var(--brand-primary)] text-white font-bold rounded-2xl shadow-lg shadow-[var(--brand-primary)]/20 hover:bg-[var(--brand-secondary)] hover:scale-105 transition-all duration-300 active:scale-95 flex items-center gap-2">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+        </svg>
+        @L["BackToDashboard"]
+    </NavLink>
+</div>
+
+<style>
+    .floating-animation {
+        animation: float 4s ease-in-out infinite;
+    }
+
+    @@keyframes float {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-10px); }
+    }
+
+    .eye-blink {
+        transform-origin: center;
+        animation: blink 3s ease-in-out infinite;
+    }
+
+    @@keyframes blink {
+        0%, 90%, 100% { transform: scaleY(1); }
+        95% { transform: scaleY(0.1); }
+    }
+
+    .mouth-sigh {
+        animation: sigh 4s ease-in-out infinite;
+    }
+
+    @@keyframes sigh {
+        0%, 100% { d: path("M9 16C9.85038 15.3691 10.8846 15 12 15C13.1154 15 14.1496 15.3691 15 16"); }
+        50% { d: path("M8.5 16.5C9.5 15.5 11 15 12 15C13 15 14.5 15.5 15.5 16.5"); }
+    }
+</style>

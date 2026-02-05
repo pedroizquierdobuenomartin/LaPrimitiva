@@ -176,4 +176,7 @@
   <data name="planes" xml:space="preserve"><value>Planes</value></data>
   <data name="datos" xml:space="preserve"><value>Datos</value></data>
   <data name="historico" xml:space="preserve"><value>Histórico</value></data>
+  <data name="NotFoundTitle" xml:space="preserve"><value>Página no encontrada</value></data>
+  <data name="NotFoundDescription" xml:space="preserve"><value>Parece que te has perdido entre los números. No te preocupes, la suerte todavía puede estar de tu lado.</value></data>
+  <data name="BackToDashboard" xml:space="preserve"><value>Volver al Dashboard</value></data>
 </root>

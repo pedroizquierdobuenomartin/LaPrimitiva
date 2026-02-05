@@ -1,4 +1,3 @@
-- [ ] - Crear página de Ayuda
-- [ ] - Crear página de Privacidad
+- [X] - Crear página de Privacidad
 - [ ] - Crear página de Términos y Condiciones
 - [ ] - Eliminar el contacto del footer.

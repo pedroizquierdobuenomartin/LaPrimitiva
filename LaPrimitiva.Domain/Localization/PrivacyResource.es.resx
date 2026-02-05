@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  
+  <data name="PrivacyTitle" xml:space="preserve"><value>Política de Privacidad</value></data>
+  <data name="PrivacySubtitle" xml:space="preserve"><value>Tu confianza es nuestro mayor premio. Transparencia total sobre tus datos.</value></data>
+  
+  <data name="IntroTitle" xml:space="preserve"><value>Compromiso de Privacidad</value></data>
+  <data name="IntroDesc" xml:space="preserve"><value>En La Primitiva Audit, entendemos que tus datos son personales y valiosos. Nuestra política está diseñada para proteger tu información mientras te ofrecemos la mejor experiencia de auditoría posible.</value></data>
+  
+  <data name="Section1Title" xml:space="preserve"><value>1. ¿Qué datos tratamos?</value></data>
+  <data name="Section1Desc" xml:space="preserve"><value>Solo procesamos la información estrictamente necesaria: tus combinaciones de lotería, planes de apuesta y datos de sesión. No vendemos tus datos a terceros.</value></data>
+  
+  <data name="Section2Title" xml:space="preserve"><value>2. Finalidad del tratamiento</value></data>
+  <data name="Section2Desc" xml:space="preserve"><value>Utilizamos tus datos para automatizar el cálculo de premios, generar estadísticas personalizadas en tu Dashboard y enviarte notificaciones sobre resultados recientes.</value></data>
+  
+  <data name="Section3Title" xml:space="preserve"><value>3. Almacenamiento Seguro</value></data>
+  <data name="Section3Desc" xml:space="preserve"><value>Tus preferencias se guardan de forma segura utilizando Local Storage y cifrado estándar de la industria para garantizar que solo tú tengas acceso a tu configuración personal.</value></data>
+  
+  <data name="Section4Title" xml:space="preserve"><value>4. Tus Derechos (ARCO)</value></data>
+  <data name="Section4Desc" xml:space="preserve"><value>Tienes pleno derecho a Acceder, Rectificar, Cancelar u Oponerte al tratamiento de tus datos en cualquier momento. Tu control sobre tu información es absoluto.</value></data>
+  
+  <data name="LegislationNote" xml:space="preserve"><value>Cumplimos estrictamente con el Reglamento General de Protección de Datos (RGPD) y la Ley Orgánica de Protección de Datos (LOPDGDD) española.</value></data>
+  
+  <data name="ContactTitle" xml:space="preserve"><value>¿Dudas sobre tus datos?</value></data>
+  <data name="ContactDesc" xml:space="preserve"><value>Para cualquier consulta legal o técnica sobre privacidad, contacta con nuestro DPO.</value></data>
+  <data name="ContactButton" xml:space="preserve"><value>Consultar DPO</value></data>
+</root>

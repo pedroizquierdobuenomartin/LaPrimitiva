@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="Plans" xml:space="preserve"><value>Planes</value></data>
+  <data name="PlanManagement" xml:space="preserve"><value>Gestión de Planes</value></data>
+  <data name="ConfigurePlanRules" xml:space="preserve"><value>Configura versiones de costes y reglas para el año</value></data>
+  <data name="NewPlan" xml:space="preserve"><value>Nuevo Plan</value></data>
+  <data name="CostPerBet" xml:space="preserve"><value>Coste por Apuesta</value></data>
+  <data name="BetsPerDraw" xml:space="preserve"><value>Apuestas/Sorteo</value></data>
+  <data name="JokerActive" xml:space="preserve"><value>Joker Activo</value></data>
+  <data name="JokerCost" xml:space="preserve"><value>Coste Joker</value></data>
+  <data name="FixedLabel" xml:space="preserve"><value>Etiqueta Fija</value></data>
+  <data name="ViewDraws" xml:space="preserve"><value>Ver Sorteos</value></data>
+  <data name="GenerateDraws" xml:space="preserve"><value>Generar Sorteos</value></data>
+  <data name="Plan" xml:space="preserve"><value>Plan</value></data>
+  <data name="NoPlanExists" xml:space="preserve"><value>No existe plan</value></data>
+  <data name="Played" xml:space="preserve"><value>Jugados</value></data>
+  <data name="Pending" xml:space="preserve"><value>Pendientes</value></data>
+  <data name="TotalCost" xml:space="preserve"><value>Coste Total</value></data>
+  <data name="Prizes" xml:space="preserve"><value>Premios</value></data>
+  <data name="WinningBets" xml:space="preserve"><value>Apuestas Ganadoras</value></data>
+  <data name="NetBalance" xml:space="preserve"><value>Balance Neto</value></data>
+  <data name="NoPlansForYear" xml:space="preserve"><value>No hay planes para {0}</value></data>
+  <data name="NoPlansForYearDesc" xml:space="preserve"><value>Crea un nuevo plan o cambia el año seleccionado para ver otros planes.</value></data>
+  <data name="OverlappingDates" xml:space="preserve"><value>Fechas Superpuestas</value></data>
+  <data name="Active" xml:space="preserve"><value>Activo</value></data>
+  <data name="Inactive" xml:space="preserve"><value>Inactivo</value></data>
+  <data name="Label" xml:space="preserve"><value>Etiqueta</value></data>
+  <data name="OverlapWarning" xml:space="preserve"><value>Este plan se solapa con otro en el mismo periodo. Las reglas de negocio y costes podrían no ser coherentes para los sorteos en estas fechas.</value></data>
+  <data name="CreatedOn" xml:space="preserve"><value>Creado {0}</value></data>
+  <data name="EditPlan" xml:space="preserve"><value>Editar Plan</value></data>
+  <data name="PlanConfigSubtitle" xml:space="preserve"><value>Configuración de periodo y costes</value></data>
+  <data name="SavePlanError" xml:space="preserve"><value>Ha ocurrido un error inesperado al guardar el plan.</value></data>
+  <data name="Name" xml:space="preserve"><value>Nombre</value></data>
+  <data name="From" xml:space="preserve"><value>Desde</value></data>
+  <data name="To" xml:space="preserve"><value>Hasta</value></data>
+  <data name="CostPerBetLabel" xml:space="preserve"><value>Coste Apuesta (€)</value></data>
+  <data name="CostJokerLabel" xml:space="preserve"><value>Coste Joker (€)</value></data>
+  <data name="FixedCombinationLabelPrompt" xml:space="preserve"><value>Combinación Fija (Etiqueta)</value></data>
+  <data name="FixedCombinationPlaceholder" xml:space="preserve"><value>Ej: Mis números de toda la vida</value></data>
+  <data name="EnableJokerLabel" xml:space="preserve"><value>Activar Joker</value></data>
+  <data name="SavePlan" xml:space="preserve"><value>Guardar Plan</value></data>
+  <data name="DeletePlanConfirmTitle" xml:space="preserve"><value>¿Eliminar {0}?</value></data>
+  <data name="CannotDeletePlan" xml:space="preserve"><value>No se puede borrar el plan</value></data>
+  <data name="CannotDeletePlanDesc" xml:space="preserve"><value>Primero debes borrar todos los sorteos asociados a este plan en la sección de Registro.</value></data>
+  <data name="DeletePlanWarningText" xml:space="preserve"><value>Estás a punto de eliminar permanentemente este plan y todas sus configuraciones asociadas.</value></data>
+  <data name="DeletePlanIrreversible" xml:space="preserve"><value>Esta acción es irreversible.</value></data>
+  <data name="Understood" xml:space="preserve"><value>Entendido</value></data>
+  <data name="UnexpectedDeleteError" xml:space="preserve"><value>Ha ocurrido un error inesperado al intentar borrar el plan.</value></data>
+  <data name="Bets" xml:space="preserve"><value>Apuestas</value></data>
+  <data name="DrawsFijoAuto" xml:space="preserve"><value>{0} Sorteos (fijo + automático)</value></data>
+  <data name="Totals" xml:space="preserve"><value>Totales</value></data>
+</root>

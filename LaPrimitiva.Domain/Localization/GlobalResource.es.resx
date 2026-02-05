@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="Dashboard" xml:space="preserve"><value>Dashboard</value></data>
+  <data name="Registration" xml:space="preserve"><value>Registro</value></data>
+  <data name="Plans" xml:space="preserve"><value>Planes</value></data>
+  <data name="Historical" xml:space="preserve"><value>Histórico</value></data>
+  <data name="Data" xml:space="preserve"><value>Datos</value></data>
+  <data name="Home" xml:space="preserve"><value>Inicio</value></data>
+  <data name="Settings" xml:space="preserve"><value>Configuración</value></data>
+  <data name="User" xml:space="preserve"><value>Usuario</value></data>
+  <data name="Menu" xml:space="preserve"><value>Menú</value></data>
+  <data name="Help" xml:space="preserve"><value>Ayuda</value></data>
+  <data name="Privacy" xml:space="preserve"><value>Privacidad</value></data>
+  <data name="Contact" xml:space="preserve"><value>Contacto</value></data>
+  <data name="Yes" xml:space="preserve"><value>SÍ</value></data>
+  <data name="No" xml:space="preserve"><value>NO</value></data>
+  <data name="Edit" xml:space="preserve"><value>Editar</value></data>
+  <data name="Delete" xml:space="preserve"><value>Borrar</value></data>
+  <data name="CancelButton" xml:space="preserve"><value>Cancelar</value></data>
+  <data name="DeleteButton" xml:space="preserve"><value>Eliminar</value></data>
+  <data name="ConfirmDeleteButton" xml:space="preserve"><value>Sí, Eliminar</value></data>
+  <data name="Error" xml:space="preserve"><value>Error</value></data>
+  <data name="Retry" xml:space="preserve"><value>Reintentar</value></data>
+  <data name="Rejoining" xml:space="preserve"><value>Reconectando con el servidor...</value></data>
+  <data name="RejoinFailed" xml:space="preserve"><value>Error al reconectar... reintentando en {0} segundos.</value></data>
+  <data name="FailedToRejoin" xml:space="preserve"><value>No se pudo reconectar. Por favor, reintenta o recarga la página.</value></data>
+  <data name="SessionPaused" xml:space="preserve"><value>La sesión ha sido pausada por el servidor.</value></data>
+  <data name="Resume" xml:space="preserve"><value>Reanudar</value></data>
+  <data name="FailedToResume" xml:space="preserve"><value>Error al reanudar la sesión. Por favor, recarga la página.</value></data>
+  <data name="NotFoundTitle" xml:space="preserve"><value>Página no encontrada</value></data>
+  <data name="NotFoundDescription" xml:space="preserve"><value>Parece que te has perdido entre los números. No te preocupes, la suerte todavía puede estar de tu lado.</value></data>
+  <data name="BackToDashboard" xml:space="preserve"><value>Volver al Dashboard</value></data>
+  <data name="registro" xml:space="preserve"><value>Registro</value></data>
+  <data name="planes" xml:space="preserve"><value>Planes</value></data>
+  <data name="datos" xml:space="preserve"><value>Datos</value></data>
+  <data name="historico" xml:space="preserve"><value>Histórico</value></data>
+  <data name="Joker" xml:space="preserve"><value>Joker</value></data>
+</root>

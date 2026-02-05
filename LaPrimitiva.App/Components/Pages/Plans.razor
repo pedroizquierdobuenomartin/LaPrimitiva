@@ -6,7 +6,8 @@
 @using Microsoft.EntityFrameworkCore
 @using Microsoft.Extensions.Localization
 @using LaPrimitiva.Domain.Localization
-@inject IStringLocalizer<PrimitivaResource> L
+@inject IStringLocalizer<PlansResource> L
+@inject IStringLocalizer<GlobalResource> LG
 @inject GlobalState GlobalState
 @inject PlanService PlanService
 @inject DrawGenerationService DrawGenService
@@ -77,12 +78,12 @@
                             </div>
                         </div>
                         <div class="flex gap-2 md:gap-3">
-                            <button @onclick="() => ShowEditModal(plan)" class="h-9 w-9 md:h-10 md:w-10 bg-white text-[var(--brand-text-secondary)] rounded-xl border border-[var(--brand-borders)] hover:text-[var(--brand-secondary)] hover:border-[var(--brand-secondary)] shadow-sm transition-all flex items-center justify-center group/btn" title="@L["Edit"]">
+                            <button @onclick="() => ShowEditModal(plan)" class="h-9 w-9 md:h-10 md:w-10 bg-white text-[var(--brand-text-secondary)] rounded-xl border border-[var(--brand-borders)] hover:text-[var(--brand-secondary)] hover:border-[var(--brand-secondary)] shadow-sm transition-all flex items-center justify-center group/btn" title="@LG["Edit"]">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                 </svg>
                             </button>
-                            <button @onclick="() => DeletePlan(plan)" class="h-9 w-9 md:h-10 md:w-10 bg-white text-rose-500 rounded-xl border border-rose-100 hover:bg-rose-500 hover:text-white shadow-sm transition-all flex items-center justify-center" title="@L["Delete"]">
+                            <button @onclick="() => DeletePlan(plan)" class="h-9 w-9 md:h-10 md:w-10 bg-white text-rose-500 rounded-xl border border-rose-100 hover:bg-rose-500 hover:text-white shadow-sm transition-all flex items-center justify-center" title="@LG["Delete"]">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-4v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                 </svg>
@@ -258,7 +259,7 @@
             </div>
             <div class="p-6 md:p-10 bg-white flex flex-col md:flex-row gap-4 md:gap-6 border-t border-[var(--brand-bg)]">
                 <button @onclick="SavePlan" class="w-full md:flex-1 bg-[var(--brand-secondary)] hover:bg-black text-white font-bold py-4 md:py-5 rounded-xl md:rounded-2xl shadow-xl transition-all uppercase tracking-widest text-xs md:text-sm active:scale-95 order-1 md:order-1">@L["SavePlan"]</button>
-                <button @onclick="() => showModal = false" class="w-full md:flex-1 bg-[var(--brand-bg)] text-[var(--brand-text-secondary)] font-bold py-4 md:py-5 rounded-xl md:rounded-2xl hover:bg-[var(--brand-borders)] transition-all uppercase tracking-widest text-xs md:text-sm active:scale-95 order-2 md:order-2">@L["CancelButton"]</button>
+                <button @onclick="() => showModal = false" class="w-full md:flex-1 bg-[var(--brand-bg)] text-[var(--brand-text-secondary)] font-bold py-4 md:py-5 rounded-xl md:rounded-2xl hover:bg-[var(--brand-borders)] transition-all uppercase tracking-widest text-xs md:text-sm active:scale-95 order-2 md:order-2">@LG["CancelButton"]</button>
             </div>
         </div>
     </div>
@@ -293,7 +294,7 @@
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 md:h-10 md:w-10 text-rose-500" viewBox="0 0 20 20" fill="currentColor">
                             <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
                         </svg>
-                        <p class="text-sm md:text-base font-bold text-rose-800 leading-snug">@L["Error"]</p>
+                        <p class="text-sm md:text-base font-bold text-rose-800 leading-snug">@LG["Error"]</p>
                         <p class="text-xs md:text-sm text-rose-700 font-medium">@_deleteErrorMessage</p>
                     </div>
                 }
@@ -310,12 +311,12 @@
 
             <div class="grid @(_hasLinkedDraws ? "grid-cols-1" : "grid-cols-2") gap-3 md:gap-4 pt-2 md:pt-4">
                 <button @onclick="CancelDelete" class="px-4 md:px-6 py-3 md:py-4 rounded-xl md:rounded-2xl text-xs md:text-sm font-bold text-[var(--brand-text-secondary)] bg-[var(--brand-bg)] hover:bg-[var(--brand-borders)] transition-all uppercase tracking-widest active:scale-95">
-                    @(_hasLinkedDraws ? L["Understood"] : L["CancelButton"])
+                    @(_hasLinkedDraws ? L["Understood"] : LG["CancelButton"])
                 </button>
                 @if (!_hasLinkedDraws)
                 {
                     <button @onclick="ConfirmDelete" class="px-4 md:px-6 py-3 md:py-4 rounded-xl md:rounded-2xl text-xs md:text-sm font-bold text-white bg-rose-600 hover:bg-rose-700 shadow-xl shadow-rose-200 transition-all active:scale-95 uppercase tracking-widest">
-                        @L["ConfirmDeleteButton"]
+                        @LG["ConfirmDeleteButton"]
                     </button>
                 }
             </div>

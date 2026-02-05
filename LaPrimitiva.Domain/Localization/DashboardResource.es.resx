@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="Dashboard" xml:space="preserve"><value>Dashboard</value></data>
+  <data name="SummaryAndKPIs" xml:space="preserve"><value>Resumen y KPIs para el año</value></data>
+  <data name="TotalSpent" xml:space="preserve"><value>Total Gastado</value></data>
+  <data name="PlayedDraws" xml:space="preserve"><value>sorteos jugados</value></data>
+  <data name="TotalWon" xml:space="preserve"><value>Total Ganado</value></data>
+  <data name="WithPrize" xml:space="preserve"><value>con premio</value></data>
+  <data name="Net" xml:space="preserve"><value>Neto</value></data>
+  <data name="Effectiveness" xml:space="preserve"><value>Efectividad</value></data>
+  <data name="WinningDrawsDesc" xml:space="preserve"><value>Sorteos con premio</value></data>
+  <data name="BreakdownByType" xml:space="preserve"><value>Desglose por Tipo</value></data>
+  <data name="SelectedYear" xml:space="preserve"><value>AÑO SELECCIONADO</value></data>
+  <data name="Yearly" xml:space="preserve"><value>Por Año</value></data>
+  <data name="Historical" xml:space="preserve"><value>Histórico</value></data>
+  <data name="HistoricalSummary" xml:space="preserve"><value>Resumen y KPIs históricos globales.</value></data>
+  <data name="NetEvolution" xml:space="preserve"><value>Evolución de Neto Acumulado</value></data>
+  <data name="FixedCombination" xml:space="preserve"><value>Combinación FIJA</value></data>
+  <data name="AutoCombination" xml:space="preserve"><value>Combinación AUTO</value>
+  </data>
+  <data name="Expense" xml:space="preserve"><value>Gasto</value></data>
+  <data name="Prize" xml:space="preserve"><value>Premio</value></data>
+</root>

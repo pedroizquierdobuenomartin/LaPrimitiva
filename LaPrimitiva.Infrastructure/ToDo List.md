@@ -1,4 +1,3 @@
-- [X] - Botón a la derecha para crear una combinación automática - Según un algoritmo que se debe programar.
 - [ ] - Crear página de Ayuda
 - [ ] - Crear página de Privacidad
 - [ ] - Crear página de Términos y Condiciones

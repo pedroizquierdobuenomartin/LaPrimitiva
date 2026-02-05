@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using LaPrimitiva.Application.DTOs;
 using LaPrimitiva.Application.Services;
+using LaPrimitiva.Domain.Models;
 
 namespace LaPrimitiva.Application.Interfaces
 {
@@ -15,5 +16,6 @@ namespace LaPrimitiva.Application.Interfaces
         Task<Result<WinningDrawDto>> CreateAsync(WinningDrawDto dto);
         Task<Result> UpdateAsync(WinningDrawDto dto);
         Task<Result> DeleteAsync(Guid id);
+        Task<Result<WinningDrawDto>> SaveFromRssAsync(RssDraw rssDraw);
     }
 }

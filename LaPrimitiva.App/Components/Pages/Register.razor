@@ -579,7 +579,8 @@
 
     protected override async Task OnInitializedAsync()
     {
-        GlobalState.OnChange += HandleStateChange;
+        GlobalState.OnChange += HandleUIStateChange;
+        GlobalState.OnDataRefreshRequired += HandleDataChange;
         
         // Try to identify current week if possible
         modalWeek = GetCurrentWeekNumber();
@@ -600,18 +601,17 @@
         return ((referenceDate - start).Days / 7) + 1;
     }
 
-    private async void HandleStateChange()
+    private void HandleUIStateChange()
+    {
+        InvokeAsync(StateHasChanged);
+    }
+
+    private async void HandleDataChange()
     {
         await InvokeAsync(async () => 
         {
-            try 
-            {
-                await LoadData();
-            }
-            finally 
-            {
-                StateHasChanged();
-            }
+            await LoadData();
+            StateHasChanged();
         });
     }
 
@@ -975,6 +975,7 @@
 
     public void Dispose()
     {
-        GlobalState.OnChange -= HandleStateChange;
+        GlobalState.OnChange -= HandleUIStateChange;
+        GlobalState.OnDataRefreshRequired -= HandleDataChange;
     }
 }

@@ -15,6 +15,7 @@ namespace LaPrimitiva.Application.Services
                 {
                     _selectedYear = value;
                     NotifyStateChanged();
+                    NotifyDataChanged();
                 }
             }
         }
@@ -29,6 +30,7 @@ namespace LaPrimitiva.Application.Services
                 {
                     _selectedPlanId = value;
                     NotifyStateChanged();
+                    NotifyDataChanged();
                 }
             }
         }
@@ -43,6 +45,7 @@ namespace LaPrimitiva.Application.Services
                 {
                     _isHistoricalView = value;
                     NotifyStateChanged();
+                    NotifyDataChanged();
                 }
             }
         }
@@ -89,7 +92,9 @@ namespace LaPrimitiva.Application.Services
         public bool HasNewDraws => NewDrawsCount > 0;
 
         public event Action? OnChange;
+        public event Action? OnDataRefreshRequired;
 
-        private void NotifyStateChanged() => OnChange?.Invoke();
+        public void NotifyStateChanged() => OnChange?.Invoke();
+        public void NotifyDataChanged() => OnDataRefreshRequired?.Invoke();
     }
 }

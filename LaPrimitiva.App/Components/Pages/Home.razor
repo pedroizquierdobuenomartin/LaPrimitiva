@@ -156,11 +156,17 @@
 
     protected override async Task OnInitializedAsync()
     {
-        GlobalState.OnChange += HandleStateChange;
+        GlobalState.OnChange += HandleUIStateChange;
+        GlobalState.OnDataRefreshRequired += HandleDataChange;
         await LoadData();
     }
 
-    private async void HandleStateChange()
+    private void HandleUIStateChange()
+    {
+        InvokeAsync(StateHasChanged);
+    }
+
+    private async void HandleDataChange()
     {
         await InvokeAsync(async () => 
         {
@@ -284,6 +290,7 @@
 
     public void Dispose()
     {
-        GlobalState.OnChange -= HandleStateChange;
+        GlobalState.OnChange -= HandleUIStateChange;
+        GlobalState.OnDataRefreshRequired -= HandleDataChange;
     }
 }

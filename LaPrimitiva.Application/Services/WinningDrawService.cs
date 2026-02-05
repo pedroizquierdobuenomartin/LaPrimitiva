@@ -6,6 +6,7 @@ using LaPrimitiva.Application.DTOs;
 using LaPrimitiva.Application.Interfaces;
 using LaPrimitiva.Domain.Entities;
 using LaPrimitiva.Domain.Repositories;
+using LaPrimitiva.Domain.Models;
 
 namespace LaPrimitiva.Application.Services
 {
@@ -91,6 +92,25 @@ namespace LaPrimitiva.Application.Services
         {
             await _repository.DeleteAsync(id);
             return Result.Success();
+        }
+
+        public async Task<Result<WinningDrawDto>> SaveFromRssAsync(RssDraw rssDraw)
+        {
+            var dto = new WinningDrawDto
+            {
+                DrawDate = rssDraw.Date,
+                Number1 = rssDraw.Numbers[0],
+                Number2 = rssDraw.Numbers[1],
+                Number3 = rssDraw.Numbers[2],
+                Number4 = rssDraw.Numbers[3],
+                Number5 = rssDraw.Numbers[4],
+                Number6 = rssDraw.Numbers[5],
+                Complementario = rssDraw.Complementary,
+                Reintegro = rssDraw.Reintegro,
+                Joker = rssDraw.Joker?.ToString()
+            };
+
+            return await CreateAsync(dto);
         }
 
         private static WinningDrawDto MapToDto(WinningDraw entity) => new(

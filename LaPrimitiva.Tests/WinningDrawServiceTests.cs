@@ -7,6 +7,7 @@ using LaPrimitiva.Application.DTOs;
 using LaPrimitiva.Application.Services;
 using LaPrimitiva.Domain.Entities;
 using LaPrimitiva.Domain.Repositories;
+using LaPrimitiva.Domain.Models;
 using Moq;
 using Xunit;
 
@@ -132,6 +133,41 @@ namespace LaPrimitiva.Tests
             // Assert
             Assert.True(result.IsSuccess);
             _repositoryMock.Verify(r => r.DeleteAsync(id), Times.Once);
+        }
+
+        [Fact]
+        public async Task SaveFromRssAsync_ShouldMapAndSaveCorrectly()
+        {
+            // Arrange
+            var rssDraw = new RssDraw(DateTime.Now.Date, [1, 2, 3, 4, 5, 6], 7, 8, 12345);
+            _repositoryMock.Setup(r => r.AnyAsync(It.IsAny<Expression<Func<WinningDraw, bool>>>())).ReturnsAsync(false);
+
+            // Act
+            var result = await _service.SaveFromRssAsync(rssDraw);
+
+            // Assert
+            Assert.True(result.IsSuccess);
+            _repositoryMock.Verify(r => r.CreateAsync(It.Is<WinningDraw>(d => 
+                d.DrawDate == rssDraw.Date &&
+                d.Number1 == 1 &&
+                d.Complementario == 7 &&
+                d.Reintegro == 8 &&
+                d.Joker == "12345")), Times.Once);
+        }
+
+        [Fact]
+        public async Task SaveFromRssAsync_WhenDuplicateDate_ShouldReturnFailure()
+        {
+            // Arrange
+            var rssDraw = new RssDraw(DateTime.Now.Date, [1, 2, 3, 4, 5, 6], 7, 8, 12345);
+            _repositoryMock.Setup(r => r.AnyAsync(It.IsAny<Expression<Func<WinningDraw, bool>>>())).ReturnsAsync(true);
+
+            // Act
+            var result = await _service.SaveFromRssAsync(rssDraw);
+
+            // Assert
+            Assert.False(result.IsSuccess);
+            Assert.Equal("Ya existe un sorteo para la fecha especificada.", result.Error);
         }
     }
 }

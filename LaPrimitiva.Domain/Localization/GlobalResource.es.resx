@@ -41,7 +41,7 @@
   <data name="Menu" xml:space="preserve"><value>Menú</value></data>
   <data name="Help" xml:space="preserve"><value>Ayuda</value></data>
   <data name="Privacy" xml:space="preserve"><value>Privacidad</value></data>
-  <data name="Contact" xml:space="preserve"><value>Contacto</value></data>
+  <data name="Terms" xml:space="preserve"><value>Términos y Condiciones</value></data>
   <data name="Yes" xml:space="preserve"><value>SÍ</value></data>
   <data name="No" xml:space="preserve"><value>NO</value></data>
   <data name="Edit" xml:space="preserve"><value>Editar</value></data>

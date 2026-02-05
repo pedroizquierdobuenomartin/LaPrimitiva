@@ -22,3 +22,4 @@ F:\Repositorios\LaPrimitiva\LaPrimitiva.Domain\obj\Debug\net10.0\LaPrimitiva.Dom
 F:\Repositorios\LaPrimitiva\LaPrimitiva.Domain\obj\Debug\net10.0\LaPrimitiva.Domain.Localization.CombinationResource.es.resources
 F:\Repositorios\LaPrimitiva\LaPrimitiva.Domain\obj\Debug\net10.0\LaPrimitiva.Domain.Localization.HelpResource.es.resources
 F:\Repositorios\LaPrimitiva\LaPrimitiva.Domain\obj\Debug\net10.0\LaPrimitiva.Domain.Localization.PrivacyResource.es.resources
+F:\Repositorios\LaPrimitiva\LaPrimitiva.Domain\obj\Debug\net10.0\LaPrimitiva.Domain.Localization.TermsAndConditionsResource.es.resources

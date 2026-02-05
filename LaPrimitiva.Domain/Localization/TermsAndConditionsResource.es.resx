@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  
+  <data name="TermsTitle" xml:space="preserve"><value>Términos y Condiciones</value></data>
+  <data name="TermsSubtitle" xml:space="preserve"><value>Tu guía legal para el uso responsable y auditable de La Primitiva Audit.</value></data>
+  
+  <data name="IntroTitle" xml:space="preserve"><value>Marco Contractual</value></data>
+  <data name="IntroDesc" xml:space="preserve"><value>Al acceder y utilizar La Primitiva Audit, aceptas estar vinculado por los siguientes términos y condiciones. Esta plataforma ha sido diseñada para ofrecer herramientas de auditoría y análisis de datos de lotería con fines informativos.</value></data>
+  
+  <data name="Section1Title" xml:space="preserve"><value>1. Identificación y Titularidad</value></data>
+  <data name="Section1Desc" xml:space="preserve"><value>El servicio es proporcionado por Pedro Izquierdo Bueno Martín. Para cualquier comunicación legal, puede dirigirse a la sección de contacto de la aplicación.</value></data>
+  
+  <data name="Section2Title" xml:space="preserve"><value>2. Condiciones de Uso</value></data>
+  <data name="Section2Desc" xml:space="preserve"><value>El usuario se compromete a hacer un uso lícito y adecuado de las herramientas proporcionadas. Queda prohibido cualquier uso que vulnere la seguridad de la plataforma o intente manipular sus algoritmos.</value></data>
+  
+  <data name="Section3Title" xml:space="preserve"><value>3. Responsabilidad de los Datos</value></data>
+  <data name="Section3Desc" xml:space="preserve"><value>La Primitiva Audit obtiene sus datos de fuentes oficiales. No nos hacemos responsables de pérdidas económicas derivadas de errores en los datos o fallos técnicos externos.</value></data>
+  
+  <data name="Section4Title" xml:space="preserve"><value>4. Propiedad Intelectual</value></data>
+  <data name="Section4Desc" stroke-linecap="round" stroke-linejoin="round" xml:space="preserve"><value>Todo el diseño, código fuente, algoritmos y marca de La Primitiva Audit son propiedad exclusiva del titular. No se permite su reproducción o decompilación.</value></data>
+  
+  <data name="LegislationNote" xml:space="preserve"><value>Estos términos se rigen por la legislación española y el marco jurídico de la Unión Europea (UE).</value></data>
+  
+  <data name="ContactTitle" xml:space="preserve"><value>¿Necesitas aclaraciones?</value></data>
+  <data name="ContactDesc" xml:space="preserve"><value>Nuestro equipo legal está a tu disposición para resolver cualquier duda sobre estos términos.</value></data>
+  <data name="ContactButton" xml:space="preserve"><value>Contactar Soporte</value></data>
+</root>

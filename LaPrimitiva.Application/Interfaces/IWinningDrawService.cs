@@ -11,6 +11,7 @@ namespace LaPrimitiva.Application.Interfaces
         Task<List<WinningDrawDto>> GetAllAsync(int? year = null);
         Task<List<int>> GetAvailableYearsAsync();
         Task<WinningDrawDto?> GetByIdAsync(Guid id);
+        Task<DateTime?> GetLatestDrawDateAsync();
         Task<Result<WinningDrawDto>> CreateAsync(WinningDrawDto dto);
         Task<Result> UpdateAsync(WinningDrawDto dto);
         Task<Result> DeleteAsync(Guid id);

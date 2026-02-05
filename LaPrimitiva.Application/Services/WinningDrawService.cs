@@ -24,6 +24,11 @@ namespace LaPrimitiva.Application.Services
             return await _repository.GetYearsAsync();
         }
 
+        public async Task<DateTime?> GetLatestDrawDateAsync()
+        {
+            return await _repository.GetLatestDateAsync();
+        }
+
         public async Task<WinningDrawDto?> GetByIdAsync(Guid id)
         {
             var draw = await _repository.GetAsync(id);

@@ -408,6 +408,10 @@
               "suppressParent": "All",
               "target": "Package",
               "version": "[10.0.1, )"
+            },
+            "Microsoft.JSInterop": {
+              "target": "Package",
+              "version": "[9.0.1, )"
             }
           },
           "imports": [

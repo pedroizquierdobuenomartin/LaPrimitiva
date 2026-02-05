@@ -389,6 +389,14 @@
           }
         }
       },
+      "Microsoft.JSInterop/9.0.1": {
+        "runtime": {
+          "lib/net9.0/Microsoft.JSInterop.dll": {
+            "assemblyVersion": "9.0.0.0",
+            "fileVersion": "9.0.124.61009"
+          }
+        }
+      },
       "Microsoft.SqlServer.Server/1.0.0": {
         "runtime": {
           "lib/netstandard2.0/Microsoft.SqlServer.Server.dll": {
@@ -503,7 +511,8 @@
       "LaPrimitiva.Infrastructure/1.0.0": {
         "dependencies": {
           "LaPrimitiva.Domain": "1.0.0",
-          "Microsoft.EntityFrameworkCore.SqlServer": "10.0.1"
+          "Microsoft.EntityFrameworkCore.SqlServer": "10.0.1",
+          "Microsoft.JSInterop": "9.0.1"
         },
         "runtime": {
           "LaPrimitiva.Infrastructure.dll": {
@@ -708,6 +717,13 @@
       "sha512": "sha512-fQ0VVCba75lknUHGldi3iTKAYUQqbzp1Un8+d9cm9nON0Gs8NAkXddNg8iaUB0qi/ybtAmNWizTR4avdkCJ9pQ==",
       "path": "microsoft.identitymodel.tokens/7.7.1",
       "hashPath": "microsoft.identitymodel.tokens.7.7.1.nupkg.sha512"
+    },
+    "Microsoft.JSInterop/9.0.1": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-/xBwIfb0YoC2Muv6EsHjxpqZw2aKv94+i0g0FWZvqvGv3DeAy+8wipAuECVvKYEs2EIclRD41bjajHLoD6mTtw==",
+      "path": "microsoft.jsinterop/9.0.1",
+      "hashPath": "microsoft.jsinterop.9.0.1.nupkg.sha512"
     },
     "Microsoft.SqlServer.Server/1.0.0": {
       "type": "package",

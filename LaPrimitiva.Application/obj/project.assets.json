@@ -536,6 +536,19 @@
           }
         }
       },
+      "Microsoft.JSInterop/9.0.1": {
+        "type": "package",
+        "compile": {
+          "lib/net9.0/Microsoft.JSInterop.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net9.0/Microsoft.JSInterop.dll": {
+            "related": ".xml"
+          }
+        }
+      },
       "Microsoft.SqlServer.Server/1.0.0": {
         "type": "package",
         "compile": {
@@ -698,7 +711,8 @@
         "framework": ".NETCoreApp,Version=v10.0",
         "dependencies": {
           "LaPrimitiva.Domain": "1.0.0",
-          "Microsoft.EntityFrameworkCore.SqlServer": "10.0.1"
+          "Microsoft.EntityFrameworkCore.SqlServer": "10.0.1",
+          "Microsoft.JSInterop": "9.0.1"
         },
         "compile": {
           "bin/placeholder/LaPrimitiva.Infrastructure.dll": {}
@@ -1470,6 +1484,21 @@
         "lib/netstandard2.0/Microsoft.IdentityModel.Tokens.xml",
         "microsoft.identitymodel.tokens.7.7.1.nupkg.sha512",
         "microsoft.identitymodel.tokens.nuspec"
+      ]
+    },
+    "Microsoft.JSInterop/9.0.1": {
+      "sha512": "/xBwIfb0YoC2Muv6EsHjxpqZw2aKv94+i0g0FWZvqvGv3DeAy+8wipAuECVvKYEs2EIclRD41bjajHLoD6mTtw==",
+      "type": "package",
+      "path": "microsoft.jsinterop/9.0.1",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "Icon.png",
+        "THIRD-PARTY-NOTICES.TXT",
+        "lib/net9.0/Microsoft.JSInterop.dll",
+        "lib/net9.0/Microsoft.JSInterop.xml",
+        "microsoft.jsinterop.9.0.1.nupkg.sha512",
+        "microsoft.jsinterop.nuspec"
       ]
     },
     "Microsoft.SqlServer.Server/1.0.0": {

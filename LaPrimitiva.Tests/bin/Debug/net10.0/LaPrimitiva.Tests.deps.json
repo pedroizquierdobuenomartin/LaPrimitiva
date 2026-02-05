@@ -185,7 +185,7 @@
           "Microsoft.Extensions.Primitives.Reference": "10.0.0.0",
           "Microsoft.Extensions.Validation": "10.0.0.0",
           "Microsoft.Extensions.WebEncoders": "10.0.0.0",
-          "Microsoft.JSInterop": "10.0.0.0",
+          "Microsoft.JSInterop.Reference": "10.0.0.0",
           "Microsoft.Net.Http.Headers": "10.0.0.0",
           "Microsoft.VisualBasic.Core": "15.0.0.0",
           "Microsoft.VisualBasic": "10.0.0.0",
@@ -1257,7 +1257,8 @@
       "LaPrimitiva.Infrastructure/1.0.0": {
         "dependencies": {
           "LaPrimitiva.Domain": "1.0.0",
-          "Microsoft.EntityFrameworkCore.SqlServer": "10.0.1"
+          "Microsoft.EntityFrameworkCore.SqlServer": "10.0.1",
+          "Microsoft.JSInterop": "9.0.1"
         },
         "runtime": {
           "LaPrimitiva.Infrastructure.dll": {
@@ -2079,7 +2080,7 @@
         },
         "compileOnly": true
       },
-      "Microsoft.JSInterop/10.0.0.0": {
+      "Microsoft.JSInterop.Reference/10.0.0.0": {
         "compile": {
           "Microsoft.JSInterop.dll": {}
         },
@@ -3358,6 +3359,9 @@
       "Microsoft.Extensions.Primitives/10.0.1": {
         "compileOnly": true
       },
+      "Microsoft.JSInterop/9.0.1": {
+        "compileOnly": true
+      },
       "System.Diagnostics.EventLog/10.0.1": {
         "compileOnly": true
       },
@@ -4370,7 +4374,7 @@
       "serviceable": false,
       "sha512": ""
     },
-    "Microsoft.JSInterop/10.0.0.0": {
+    "Microsoft.JSInterop.Reference/10.0.0.0": {
       "type": "referenceassembly",
       "serviceable": false,
       "sha512": ""
@@ -5446,6 +5450,13 @@
       "sha512": "sha512-DO8XrJkp5x4PddDuc/CH37yDBCs9BYN6ijlKyR3vMb55BP1Vwh90vOX8bNfnKxr5B2qEI3D8bvbY1fFbDveDHQ==",
       "path": "microsoft.extensions.primitives/10.0.1",
       "hashPath": "microsoft.extensions.primitives.10.0.1.nupkg.sha512"
+    },
+    "Microsoft.JSInterop/9.0.1": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-/xBwIfb0YoC2Muv6EsHjxpqZw2aKv94+i0g0FWZvqvGv3DeAy+8wipAuECVvKYEs2EIclRD41bjajHLoD6mTtw==",
+      "path": "microsoft.jsinterop/9.0.1",
+      "hashPath": "microsoft.jsinterop.9.0.1.nupkg.sha512"
     },
     "System.Diagnostics.EventLog/10.0.1": {
       "type": "package",

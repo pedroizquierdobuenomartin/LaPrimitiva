@@ -2,6 +2,7 @@
 - [x] - Nav Superior en español por recursos
 - [X] - Crear página Not Found
 - [X] - Dividir los recursos en archivos por global, páginas, componentes.
-- [ ] - Notificación a la derecha cuando haya una combinación ganadora nueva sacada de una API a Loterias y Apuestas del estado. Comprobación una vez al día.
-- [ ] - Si hay una combinación ganadora nueva, poder ver el detalle de la combinación ganadora y dar la opción de añadirla.
+- [X] - Notificación a la derecha cuando haya una combinación ganadora nueva sacada de una API a Loterias y Apuestas del estado. Comprobación una vez al día.
+- [X] - Si hay una combinación ganadora nueva, poder ver el detalle de la combinación ganadora y 
+- [ ] - Dar la opción de añadir la combinación ganadora al histórico.
 - [ ] - Botón a la derecha para crear una combinación automática - Según un algoritmo que se debe programar.

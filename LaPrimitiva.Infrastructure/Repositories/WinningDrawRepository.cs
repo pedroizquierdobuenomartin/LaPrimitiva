@@ -30,6 +30,11 @@ namespace LaPrimitiva.Infrastructure.Repositories
                 .ToListAsync();
         }
 
+        public async Task<DateTime?> GetLatestDateAsync()
+        {
+            return await _context.WinningDraws.MaxAsync(d => (DateTime?)d.DrawDate);
+        }
+
         public async Task<WinningDraw?> GetAsync(Guid id)
         {
             return await _context.WinningDraws.FindAsync(id);

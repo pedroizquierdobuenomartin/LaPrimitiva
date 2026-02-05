@@ -3,10 +3,13 @@ using LaPrimitiva.Infrastructure.Persistence.Seed;
 using LaPrimitiva.App.Models;
 using LaPrimitiva.Infrastructure.Repositories;
 using LaPrimitiva.Infrastructure.Persistence;
+using LaPrimitiva.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
 using LaPrimitiva.Application.Services;
 using LaPrimitiva.Application.Interfaces;
 using LaPrimitiva.App.Components;
+using LaPrimitiva.Domain.Interfaces;
+using LaPrimitiva.Domain.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -36,6 +39,12 @@ builder.Services.AddScoped<GlobalState>();
 builder.Services.AddScoped<IDrawService, DrawService>();
 builder.Services.AddScoped<IWinningDrawService, WinningDrawService>();
 builder.Services.AddScoped<WinningDrawSeeder>();
+
+// Register Notification Services
+builder.Services.AddHttpClient<IRssClient, RssClient>();
+builder.Services.AddScoped<IRssParserService, RssParserService>();
+builder.Services.AddScoped<ILocalStorageService, LocalStorageService>();
+builder.Services.AddScoped<IDrawNotificationService, DrawNotificationService>();
 
 var app = builder.Build();
 

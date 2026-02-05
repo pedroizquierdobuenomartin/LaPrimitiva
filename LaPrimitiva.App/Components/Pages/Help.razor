@@ -1,0 +1,135 @@
+@page "/ayuda"
+@using LaPrimitiva.Domain.Localization
+@using Microsoft.Extensions.Localization
+@inject IStringLocalizer<HelpResource> L
+
+<PageTitle>@L["HelpTitle"] - La Primitiva Audit</PageTitle>
+
+<div class="max-w-5xl mx-auto space-y-16 py-8 px-4 animate-in fade-in duration-700">
+    <!-- Header Section -->
+    <div class="text-center space-y-4">
+        <h1 class="text-4xl md:text-5xl font-black text-[var(--brand-secondary)] tracking-tight">
+            @L["HelpTitle"]
+        </h1>
+        <p class="text-lg md:text-xl text-[var(--brand-text-secondary)] font-medium max-w-2xl mx-auto">
+            @L["HelpSubtitle"]
+        </p>
+    </div>
+
+    <!-- Intro Card -->
+    <div class="bg-white rounded-[24px] p-8 md:p-12 border border-[var(--brand-borders)]/10 shadow-sm relative overflow-hidden group">
+        <div class="absolute top-0 right-0 p-8 opacity-5 group-hover:scale-110 transition-transform duration-700">
+            <svg class="h-32 w-32 text-[var(--brand-primary)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" />
+                <path d="M12 16V12" />
+                <path d="M12 8H12.01" />
+            </svg>
+        </div>
+        <div class="relative z-10 space-y-6 max-w-2xl">
+            <h2 class="text-2xl font-bold text-[var(--brand-secondary)]">@L["IntroTitle"]</h2>
+            <p class="text-[var(--brand-text-secondary)] leading-relaxed text-lg">
+                @L["IntroDesc"]
+            </p>
+        </div>
+    </div>
+
+    <!-- Quick Guide -->
+    <div class="space-y-8">
+        <div class="flex items-center gap-4">
+            <div class="h-px bg-[var(--brand-borders)]/20 flex-1"></div>
+            <h2 class="text-xs font-black text-[var(--brand-primary)] uppercase tracking-[0.3em]">@L["QuickGuideTitle"]</h2>
+            <div class="h-px bg-[var(--brand-borders)]/20 flex-1"></div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div class="bg-white p-8 rounded-[24px] border border-[var(--brand-borders)]/10 shadow-sm hover:shadow-md transition-all group">
+                <div class="h-14 w-14 rounded-2xl bg-orange-50 text-orange-500 mb-6 flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <svg class="h-7 w-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 5V19M5 12H19" />
+                    </svg>
+                </div>
+                <h3 class="text-lg font-bold text-[var(--brand-secondary)] mb-3">@L["Step1Title"]</h3>
+                <p class="text-sm text-[var(--brand-text-secondary)] leading-relaxed">@L["Step1Desc"]</p>
+            </div>
+
+            <div class="bg-white p-8 rounded-[24px] border border-[var(--brand-borders)]/10 shadow-sm hover:shadow-md transition-all group">
+                <div class="h-14 w-14 rounded-2xl bg-emerald-50 text-emerald-500 mb-6 flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <svg class="h-7 w-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 100 4m0-4a2 2 0 110 4" />
+                    </svg>
+                </div>
+                <h3 class="text-lg font-bold text-[var(--brand-secondary)] mb-3">@L["Step2Title"]</h3>
+                <p class="text-sm text-[var(--brand-text-secondary)] leading-relaxed">@L["Step2Desc"]</p>
+            </div>
+
+            <div class="bg-white p-8 rounded-[24px] border border-[var(--brand-borders)]/10 shadow-sm hover:shadow-md transition-all group">
+                <div class="h-14 w-14 rounded-2xl bg-indigo-50 text-indigo-500 mb-6 flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <svg class="h-7 w-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M3 3v18h18M18 9l-6 6-4-4-3 3" />
+                    </svg>
+                </div>
+                <h3 class="text-lg font-bold text-[var(--brand-secondary)] mb-3">@L["Step3Title"]</h3>
+                <p class="text-sm text-[var(--brand-text-secondary)] leading-relaxed">@L["Step3Desc"]</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- FAQ Section -->
+    <div class="space-y-8">
+        <div class="flex flex-col gap-2">
+            <h2 class="text-3xl font-bold text-[var(--brand-secondary)]">@L["FaqTitle"]</h2>
+            <div class="h-1.5 w-12 bg-[var(--brand-accent)] rounded-full"></div>
+        </div>
+
+        <div class="space-y-4">
+            @for (int i = 1; i <= 3; i++)
+            {
+                var index = i;
+                <div class="bg-white rounded-[20px] border border-[var(--brand-borders)]/10 shadow-sm overflow-hidden transition-all">
+                    <button @onclick="() => ToggleFaq(index)" 
+                            class="w-full p-6 text-left flex items-center justify-between hover:bg-gray-50/50 transition-colors">
+                        <span class="font-bold text-[var(--brand-text-primary)]">@L[$"Faq{index}Q"]</span>
+                        <svg class="h-5 w-5 text-gray-400 transition-transform duration-300 @(activeFaq == index ? "rotate-180" : "")" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                        </svg>
+                    </button>
+                    <div class="overflow-hidden transition-all duration-300 @(activeFaq == index ? "max-h-40 opacity-100" : "max-h-0 opacity-0")">
+                        <div class="p-6 pt-0 text-[var(--brand-text-secondary)] leading-relaxed border-t border-gray-50 mt-2">
+                            @L[$"Faq{index}A"]
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- Contact Section -->
+    <div class="bg-gradient-to-br from-[var(--brand-secondary)] to-[var(--brand-primary)] rounded-[32px] p-10 md:p-16 text-center text-white space-y-8 shadow-2xl relative overflow-hidden">
+        <div class="absolute inset-0 bg-[url('/images/pattern.png')] opacity-5 pointer-events-none"></div>
+        <div class="absolute -top-20 -left-20 h-64 w-64 bg-white/10 rounded-full blur-3xl"></div>
+        <div class="absolute -bottom-20 -right-20 h-64 w-64 bg-[var(--brand-accent)]/20 rounded-full blur-3xl"></div>
+
+        <div class="relative z-10 space-y-4">
+            <h2 class="text-3xl font-black italic tracking-tight">@L["ContactTitle"]</h2>
+            <p class="text-white/80 font-medium max-w-lg mx-auto leading-relaxed">
+                @L["ContactDesc"]
+            </p>
+        </div>
+        
+        <div class="relative z-10 pt-4">
+            <button class="bg-white text-[var(--brand-secondary)] hover:bg-[var(--brand-accent)] hover:text-white px-10 py-4 rounded-2xl font-black uppercase tracking-widest text-xs transition-all shadow-xl hover:shadow-2xl hover:-translate-y-1 active:scale-95">
+                @L["ContactButton"]
+            </button>
+        </div>
+    </div>
+</div>
+
+@code {
+    private int activeFaq = 0;
+
+    private void ToggleFaq(int index)
+    {
+        if (activeFaq == index) activeFaq = 0;
+        else activeFaq = index;
+    }
+}

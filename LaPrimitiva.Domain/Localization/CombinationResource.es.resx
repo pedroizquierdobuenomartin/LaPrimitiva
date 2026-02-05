@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="Creade" xml:space="preserve"><value>Creación de</value></data>
+  <data name="Combination" xml:space="preserve"><value>Combinación</value></data>
+  <data name="Automated" xml:space="preserve"><value>Automática</value></data>
+  <data name="AlgorithmSubtitle_Part1" xml:space="preserve"><value>Algoritmo inteligente basado en</value></data>
+  <data name="BayesianAnalysis" xml:space="preserve"><value>análisis bayesiano</value></data>
+  <data name="AlgorithmSubtitle_Part2" xml:space="preserve"><value>y patrones históricos.</value></data>
+  <data name="AnalyzingHistory" xml:space="preserve"><value>Analizando histórico</value></data>
+  <data name="Generator" xml:space="preserve"><value>Generador</value></data>
+  <data name="Intelligent" xml:space="preserve"><value>Inteligente</value></data>
+  <data name="GeneratorSubtitle" xml:space="preserve"><value>Cálculo probabilístico basado en tendencias históricas.</value></data>
+  <data name="GeneratePlay" xml:space="preserve"><value>Generar Jugada</value></data>
+  <data name="Suggested" xml:space="preserve"><value>Sugerida</value></data>
+  <data name="HistoryAnalyzed" xml:space="preserve"><value>Histórico analizado:</value></data>
+  <data name="Draws" xml:space="preserve"><value>sorteos.</value></data>
+  <data name="Reintegro" xml:space="preserve"><value>Reintegro</value></data>
+  <data name="Regenerate" xml:space="preserve"><value>Regenerar</value></data>
+  <data name="LuckyPrompt" xml:space="preserve"><value>¡Mucha suerte con tu jugada!</value></data>
+  <data name="FortunePrompt" xml:space="preserve"><value>Que la fortuna te acompañe</value></data>
+  <data name="Today" xml:space="preserve"><value>hoy.</value></data>
+  <data name="ModelMetadata" xml:space="preserve"><value>Metadatos del Modelo</value></data>
+  <data name="BayesianArchitecture" xml:space="preserve"><value>Arquitectura Bayesiana v1.0</value></data>
+  <data name="WeightingParameter" xml:space="preserve"><value>Parámetro Ponderación</value></data>
+  <data name="Days" xml:space="preserve"><value>días</value></data>
+  <data name="RecencyDecay" xml:space="preserve"><value>Decaimiento exponencial por recencia histórico.</value></data>
+  <data name="DirichletSmoothing" xml:space="preserve"><value>Suavizado Dirichlet (Alpha)</value></data>
+  <data name="SmoothingFactor" xml:space="preserve"><value>Factor de regularización para evitar sobreajuste.</value></data>
+  <data name="ChiSquareStatistic" xml:space="preserve"><value>Estadístico Chi-Cuadrado</value></data>
+  <data name="ChiSquareDesc" xml:space="preserve"><value>Grado de desviación respecto a la uniformidad.</value></data>
+  <data name="HotNumbersTitle" xml:space="preserve"><value>Hot Numbers</value></data>
+  <data name="ModelFeed" xml:space="preserve"><value>Model Feed</value></data>
+  <data name="HotNumbersDesc" xml:space="preserve"><value>Los 10 números con mayor peso ponderado actualmente.</value></data>
+</root>

@@ -45,6 +45,7 @@ builder.Services.AddHttpClient<IRssClient, RssClient>();
 builder.Services.AddScoped<IRssParserService, RssParserService>();
 builder.Services.AddScoped<ILocalStorageService, LocalStorageService>();
 builder.Services.AddScoped<IDrawNotificationService, DrawNotificationService>();
+builder.Services.AddScoped<IAutomatedCombinationService, AutomatedCombinationService>();
 
 var app = builder.Build();
 

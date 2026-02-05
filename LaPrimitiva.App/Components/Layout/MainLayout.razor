@@ -118,7 +118,7 @@
                 @if (!_isHistoricalPage)
                 {
                     <div class="flex items-center gap-2">
-                        <span class="text-[10px] font-bold text-[var(--brand-text-secondary)] uppercase tracking-wider hidden sm:block">@L["SelectedYear"]</span>
+                        <span class="text-[10px] font-bold text-[var(--brand-text-secondary)] uppercase tracking-wider hidden sm:block">@LD["SelectedYear"]</span>
                         <select @bind="GlobalState.SelectedYear" disabled="@GlobalState.IsHistoricalView" 
                                 class="bg-gray-50 border border-[var(--brand-borders)] text-[var(--brand-secondary)] text-xs rounded-lg px-2 py-1 outline-none focus:ring-1 focus:ring-[var(--brand-primary)]">
                             @if (_availableYears != null)
@@ -136,10 +136,10 @@
                 {
                     <div class="flex bg-gray-100 p-1 rounded-lg scale-90 sm:scale-100">
                         <button @onclick="() => SetHistorical(false)" class="px-3 py-1 text-[10px] font-bold rounded-md transition-all @(!GlobalState.IsHistoricalView ? "bg-white text-[var(--brand-primary)] shadow-sm" : "text-gray-500 hover:text-gray-700")">
-                            LD["Yearly"]
+                            @LD["Yearly"]
                         </button>
                         <button @onclick="() => SetHistorical(true)" class="px-3 py-1 text-[10px] font-bold rounded-md transition-all @(GlobalState.IsHistoricalView ? "bg-white text-[var(--brand-primary)] shadow-sm" : "text-gray-500 hover:text-gray-700")">
-                            LD["Historical"]
+                            @LD["Historical"]
                         </button>
                     </div>
                 }

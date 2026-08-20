@@ -1,0 +1,13 @@
+{
+  "milestone": "M-102",
+  "result": "successful",
+  "serverInstance": "localhost\\LOCALSERVER",
+  "sourceBackup": "E:\\Repositorios\\LaPrimitiva\\.tmp-m102-sql\\PrimitivaAuditV2_LaPrimitiva_20260820_125244.bak",
+  "sha256": "64c744d2eb425361399bb0be6fc522d5dd1e59c8ebadf9c88fea98e922b129d8",
+  "temporaryDatabase": "PrimitivaRestoreTest_M102_20260820",
+  "restoreVerifyOnly": "successful",
+  "restoreDatabase": "successful",
+  "dbccCheckDb": "successful",
+  "startedAt": "2026-08-20T12:52:58.0488428+02:00",
+  "completedAt": "2026-08-20T12:52:58.9410764+02:00"
+}

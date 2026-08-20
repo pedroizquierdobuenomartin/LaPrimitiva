@@ -82,7 +82,7 @@ if ($b) { $capturedArguments += "-b" }
 $capturedArguments += @("-S", $S)
 if ($E) { $capturedArguments += "-E" }
 $capturedArguments += @("-Q", $Q)
-$capturedArguments | ConvertTo-Json -Compress | Set-Content -LiteralPath $env:M101_SQLCMD_LOG
+    $capturedArguments | ConvertTo-Json -Compress | Add-Content -LiteralPath $env:M101_SQLCMD_LOG
 
 if ($env:M101_BREAK_DRIVE_PATH) {
     Remove-Item -LiteralPath $env:M101_BREAK_DRIVE_PATH -Recurse -Force
@@ -94,14 +94,11 @@ if ($env:M101_SQLCMD_EXIT_CODE) {
     exit [int]$env:M101_SQLCMD_EXIT_CODE
 }
 
-$match = [regex]::Match($Q, "TO DISK = N?'((?:''|[^'])*)'", "IgnoreCase")
-if (-not $match.Success) {
-    Write-Error "Backup destination not found in query"
-    exit 91
+$match = [regex]::Match($Q, "BACKUP DATABASE .*?TO DISK = N?'((?:''|[^'])*)'", "IgnoreCase")
+if ($match.Success) {
+    $backupPath = $match.Groups[1].Value.Replace("''", "'")
+    Set-Content -LiteralPath $backupPath -Value "simulated backup"
 }
-
-$backupPath = $match.Groups[1].Value.Replace("''", "'")
-Set-Content -LiteralPath $backupPath -Value "simulated backup"
 exit 0
 '@ | Set-Content -LiteralPath $mockSqlCmd
 
@@ -122,7 +119,10 @@ exit 0
     $success = Invoke-BackupScript -LocalDirectory $localDir -DriveDirectory $driveDir -SqlCmdPath $mockSqlCmd -LogPath $successLog
     Assert-True ($success.ExitCode -eq 0) "el caso feliz debe finalizar con código 0. Salida: $($success.Output)"
 
-    $sqlArguments = @(Get-Content -LiteralPath $successLog -Raw | ConvertFrom-Json)
+    $backupCall = Get-Content -LiteralPath $successLog |
+        Where-Object { $_ -match 'BACKUP DATABASE \[PrimitivaAuditV2\]' } |
+        Select-Object -First 1
+    $sqlArguments = @($backupCall | ConvertFrom-Json)
     $serverIndex = [Array]::IndexOf($sqlArguments, "-S")
     Assert-True ($serverIndex -ge 0 -and $sqlArguments[$serverIndex + 1] -eq "localhost\SQLEXPRESS") "sqlcmd debe recibir la instancia de la aplicación"
     Assert-True ($sqlArguments -contains "-b") "sqlcmd debe recibir -b para convertir errores SQL en código de salida"

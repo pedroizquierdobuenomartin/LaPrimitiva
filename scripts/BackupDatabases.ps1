@@ -67,7 +67,7 @@ try {
         $localFile = Join-Path $LocalBackupDir $fileName
         $escapedDatabaseName = $databaseName.Replace("]", "]]" )
         $escapedLocalFile = $localFile.Replace("'", "''")
-        $sqlCommand = "BACKUP DATABASE [$escapedDatabaseName] TO DISK = N'$escapedLocalFile' WITH FORMAT, NAME = N'Full Backup of $escapedDatabaseName';"
+        $sqlCommand = "BACKUP DATABASE [$escapedDatabaseName] TO DISK = N'$escapedLocalFile' WITH FORMAT, CHECKSUM, NAME = N'Full Backup of $escapedDatabaseName';"
 
         Write-Host "Procesando '$databaseName'..." -ForegroundColor Yellow
         $sqlOutput = & $SqlCmdExecutable -b -S $ServerInstance -E -Q $sqlCommand 2>&1
@@ -82,12 +82,28 @@ try {
             throw "sqlcmd terminó sin error, pero no se creó '$localFile'."
         }
 
-        Write-Host "  [OK] Backup local creado en '$localFile'." -ForegroundColor Green
+        $verifyCommand = "RESTORE VERIFYONLY FROM DISK = N'$escapedLocalFile' WITH CHECKSUM;"
+        $verifyOutput = & $SqlCmdExecutable -b -S $ServerInstance -E -Q $verifyCommand 2>&1
+        $verifyExitCode = $LASTEXITCODE
+
+        if ($verifyExitCode -ne 0) {
+            $details = @($verifyOutput) -join [Environment]::NewLine
+            throw "RESTORE VERIFYONLY falló para '$databaseName' con código $verifyExitCode. $details"
+        }
+
+        $hash = Get-FileHash -LiteralPath $localFile -Algorithm SHA256 -ErrorAction Stop
+        $hashFile = "$localFile.sha256"
+        "$($hash.Hash.ToLowerInvariant()) *$fileName" |
+            Set-Content -LiteralPath $hashFile -Encoding ascii -ErrorAction Stop
+
+        Write-Host "  [OK] Backup verificado en '$localFile'." -ForegroundColor Green
+        Write-Host "  [OK] SHA-256: $($hash.Hash.ToLowerInvariant())" -ForegroundColor Green
 
         if ($copyToDrive) {
             $driveFile = Join-Path $DriveBackupDir $fileName
             Copy-Item -LiteralPath $localFile -Destination $driveFile -Force -ErrorAction Stop
-            Write-Host "  [OK] Backup copiado a '$driveFile'." -ForegroundColor Green
+            Copy-Item -LiteralPath $hashFile -Destination "$driveFile.sha256" -Force -ErrorAction Stop
+            Write-Host "  [OK] Backup y hash copiados a '$driveFile'." -ForegroundColor Green
         }
     }
 
@@ -97,9 +113,16 @@ try {
     foreach ($databaseName in $DatabaseNames) {
         $safeDatabaseName = Get-SafeFileComponent -Value $databaseName
         $managedPattern = "${safeDatabaseName}_${backupMarker}_*.bak"
-        Get-ChildItem -LiteralPath $LocalBackupDir -File -Filter $managedPattern -ErrorAction Stop |
-            Where-Object { $_.LastWriteTime -lt $retentionLimit } |
-            Remove-Item -Force -ErrorAction Stop
+        foreach ($expiredBackup in @(
+            Get-ChildItem -LiteralPath $LocalBackupDir -File -Filter $managedPattern -ErrorAction Stop |
+                Where-Object { $_.LastWriteTime -lt $retentionLimit }
+        )) {
+            $expiredHash = "$($expiredBackup.FullName).sha256"
+            Remove-Item -LiteralPath $expiredBackup.FullName -Force -ErrorAction Stop
+            if (Test-Path -LiteralPath $expiredHash -PathType Leaf) {
+                Remove-Item -LiteralPath $expiredHash -Force -ErrorAction Stop
+            }
+        }
     }
 
     Write-Host "Proceso finalizado correctamente." -ForegroundColor Cyan

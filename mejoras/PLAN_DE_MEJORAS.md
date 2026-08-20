@@ -87,7 +87,7 @@
 
 ---
 
-### [ ] M-102 — Verificar restauraciones
+### [x] M-102 — Verificar restauraciones
 
 **Problema:** crear un `.bak` no garantiza que pueda restaurarse.
 
@@ -103,6 +103,15 @@
 - Un backup corrupto provoca un fallo visible.
 - Existe evidencia de al menos una restauración satisfactoria.
 - La recuperación está documentada y no depende de conocimiento informal.
+
+**Ejecución:**
+
+- **Fecha:** 20 de agosto de 2026.
+- **Commit o referencia:** commit `M-102` (este commit), creado sobre `b177788`; verificación reproducible en `scripts/Verify-M102Restore.ps1` y evidencia operativa en `mejoras/evidencias/M-102-restore-20260820.json`.
+- **Evidencia previa:** `scripts/BackupDatabases.ps1` solo comprobaba que `sqlcmd` terminase con código cero y que existiese un `.bak`; no ejecutaba `RESTORE VERIFYONLY`, no generaba hash, no efectuaba una restauración temporal y no existía un procedimiento de recuperación fuera de este plan.
+- **Pruebas realizadas:** análisis sintáctico PowerShell correcto para los cuatro scripts afectados; `scripts/Verify-M101Backup.ps1` correcto tras adaptar su doble a las dos llamadas SQL; `scripts/Verify-M102Restore.ps1` correcto, incluyendo un `RESTORE VERIFYONLY` simulado como corrupto que devuelve fallo visible y no distribuye ni firma el backup. Prueba operativa contra `localhost\LOCALSERVER`: backup real de `PrimitivaAuditV2` de 6.213.632 bytes, `RESTORE VERIFYONLY WITH CHECKSUM` correcto, SHA-256 `64c744d2eb425361399bb0be6fc522d5dd1e59c8ebadf9c88fea98e922b129d8`, restauración como `PrimitivaRestoreTest_M102_20260820`, `DBCC CHECKDB` correcto, eliminación de la base temporal confirmada con recuento cero y eliminación posterior del `.bak` temporal. No se compiló la solución.
+- **Resultado:** cada backup se crea con checksums de página, se valida antes de copiarse y recibe un fichero `.sha256`; cualquier fallo de creación, verificación, hash o copia finaliza con código `1`. `scripts/Test-DatabaseRestore.ps1` realiza un simulacro seguro con `FILELISTONLY`, archivos físicos independientes, `DBCC CHECKDB`, evidencia JSON y limpieza de la base temporal. `mejoras/RECUPERACION_BACKUPS.md` documenta ubicaciones, retención, verificación, periodicidad y recuperación real.
+- **Decisiones:** el simulacro exige el prefijo `PrimitivaRestoreTest_` y nunca puede sobrescribir `PrimitivaAuditV2`; se usa `MOVE` para impedir colisiones con sus archivos activos; la restauración temporal se elimina solo después de completarse correctamente para no ocultar un fallo a mitad de proceso; la validación funcional completa tras una recuperación real queda reservada a M-603. La prueba operativa usó `localhost\LOCALSERVER`, única instancia disponible en este equipo, sin cambiar el valor predeterminado `localhost\SQLEXPRESS` definido por la configuración de la aplicación y por M-101. M-103 no se ha iniciado.
 
 ### [ ] M-103 — Aislar completamente las pruebas de integración
 
@@ -440,3 +449,4 @@ Estos descartes describen el código auditado y deben revisarse si cambian las f
 | ID | Fecha | Commit/PR | Resultado | Notas |
 |---|---|---|---|---|
 | M-000 | 2026-08-20 | Commit `M-000` (este commit), sobre `39d6d48` | Completado | Línea base en `mejoras/LINEA_BASE_M000.md`; 25/25 pruebas no integradas correctas antes del cambio y verificación estática M-000 correcta después. |
+| M-102 | 2026-08-20 | Commit `M-102` (este commit), sobre `b177788` | Completado | Backup real verificado y restaurado temporalmente; evidencia en `mejoras/evidencias/M-102-restore-20260820.json`; recuperación documentada. |

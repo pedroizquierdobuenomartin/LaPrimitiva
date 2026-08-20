@@ -107,6 +107,33 @@ namespace LaPrimitiva.Infrastructure.Persistence.Seed
             await _context.Database.ExecuteSqlRawAsync(sqlPlans);
             await _context.Database.ExecuteSqlRawAsync(sqlDrawRecords);
             await _context.Database.ExecuteSqlRawAsync(sqlWinningDraws);
+
+            await RepairFinancialTotalsAsync();
+        }
+
+        private async Task RepairFinancialTotalsAsync()
+        {
+            var inconsistentDraws = await _context.DrawRecords
+                .Where(draw =>
+                    draw.TotalCoste != draw.CosteFija + draw.CosteAuto + draw.CosteJokerFija + draw.CosteJokerAuto ||
+                    draw.TotalPremios != draw.FixedPrize + draw.AutoPrize + draw.JokerFixedPrize + draw.JokerAutoPrize ||
+                    draw.Neto != draw.TotalPremios - draw.TotalCoste ||
+                    (!draw.Played &&
+                        (draw.CosteFija != 0 || draw.CosteAuto != 0 ||
+                         draw.CosteJokerFija != 0 || draw.CosteJokerAuto != 0 ||
+                         draw.FixedPrize != 0 || draw.AutoPrize != 0 ||
+                         draw.JokerFixedPrize != 0 || draw.JokerAutoPrize != 0)))
+                .ToListAsync();
+
+            foreach (var draw in inconsistentDraws)
+            {
+                draw.RecalculateFinancials();
+            }
+
+            if (inconsistentDraws.Count > 0)
+            {
+                await _context.SaveChangesAsync();
+            }
         }
 
         public async Task SeedFromDirectoryAsync(string directoryPath)

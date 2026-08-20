@@ -184,7 +184,7 @@
 - **Resultado:** Planes navega ahora mediante `AppRoutes.Registration`, cuyo valor es `/registro`, y la propia página Registro obtiene su `RouteAttribute` de esa misma constante. La ruta incorrecta `/register` ya no aparece en el código de la aplicación.
 - **Decisiones:** se sustituyó `@page` por un `RouteAttribute` basado en constante para que origen y destino compartan una única fuente de verdad; cambiar solo el literal de `NavigateTo` habría arreglado el fallo inmediato, pero mantendría la duplicación que el criterio de aceptación prohíbe. No se ha iniciado M-203.
 
-### [ ] M-203 — Unificar totales, premios y Joker
+### [x] M-203 — Unificar totales, premios y Joker
 
 **Problema:** algunas rutas persisten `TotalCoste` y `TotalPremios` sin Joker, mientras otras propiedades calculadas sí lo incluyen.
 
@@ -194,11 +194,19 @@
 2. Centralizar el cálculo en dominio o aplicación.
 3. Recalcular o migrar registros existentes si contienen datos incoherentes.
 4. Añadir pruebas para Joker activado, desactivado, premiado y sin premio.
+5. Comprobar que el ROI se calcula correctamente.
 
 **Criterios de aceptación:**
 
 - Dashboard, registro, resumen y ROI muestran los mismos totales.
 - El total coincide con la suma visible de sus componentes.
+
+**Cierre (2026-08-20):**
+
+- **Referencia:** commit `M-203` (este commit), sobre `07a58cc`.
+- **Pruebas realizadas:** línea base previa `dotnet test LaPrimitiva.Tests/LaPrimitiva.Tests.csproj --no-build --filter "FullyQualifiedName~DrawRecordTests"` (3/3 correctas); `scripts/Verify-M203FinancialTotals.ps1` correcto tras la implementación; `git diff --check` correcto; build, ejecución y comprobación visual satisfactorios comunicados por el usuario. Se añadieron pruebas unitarias para Joker activado/desactivado, premiado/sin premio y ROI, una prueba de persistencia y otra de reparación de datos; el agente no volvió a compilar tras los cambios por la política del repositorio.
+- **Resultado:** `DrawRecord.RecalculateFinancials` define una única regla: coste total = fija + automática + Joker fija + Joker automática; premios totales siguen la misma composición y neto = premios − coste. Registro muestra y edita los componentes Joker, Dashboard/resúmenes/planes consumen los totales unificados y el ROI deriva de ellos. El repositorio impone el invariante al crear y actualizar, y el arranque repara de forma idempotente registros anteriores incoherentes.
+- **Decisiones:** se conservaron los importes por componente como fotografía histórica y se centralizó solo su agregación en dominio; se evitó recalcular desde el plan salvo al activar/desactivar `Played`, porque cambios posteriores del plan no deben reescribir costes históricos. No se modificó `BetsPerDraw`, cuya validación y aplicación pertenece expresamente a M-205, ni se avanzó a M-204.
 
 ### [ ] M-204 — Robustecer el parser RSS
 
@@ -478,3 +486,4 @@ Estos descartes describen el código auditado y deben revisarse si cambian las f
 | M-103 | 2026-08-20 | Commit `M-103` (este commit), sobre `d48abb7` | Completado | Base única por ejecución, migraciones, reset Respawn, borrado protegido, colección serializada y CSV portable; verificación estática doble correcta. |
 | M-201 | 2026-08-20 | Commit `M-201` (este commit), creado tras M-103 | Completado | Actualización explícita de sorteos desconectados con entidad seguida y lista blanca de columnas; prueba de integración añadida, build correcto y verificación visual satisfactoria. |
 | M-202 | 2026-08-20 | Commit `M-202` (este commit), sobre `4a7cfdf` | Completado | Ruta `/registro` centralizada en `AppRoutes.Registration`; verificador estático correcto y navegación Planes → Registro comprobada manualmente por el usuario. |
+| M-203 | 2026-08-20 | Commit `M-203` (este commit), sobre `07a58cc` | Completado | Totales de coste y premios incluyen los cuatro componentes; persistencia y reparación aplican el invariante; casos Joker y ROI añadidos; build, ejecución y comprobación visual satisfactorios comunicados por el usuario. |

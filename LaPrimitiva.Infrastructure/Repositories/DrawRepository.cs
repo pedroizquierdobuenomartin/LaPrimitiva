@@ -31,7 +31,13 @@ namespace LaPrimitiva.Infrastructure.Repositories
 
         public async Task CreateRangeAsync(IEnumerable<DrawRecord> draws)
         {
-            await _context.DrawRecords.AddRangeAsync(draws);
+            var drawList = draws.ToList();
+            foreach (var draw in drawList)
+            {
+                draw.RecalculateFinancials();
+            }
+
+            await _context.DrawRecords.AddRangeAsync(drawList);
             await _context.SaveChangesAsync();
             _context.ChangeTracker.Clear();
         }
@@ -91,6 +97,7 @@ namespace LaPrimitiva.Infrastructure.Repositories
 
         private static void ApplyEditableValues(DrawRecord target, DrawRecord source)
         {
+            source.RecalculateFinancials();
             target.Played = source.Played;
             target.FixedPrize = source.FixedPrize;
             target.AutoPrize = source.AutoPrize;

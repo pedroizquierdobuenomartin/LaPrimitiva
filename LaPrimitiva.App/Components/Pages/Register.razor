@@ -434,6 +434,17 @@
                                                 <label class="text-[8px] md:text-[9px] font-bold text-[var(--brand-text-secondary)]/50 uppercase ml-1">@L["AutoCostLabel"]</label>
                                                 <input type="number" step="0.01" @bind="draw.CosteAuto" @bind:after="() => RecalculateDraw(draw)" disabled="@(!draw.Played)" class="w-full bg-[var(--brand-bg)] border-none rounded-xl p-2 md:p-3 text-xs md:text-sm font-bold focus:ring-2 focus:ring-[var(--brand-primary)]/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all" />
                                             </div>
+                                            @if (IsJokerVisible(draw))
+                                            {
+                                                <div class="group">
+                                                    <label class="text-[8px] md:text-[9px] font-bold text-[var(--brand-text-secondary)]/50 uppercase ml-1">Joker Fija (€)</label>
+                                                    <input type="number" step="0.01" @bind="draw.CosteJokerFija" @bind:after="() => RecalculateDraw(draw)" disabled="@(!draw.Played)" class="w-full bg-[var(--brand-bg)] border-none rounded-xl p-2 md:p-3 text-xs md:text-sm font-bold focus:ring-2 focus:ring-[var(--brand-primary)]/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all" />
+                                                </div>
+                                                <div class="group">
+                                                    <label class="text-[8px] md:text-[9px] font-bold text-[var(--brand-text-secondary)]/50 uppercase ml-1">Joker Auto (€)</label>
+                                                    <input type="number" step="0.01" @bind="draw.CosteJokerAuto" @bind:after="() => RecalculateDraw(draw)" disabled="@(!draw.Played)" class="w-full bg-[var(--brand-bg)] border-none rounded-xl p-2 md:p-3 text-xs md:text-sm font-bold focus:ring-2 focus:ring-[var(--brand-primary)]/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all" />
+                                                </div>
+                                            }
                                         </div>
                                     </div>
 
@@ -449,6 +460,17 @@
                                                 <label class="text-[8px] md:text-[9px] font-bold text-[var(--brand-primary)]/50 uppercase ml-1">Auto (€)</label>
                                                 <input type="number" step="0.01" @bind="draw.AutoPrize" @bind:after="() => RecalculateDraw(draw)" disabled="@(!draw.Played || draw.CosteAuto == 0)" class="w-full bg-[var(--brand-primary)]/5 border-none rounded-xl p-2 md:p-3 text-xs md:text-sm font-bold text-[var(--brand-primary)] focus:ring-2 focus:ring-[var(--brand-primary)]/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all" />
                                             </div>
+                                            @if (IsJokerVisible(draw))
+                                            {
+                                                <div class="group">
+                                                    <label class="text-[8px] md:text-[9px] font-bold text-[var(--brand-primary)]/50 uppercase ml-1">Joker Fija (€)</label>
+                                                    <input type="number" step="0.01" @bind="draw.JokerFixedPrize" @bind:after="() => RecalculateDraw(draw)" disabled="@(!draw.Played || draw.CosteJokerFija == 0)" class="w-full bg-[var(--brand-primary)]/5 border-none rounded-xl p-2 md:p-3 text-xs md:text-sm font-bold text-[var(--brand-primary)] focus:ring-2 focus:ring-[var(--brand-primary)]/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all" />
+                                                </div>
+                                                <div class="group">
+                                                    <label class="text-[8px] md:text-[9px] font-bold text-[var(--brand-primary)]/50 uppercase ml-1">Joker Auto (€)</label>
+                                                    <input type="number" step="0.01" @bind="draw.JokerAutoPrize" @bind:after="() => RecalculateDraw(draw)" disabled="@(!draw.Played || draw.CosteJokerAuto == 0)" class="w-full bg-[var(--brand-primary)]/5 border-none rounded-xl p-2 md:p-3 text-xs md:text-sm font-bold text-[var(--brand-primary)] focus:ring-2 focus:ring-[var(--brand-primary)]/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all" />
+                                                </div>
+                                            }
                                         </div>
                                     </div>
 
@@ -631,7 +653,9 @@
                 Id = p.Id,
                 Name = p.Name,
                 BetsPerDraw = p.BetsPerDraw,
+                CostPerBet = p.CostPerBet,
                 EnableJoker = p.EnableJoker,
+                JokerCostPerBet = p.JokerCostPerBet,
                 EffectiveFrom = p.EffectiveFrom
             }).ToList();
 
@@ -709,36 +733,13 @@
 
     private void RecalculateDraw(DrawRecord draw, bool forceDefaults = false)
     {
-        if (forceDefaults)
-        {
-            // Snapshot audit fields - only if Plan is available
-            if (draw.Plan != null)
-            {
-                draw.CosteFija = draw.Played ? draw.Plan.CostPerBet : 0;
-                draw.CosteAuto = draw.Played ? draw.Plan.CostPerBet : 0;
-                draw.CosteJokerFija = (draw.Played && draw.Plan.EnableJoker) ? draw.Plan.JokerCostPerBet : 0;
-                draw.CosteJokerAuto = (draw.Played && draw.Plan.EnableJoker) ? draw.Plan.JokerCostPerBet : 0;
-            }
-        }
-
-        if (!draw.Played)
-        {
-            // When not played, reset ALL costs and prizes to zero
-            draw.CosteFija = 0;
-            draw.CosteAuto = 0;
-            draw.CosteJokerFija = 0;
-            draw.CosteJokerAuto = 0;
-            draw.FixedPrize = 0;
-            draw.AutoPrize = 0;
-            draw.JokerFixedPrize = 0;
-            draw.JokerAutoPrize = 0;
-        }
-        
-        // The user wants TotalCoste to be exactly what's visible (Fija + Auto)
-        draw.TotalCoste = draw.CosteFija + draw.CosteAuto;
-        draw.TotalPremios = draw.FixedPrize + draw.AutoPrize;
-        draw.Neto = draw.TotalPremios - draw.TotalCoste;
+        draw.RecalculateFinancials(forceDefaults);
     }
+
+    private static bool IsJokerVisible(DrawRecord draw) =>
+        draw.Plan?.EnableJoker == true ||
+        draw.CosteJokerFija != 0 || draw.CosteJokerAuto != 0 ||
+        draw.JokerFixedPrize != 0 || draw.JokerAutoPrize != 0;
 
     private void ShowRegisterModal()
     {
@@ -785,6 +786,10 @@
             }
             else 
             {
+                foreach (var draw in existing)
+                {
+                    draw.Plan = allPlans?.FirstOrDefault(plan => plan.Id == draw.PlanId) ?? null!;
+                }
                 modalDraws = existing;
             }
             

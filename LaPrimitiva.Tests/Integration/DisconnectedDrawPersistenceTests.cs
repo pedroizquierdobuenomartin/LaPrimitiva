@@ -73,7 +73,7 @@ public class DisconnectedDrawPersistenceTests(IntegrationTestFixture fixture)
             disconnected.AutoPrize = 20m;
             disconnected.JokerFixedPrize = 30m;
             disconnected.JokerAutoPrize = 40m;
-            disconnected.TotalCoste = 3m;
+            disconnected.TotalCoste = 3m; // Deliberately inconsistent: repository must enforce the domain invariant.
             disconnected.TotalPremios = 30m;
             disconnected.Neto = 27m;
             disconnected.Notes = "Actualizado desde una consulta sin seguimiento";
@@ -103,9 +103,9 @@ public class DisconnectedDrawPersistenceTests(IntegrationTestFixture fixture)
         Assert.Equal(20m, persisted.AutoPrize);
         Assert.Equal(30m, persisted.JokerFixedPrize);
         Assert.Equal(40m, persisted.JokerAutoPrize);
-        Assert.Equal(3m, persisted.TotalCoste);
-        Assert.Equal(30m, persisted.TotalPremios);
-        Assert.Equal(27m, persisted.Neto);
+        Assert.Equal(10m, persisted.TotalCoste);
+        Assert.Equal(100m, persisted.TotalPremios);
+        Assert.Equal(90m, persisted.Neto);
         Assert.Equal("Actualizado desde una consulta sin seguimiento", persisted.Notes);
         Assert.Equal(updatedAt, persisted.UpdatedAt);
 

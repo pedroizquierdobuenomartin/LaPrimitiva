@@ -168,7 +168,7 @@
 - **Resultado:** `Register.SaveDraw()` delega ahora en `IDrawRepository.UpdateAsync()`. El repositorio vuelve a cargar la fila como entidad seguida y copia explícitamente únicamente estado de juego, costes, premios, totales editables, notas y `UpdatedAt`; después persiste en una sola llamada. Se eliminó el `SaveChangesAsync()` genérico del contrato para impedir que la UI vuelva a confiar en el seguimiento accidental.
 - **Decisiones:** se eligió cargar la entidad seguida en vez de adjuntar el objeto completo, porque permite una lista blanca clara de columnas y conserva identidad, plan, fecha, tipo, semana, acumulado y fecha de creación. `UpdateRangeAsync()` reutiliza la misma lista blanca para que el guardado modal no mantenga una segunda semántica más permisiva. No se ha iniciado M-202.
 
-### [ ] M-202 — Corregir la navegación a Registro
+### [x] M-202 — Corregir la navegación a Registro
 
 **Problema:** Planes navega a `/register`, pero la ruta real es `/registro`.
 
@@ -176,6 +176,13 @@
 
 - La navegación abre la página correcta.
 - La ruta se obtiene de una constante o mecanismo que evite duplicación futura.
+
+- **Fecha:** 2026-08-20.
+- **Commit o referencia:** commit `M-202` (este commit), sobre `4a7cfdf` (`fix: persist disconnected draw updates`).
+- **Evidencia previa:** `Plans.razor` ejecutaba `Nav.NavigateTo("/register")`, mientras `Register.razor` declaraba únicamente `@page "/registro"`; la búsqueda de rutas no encontró ningún alias `/register` ni una constante compartida, por lo que la acción de Planes apuntaba a una URL sin página asociada.
+- **Pruebas realizadas:** se añadió `scripts/Verify-M202RegistrationNavigation.ps1`; primero se ejecutó en rojo porque no existía `LaPrimitiva.App/AppRoutes.cs`. Tras implementar el hito, el análisis sintáctico PowerShell fue correcto, el verificador M-202 terminó correctamente, la búsqueda estática confirmó que aplicación y destino consumen `AppRoutes.Registration`, y `git diff --check` no detectó errores. El usuario compiló y ejecutó la aplicación y verificó manualmente que desde Planes se accede correctamente a Registro mediante `/registro`.
+- **Resultado:** Planes navega ahora mediante `AppRoutes.Registration`, cuyo valor es `/registro`, y la propia página Registro obtiene su `RouteAttribute` de esa misma constante. La ruta incorrecta `/register` ya no aparece en el código de la aplicación.
+- **Decisiones:** se sustituyó `@page` por un `RouteAttribute` basado en constante para que origen y destino compartan una única fuente de verdad; cambiar solo el literal de `NavigateTo` habría arreglado el fallo inmediato, pero mantendría la duplicación que el criterio de aceptación prohíbe. No se ha iniciado M-203.
 
 ### [ ] M-203 — Unificar totales, premios y Joker
 
@@ -470,3 +477,4 @@ Estos descartes describen el código auditado y deben revisarse si cambian las f
 | M-102 | 2026-08-20 | Commit `M-102` (este commit), sobre `b177788` | Completado | Backup real verificado y restaurado temporalmente; evidencia en `mejoras/evidencias/M-102-restore-20260820.json`; recuperación documentada. |
 | M-103 | 2026-08-20 | Commit `M-103` (este commit), sobre `d48abb7` | Completado | Base única por ejecución, migraciones, reset Respawn, borrado protegido, colección serializada y CSV portable; verificación estática doble correcta. |
 | M-201 | 2026-08-20 | Commit `M-201` (este commit), creado tras M-103 | Completado | Actualización explícita de sorteos desconectados con entidad seguida y lista blanca de columnas; prueba de integración añadida, build correcto y verificación visual satisfactoria. |
+| M-202 | 2026-08-20 | Commit `M-202` (este commit), sobre `4a7cfdf` | Completado | Ruta `/registro` centralizada en `AppRoutes.Registration`; verificador estático correcto y navegación Planes → Registro comprobada manualmente por el usuario. |

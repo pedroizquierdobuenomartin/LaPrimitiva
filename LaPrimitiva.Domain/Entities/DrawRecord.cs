@@ -35,9 +35,11 @@ namespace LaPrimitiva.Domain.Entities
 
         // Plan-derived helpers are only used to snapshot the configured costs.
         public decimal FixedCost => Played ? Plan.CostPerBet : 0;
-        public decimal AutoCost => Played ? Plan.CostPerBet : 0;
+        public decimal AutoCost => Played ? Plan.CostPerBet * (Plan.BetsPerDraw - 1) : 0;
         public decimal JokerFixedCost => Played && Plan.EnableJoker ? Plan.JokerCostPerBet : 0;
-        public decimal JokerAutoCost => Played && Plan.EnableJoker ? Plan.JokerCostPerBet : 0;
+        public decimal JokerAutoCost => Played && Plan.EnableJoker
+            ? Plan.JokerCostPerBet * (Plan.BetsPerDraw - 1)
+            : 0;
         
         /// <summary>
         /// Total cost is the sum of the four persisted cost components, including Joker.
@@ -67,10 +69,11 @@ namespace LaPrimitiva.Domain.Entities
                     throw new InvalidOperationException("No se pueden actualizar los costes sin un plan asociado.");
                 }
 
-                CosteFija = Plan.CostPerBet;
-                CosteAuto = Plan.CostPerBet;
-                CosteJokerFija = Plan.EnableJoker ? Plan.JokerCostPerBet : 0;
-                CosteJokerAuto = Plan.EnableJoker ? Plan.JokerCostPerBet : 0;
+                Plan.Validate();
+                CosteFija = FixedCost;
+                CosteAuto = AutoCost;
+                CosteJokerFija = JokerFixedCost;
+                CosteJokerAuto = JokerAutoCost;
 
                 if (!Plan.EnableJoker)
                 {

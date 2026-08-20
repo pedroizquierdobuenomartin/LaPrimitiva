@@ -56,12 +56,16 @@ namespace LaPrimitiva.Infrastructure.Repositories
 
         public async Task CreateAsync(Plan plan)
         {
+            plan.Validate();
+            await EnsureNoOverlapAsync(plan);
             _context.Plans.Add(plan);
             await _context.SaveChangesAsync();
         }
 
         public async Task UpdateAsync(Plan plan)
         {
+            plan.Validate();
+            await EnsureNoOverlapAsync(plan);
             plan.UpdatedAt = DateTime.UtcNow;
             
             var local = _context.Set<Plan>()
@@ -75,6 +79,19 @@ namespace LaPrimitiva.Infrastructure.Repositories
 
             _context.Entry(plan).State = EntityState.Modified;
             await _context.SaveChangesAsync();
+        }
+
+        private async Task EnsureNoOverlapAsync(Plan plan)
+        {
+            var overlap = await _context.Plans.AnyAsync(existing =>
+                existing.Id != plan.Id &&
+                (plan.EffectiveTo == null || existing.EffectiveFrom <= plan.EffectiveTo) &&
+                (existing.EffectiveTo == null || existing.EffectiveTo >= plan.EffectiveFrom));
+
+            if (overlap)
+            {
+                throw new InvalidOperationException("Ya existe un plan que se solapa con este periodo de fechas.");
+            }
         }
 
         public async Task DeleteAsync(Guid id)

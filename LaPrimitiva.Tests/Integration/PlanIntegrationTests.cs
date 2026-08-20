@@ -6,6 +6,8 @@ using LaPrimitiva.Application.DTOs;
 using LaPrimitiva.Application.Services;
 using LaPrimitiva.Domain.Entities;
 using LaPrimitiva.App;
+using LaPrimitiva.Infrastructure.Persistence;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
@@ -35,7 +37,7 @@ namespace LaPrimitiva.Tests.Integration
                 CostPerBet = 1.0m,
                 BetsPerDraw = 2,
                 EnableJoker = false,
-                JokerCostPerBet = 0.5m
+                JokerCostPerBet = 0m
             };
             
             // Use PlanService to create, ensuring validations are run
@@ -78,6 +80,67 @@ namespace LaPrimitiva.Tests.Integration
 
             // Act & Assert
             await Assert.ThrowsAsync<InvalidOperationException>(() => planService.CreatePlanAsync(overlappingPlan));
+        }
+
+        [Fact]
+        public async Task Repository_ShouldRejectInvalidPlan_WhenApplicationServiceIsBypassed()
+        {
+            await ResetDatabaseAsync();
+            using var scope = CreateScope();
+            var repository = scope.ServiceProvider.GetRequiredService<LaPrimitiva.Domain.Repositories.IPlanRepository>();
+            var invalidPlan = new Plan
+            {
+                Name = "Plan inválido",
+                EffectiveFrom = new DateTime(2026, 12, 31),
+                EffectiveTo = new DateTime(2026, 1, 1),
+                BetsPerDraw = 2
+            };
+
+            await Assert.ThrowsAsync<InvalidOperationException>(() => repository.CreateAsync(invalidPlan));
+        }
+
+        [Fact]
+        public async Task SqlConstraint_ShouldRejectInvalidPlan_WhenEveryServiceIsBypassed()
+        {
+            await ResetDatabaseAsync();
+            using var scope = CreateScope();
+            var context = scope.ServiceProvider.GetRequiredService<PrimitivaDbContext>();
+            context.Plans.Add(new Plan
+            {
+                Name = "SQL inválido",
+                EffectiveFrom = new DateTime(2026, 12, 31),
+                EffectiveTo = new DateTime(2026, 1, 1),
+                CostPerBet = -1m,
+                BetsPerDraw = 0
+            });
+
+            await Assert.ThrowsAsync<DbUpdateException>(() => context.SaveChangesAsync());
+        }
+
+        [Fact]
+        public async Task SqlTrigger_ShouldRejectOverlappingPeriods_WhenEveryServiceIsBypassed()
+        {
+            await ResetDatabaseAsync();
+            using var scope = CreateScope();
+            var context = scope.ServiceProvider.GetRequiredService<PrimitivaDbContext>();
+            context.Plans.Add(new Plan
+            {
+                Name = "Primero",
+                EffectiveFrom = new DateTime(2026, 1, 1),
+                EffectiveTo = new DateTime(2026, 12, 31),
+                BetsPerDraw = 2
+            });
+            await context.SaveChangesAsync();
+
+            context.Plans.Add(new Plan
+            {
+                Name = "Solapado",
+                EffectiveFrom = new DateTime(2026, 6, 1),
+                EffectiveTo = new DateTime(2027, 5, 31),
+                BetsPerDraw = 2
+            });
+
+            await Assert.ThrowsAsync<DbUpdateException>(() => context.SaveChangesAsync());
         }
 
         [Fact]

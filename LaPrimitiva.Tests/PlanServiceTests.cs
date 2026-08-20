@@ -44,6 +44,23 @@ namespace LaPrimitiva.Tests
         }
 
         [Fact]
+        public async Task CreatePlanAsync_ShouldRejectInvalidPlan_BeforeCallingRepository()
+        {
+            var invalidPlan = new Plan
+            {
+                Name = "Inválido",
+                EffectiveFrom = new DateTime(2026, 12, 31),
+                EffectiveTo = new DateTime(2026, 1, 1),
+                BetsPerDraw = 0
+            };
+
+            await Assert.ThrowsAsync<InvalidOperationException>(() => _service.CreatePlanAsync(invalidPlan));
+
+            _planRepoMock.Verify(repository => repository.CreateAsync(It.IsAny<Plan>()), Times.Never);
+            _planRepoMock.Verify(repository => repository.AnyAsync(It.IsAny<Expression<Func<Plan, bool>>>()), Times.Never);
+        }
+
+        [Fact]
         public async Task DeletePlanAsync_ShouldThrowException_WhenPlanHasDraws()
         {
             // Arrange

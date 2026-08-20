@@ -46,7 +46,12 @@ namespace LaPrimitiva.Infrastructure.Persistence.Seed
                         [FixedCombinationLabel] nvarchar(max) NULL,
                         [CreatedAt] datetime2 NOT NULL,
                         [UpdatedAt] datetime2 NOT NULL,
-                        CONSTRAINT [PK_Plans] PRIMARY KEY ([Id])
+                        CONSTRAINT [PK_Plans] PRIMARY KEY ([Id]),
+                        CONSTRAINT [CK_Plans_EffectivePeriod] CHECK ([EffectiveTo] IS NULL OR [EffectiveFrom] <= [EffectiveTo]),
+                        CONSTRAINT [CK_Plans_Name] CHECK (LEN(LTRIM(RTRIM([Name]))) > 0),
+                        CONSTRAINT [CK_Plans_NonNegativeValues] CHECK ([WeeksToTrackDefault] >= 0 AND [CostPerBet] >= 0 AND [JokerCostPerBet] >= 0),
+                        CONSTRAINT [CK_Plans_BetsPerDraw] CHECK ([BetsPerDraw] BETWEEN 1 AND 100),
+                        CONSTRAINT [CK_Plans_DisabledJokerCost] CHECK ([EnableJoker] = 1 OR [JokerCostPerBet] = 0)
                     );
                 END;";
 
@@ -108,7 +113,63 @@ namespace LaPrimitiva.Infrastructure.Persistence.Seed
             await _context.Database.ExecuteSqlRawAsync(sqlDrawRecords);
             await _context.Database.ExecuteSqlRawAsync(sqlWinningDraws);
 
+            await EnsurePlanConstraintsAsync();
             await RepairFinancialTotalsAsync();
+        }
+
+        private async Task EnsurePlanConstraintsAsync()
+        {
+            var constraintsSql = @"
+                UPDATE [Plans]
+                SET [JokerCostPerBet] = 0
+                WHERE [EnableJoker] = 0 AND [JokerCostPerBet] <> 0;
+
+                IF EXISTS (
+                    SELECT 1
+                    FROM [Plans] firstPlan
+                    INNER JOIN [Plans] secondPlan ON firstPlan.[Id] < secondPlan.[Id]
+                    WHERE (firstPlan.[EffectiveTo] IS NULL OR secondPlan.[EffectiveFrom] <= firstPlan.[EffectiveTo])
+                      AND (secondPlan.[EffectiveTo] IS NULL OR secondPlan.[EffectiveTo] >= firstPlan.[EffectiveFrom]))
+                    THROW 51000, 'No se pueden activar las restricciones: existen planes solapados.', 1;
+
+                IF NOT EXISTS (SELECT 1 FROM sys.check_constraints WHERE [name] = N'CK_Plans_EffectivePeriod')
+                    ALTER TABLE [Plans] WITH CHECK ADD CONSTRAINT [CK_Plans_EffectivePeriod]
+                        CHECK ([EffectiveTo] IS NULL OR [EffectiveFrom] <= [EffectiveTo]);
+
+                IF NOT EXISTS (SELECT 1 FROM sys.check_constraints WHERE [name] = N'CK_Plans_Name')
+                    ALTER TABLE [Plans] WITH CHECK ADD CONSTRAINT [CK_Plans_Name]
+                        CHECK (LEN(LTRIM(RTRIM([Name]))) > 0);
+
+                IF NOT EXISTS (SELECT 1 FROM sys.check_constraints WHERE [name] = N'CK_Plans_NonNegativeValues')
+                    ALTER TABLE [Plans] WITH CHECK ADD CONSTRAINT [CK_Plans_NonNegativeValues]
+                        CHECK ([WeeksToTrackDefault] >= 0 AND [CostPerBet] >= 0 AND [JokerCostPerBet] >= 0);
+
+                IF NOT EXISTS (SELECT 1 FROM sys.check_constraints WHERE [name] = N'CK_Plans_BetsPerDraw')
+                    ALTER TABLE [Plans] WITH CHECK ADD CONSTRAINT [CK_Plans_BetsPerDraw]
+                        CHECK ([BetsPerDraw] BETWEEN 1 AND 100);
+
+                IF NOT EXISTS (SELECT 1 FROM sys.check_constraints WHERE [name] = N'CK_Plans_DisabledJokerCost')
+                    ALTER TABLE [Plans] WITH CHECK ADD CONSTRAINT [CK_Plans_DisabledJokerCost]
+                        CHECK ([EnableJoker] = 1 OR [JokerCostPerBet] = 0);";
+
+            var overlapTriggerSql = @"
+                EXEC(N'CREATE OR ALTER TRIGGER [TR_Plans_PreventOverlap]
+                ON [Plans]
+                AFTER INSERT, UPDATE
+                AS
+                BEGIN
+                    SET NOCOUNT ON;
+                    IF EXISTS (
+                        SELECT 1
+                        FROM inserted candidate
+                        INNER JOIN [Plans] existing ON existing.[Id] <> candidate.[Id]
+                        WHERE (candidate.[EffectiveTo] IS NULL OR existing.[EffectiveFrom] <= candidate.[EffectiveTo])
+                          AND (existing.[EffectiveTo] IS NULL OR existing.[EffectiveTo] >= candidate.[EffectiveFrom]))
+                        THROW 51001, ''El periodo del plan se solapa con otro plan existente.'', 1;
+                END');";
+
+            await _context.Database.ExecuteSqlRawAsync(constraintsSql);
+            await _context.Database.ExecuteSqlRawAsync(overlapTriggerSql);
         }
 
         private async Task RepairFinancialTotalsAsync()

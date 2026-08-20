@@ -7,11 +7,58 @@ namespace LaPrimitiva.Tests
     public class DrawRecordTests
     {
         [Fact]
+        public void RecalculateFinancials_AppliesBetsPerDrawToBaseAndJokerCosts()
+        {
+            var plan = new Plan
+            {
+                Name = "Plan",
+                EffectiveFrom = new DateTime(2026, 1, 1),
+                CostPerBet = 1.25m,
+                BetsPerDraw = 3,
+                EnableJoker = true,
+                JokerCostPerBet = 0.50m
+            };
+            var draw = new DrawRecord { Plan = plan, Played = true };
+
+            draw.RecalculateFinancials(refreshCostsFromPlan: true);
+
+            Assert.Equal(1.25m, draw.CosteFija);
+            Assert.Equal(2.50m, draw.CosteAuto);
+            Assert.Equal(0.50m, draw.CosteJokerFija);
+            Assert.Equal(1.00m, draw.CosteJokerAuto);
+            Assert.Equal(5.25m, draw.TotalCoste);
+        }
+
+        [Fact]
+        public void RecalculateFinancials_WithOneBet_LeavesAutomaticComponentsAtZero()
+        {
+            var plan = new Plan
+            {
+                Name = "Plan",
+                EffectiveFrom = new DateTime(2026, 1, 1),
+                CostPerBet = 1m,
+                BetsPerDraw = 1,
+                EnableJoker = true,
+                JokerCostPerBet = 0.50m
+            };
+            var draw = new DrawRecord { Plan = plan, Played = true };
+
+            draw.RecalculateFinancials(refreshCostsFromPlan: true);
+
+            Assert.Equal(1m, draw.CosteFija);
+            Assert.Equal(0m, draw.CosteAuto);
+            Assert.Equal(0.50m, draw.CosteJokerFija);
+            Assert.Equal(0m, draw.CosteJokerAuto);
+        }
+
+        [Fact]
         public void RecalculateFinancials_IncludesJokerCostsAndPrizes_WhenEnabledAndAwarded()
         {
             // Arrange
             var plan = new Plan
             {
+                Name = "Plan",
+                EffectiveFrom = new DateTime(2026, 1, 1),
                 CostPerBet = 1.00m,
                 BetsPerDraw = 2,
                 EnableJoker = true,
@@ -40,7 +87,14 @@ namespace LaPrimitiva.Tests
         [Fact]
         public void RecalculateFinancials_IncludesJokerCost_WhenEnabledWithoutPrize()
         {
-            var plan = new Plan { CostPerBet = 1m, EnableJoker = true, JokerCostPerBet = 0.5m };
+            var plan = new Plan
+            {
+                Name = "Plan",
+                EffectiveFrom = new DateTime(2026, 1, 1),
+                CostPerBet = 1m,
+                EnableJoker = true,
+                JokerCostPerBet = 0.5m
+            };
             var draw = new DrawRecord
             {
                 Plan = plan,
@@ -57,7 +111,13 @@ namespace LaPrimitiva.Tests
         [Fact]
         public void RecalculateFinancials_ExcludesJoker_WhenDisabled()
         {
-            var plan = new Plan { CostPerBet = 1m, EnableJoker = false };
+            var plan = new Plan
+            {
+                Name = "Plan",
+                EffectiveFrom = new DateTime(2026, 1, 1),
+                CostPerBet = 1m,
+                EnableJoker = false
+            };
             var draw = new DrawRecord
             {
                 Plan = plan,

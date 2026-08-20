@@ -20,9 +20,14 @@ namespace LaPrimitiva.Infrastructure.Persistence
                 entity.HasKey(e => e.Id);
                 entity.Property(e => e.CostPerBet).HasPrecision(10, 2);
                 entity.Property(e => e.JokerCostPerBet).HasPrecision(10, 2);
-                
-                // Requirement: Block overlaps usually, or define priority. 
-                // We will handle overlap logic in the Service layer.
+                entity.ToTable(table =>
+                {
+                    table.HasCheckConstraint("CK_Plans_EffectivePeriod", "[EffectiveTo] IS NULL OR [EffectiveFrom] <= [EffectiveTo]");
+                    table.HasCheckConstraint("CK_Plans_Name", "LEN(LTRIM(RTRIM([Name]))) > 0");
+                    table.HasCheckConstraint("CK_Plans_NonNegativeValues", "[WeeksToTrackDefault] >= 0 AND [CostPerBet] >= 0 AND [JokerCostPerBet] >= 0");
+                    table.HasCheckConstraint("CK_Plans_BetsPerDraw", $"[BetsPerDraw] BETWEEN {Plan.MinBetsPerDraw} AND {Plan.MaxBetsPerDraw}");
+                    table.HasCheckConstraint("CK_Plans_DisabledJokerCost", "[EnableJoker] = 1 OR [JokerCostPerBet] = 0");
+                });
             });
 
             modelBuilder.Entity<DrawRecord>(entity =>

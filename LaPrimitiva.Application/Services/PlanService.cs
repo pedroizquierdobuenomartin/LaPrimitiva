@@ -66,10 +66,7 @@ namespace LaPrimitiva.Application.Services
         /// </summary>
         public async Task CreatePlanAsync(Plan plan)
         {
-            if (string.IsNullOrWhiteSpace(plan.Name))
-            {
-                throw new InvalidOperationException("El nombre del plan no puede estar vacío.");
-            }
+            plan.Validate();
 
             // Validación de solapamiento
             var overlap = await _planRepository.AnyAsync(p => 
@@ -89,10 +86,7 @@ namespace LaPrimitiva.Application.Services
         /// </summary>
         public async Task UpdatePlanAsync(Plan plan)
         {
-            if (string.IsNullOrWhiteSpace(plan.Name))
-            {
-                throw new InvalidOperationException("El nombre del plan no puede estar vacío.");
-            }
+            plan.Validate();
 
             var overlap = await _planRepository.AnyAsync(p => 
                 p.Id != plan.Id &&

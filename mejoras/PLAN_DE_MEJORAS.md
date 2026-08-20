@@ -226,7 +226,7 @@
 - **Resultado:** el parser separa ahora por el carácter `-`, recorta cada segmento y descarta segmentos vacíos, manteniendo alineado el parseo con los espacios que admite la expresión regular. La proyección de elementos se materializa mediante `ToArray()` dentro del `try`, de modo que cualquier error de parseo diferido queda capturado y produce una colección vacía en vez de escapar al consumidor.
 - **Decisiones:** se mantuvo el contrato tolerante actual —elementos incompletos o malformados se omiten y un feed inválido devuelve una colección vacía— y no se amplió el alcance con validación de rangos, cambios del cliente RSS ni trabajo de M-205. Se eligió `StringSplitOptions.TrimEntries | RemoveEmptyEntries` frente a otra expresión regular para que el separador aceptado tenga una única semántica simple y explícita.
 
-### [ ] M-205 — Validar completamente los planes
+### [x] M-205 — Validar completamente los planes
 
 **Reglas mínimas:**
 
@@ -240,6 +240,14 @@
 
 - Las mismas reglas se aplican en UI, aplicación, dominio y SQL cuando corresponda.
 - Una llamada que no pase por la UI tampoco puede guardar un plan inválido.
+
+**Cierre (2026-08-20):**
+
+- **Referencia:** commit `M-205` (este commit), sobre `a39f7a2` (`fix: harden RSS draw handling`).
+- **Evidencia previa:** `PlanService` solo comprobaba el nombre y los solapamientos, mientras `PlanRepository` guardaba directamente; `Plan` no validaba fechas, costes ni cantidades y nacía con Joker desactivado pero coste Joker `0,50`. La UI no permitía editar `BetsPerDraw`, EF y el DDL manual carecían de restricciones `CHECK`, y `DrawRecord.RecalculateFinancials()` cobraba siempre una apuesta fija y una automática con independencia de `BetsPerDraw`. La línea base previa `dotnet test LaPrimitiva.Tests/LaPrimitiva.Tests.csproj --no-build --filter "FullyQualifiedName~PlanTests|FullyQualifiedName~PlanServiceTests"` pasó 7/7 pruebas sobre los binarios existentes, confirmando que la cobertura anterior no ejercitaba estas reglas.
+- **Pruebas realizadas:** línea base previa de planes 7/7 correcta; `scripts/Verify-M205PlanValidation.ps1` correcto; `git diff --check` sin errores. Se añadieron 14 casos xUnit para límites y valores inválidos de dominio, aplicación real de `BetsPerDraw`, rechazo al omitir la UI y el servicio, restricciones SQL y trigger de solapamientos. Las pruebas nuevas no se ejecutaron porque la política del repositorio prohíbe compilar después de los cambios.
+- **Resultado:** `Plan.Validate()` concentra las reglas estructurales y se invoca desde UI, Application, repositorio y cálculo de costes. La UI expone `BetsPerDraw` con límites y restringe fechas/costes; el repositorio vuelve a validar y rechaza solapamientos aunque se omita el servicio. EF, una migración y el inicializador DDL incorporan restricciones `CHECK`; un trigger SQL impide carreras o escrituras directas con periodos solapados. Los costes base y Joker ya multiplican realmente el número de apuestas configurado.
+- **Decisiones:** `BetsPerDraw` admite `1..100`; una apuesta se registra como fija y las restantes se agregan en el componente automático, preservando el modelo histórico de dos componentes. El Joker se cobra por cada apuesta. Los costes Joker históricos de planes con Joker desactivado se normalizan a cero antes de activar las restricciones; los solapamientos históricos no se corrigen de forma arbitraria, sino que bloquean la activación para exigir una decisión explícita. Se mantuvieron las fotografías de coste ya persistidas en sorteos anteriores y no se avanzó a M-206.
 
 ### [ ] M-206 — Preservar `CreatedAt` al actualizar planes
 
@@ -530,3 +538,4 @@ Estos descartes describen el código auditado y deben revisarse si cambian las f
 | M-201 | 2026-08-20 | Commit `M-201` (este commit), creado tras M-103 | Completado | Actualización explícita de sorteos desconectados con entidad seguida y lista blanca de columnas; prueba de integración añadida, build correcto y verificación visual satisfactoria. |
 | M-202 | 2026-08-20 | Commit `M-202` (este commit), sobre `4a7cfdf` | Completado | Ruta `/registro` centralizada en `AppRoutes.Registration`; verificador estático correcto y navegación Planes → Registro comprobada manualmente por el usuario. |
 | M-203 | 2026-08-20 | Commit `M-203` (este commit), sobre `07a58cc` | Completado | Totales de coste y premios incluyen los cuatro componentes; persistencia y reparación aplican el invariante; casos Joker y ROI añadidos; build, ejecución y comprobación visual satisfactorios comunicados por el usuario. |
+| M-205 | 2026-08-20 | Commit `M-205` (este commit), sobre `a39f7a2` | Completado | Validación coherente en UI, Application, dominio, repositorio y SQL; `BetsPerDraw` aplicado a costes; verificación estática correcta y 14 casos xUnit añadidos sin compilarlos por política. |

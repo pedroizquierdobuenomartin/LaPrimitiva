@@ -156,7 +156,18 @@ namespace LaPrimitiva.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Plans");
+                    b.ToTable("Plans", t =>
+                        {
+                            t.HasCheckConstraint("CK_Plans_BetsPerDraw", "[BetsPerDraw] BETWEEN 1 AND 100");
+
+                            t.HasCheckConstraint("CK_Plans_DisabledJokerCost", "[EnableJoker] = 1 OR [JokerCostPerBet] = 0");
+
+                            t.HasCheckConstraint("CK_Plans_EffectivePeriod", "[EffectiveTo] IS NULL OR [EffectiveFrom] <= [EffectiveTo]");
+
+                            t.HasCheckConstraint("CK_Plans_Name", "LEN(LTRIM(RTRIM([Name]))) > 0");
+
+                            t.HasCheckConstraint("CK_Plans_NonNegativeValues", "[WeeksToTrackDefault] >= 0 AND [CostPerBet] >= 0 AND [JokerCostPerBet] >= 0");
+                        });
                 });
 
             modelBuilder.Entity("LaPrimitiva.Domain.Entities.WinningDraw", b =>

@@ -144,7 +144,7 @@ namespace LaPrimitiva.Tests.Integration
         }
 
         [Fact]
-        public async Task UpdatePlan_ShouldSucceed_WhenValid()
+        public async Task UpdatePlan_ShouldSucceed_WhenSqlOverlapTriggerIsEnabled()
         {
             // Arrange
             await ResetDatabaseAsync();

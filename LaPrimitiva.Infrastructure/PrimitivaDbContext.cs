@@ -22,6 +22,8 @@ namespace LaPrimitiva.Infrastructure.Persistence
                 entity.Property(e => e.JokerCostPerBet).HasPrecision(10, 2);
                 entity.ToTable(table =>
                 {
+                    table.HasTrigger("TR_Plans_PreventOverlap");
+                    table.UseSqlOutputClause(false);
                     table.HasCheckConstraint("CK_Plans_EffectivePeriod", "[EffectiveTo] IS NULL OR [EffectiveFrom] <= [EffectiveTo]");
                     table.HasCheckConstraint("CK_Plans_Name", "LEN(LTRIM(RTRIM([Name]))) > 0");
                     table.HasCheckConstraint("CK_Plans_NonNegativeValues", "[WeeksToTrackDefault] >= 0 AND [CostPerBet] >= 0 AND [JokerCostPerBet] >= 0");

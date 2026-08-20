@@ -158,6 +158,8 @@ namespace LaPrimitiva.Infrastructure.Migrations
 
                     b.ToTable("Plans", t =>
                         {
+                            t.HasTrigger("TR_Plans_PreventOverlap");
+
                             t.HasCheckConstraint("CK_Plans_BetsPerDraw", "[BetsPerDraw] BETWEEN 1 AND 100");
 
                             t.HasCheckConstraint("CK_Plans_DisabledJokerCost", "[EnableJoker] = 1 OR [JokerCostPerBet] = 0");
@@ -167,6 +169,8 @@ namespace LaPrimitiva.Infrastructure.Migrations
                             t.HasCheckConstraint("CK_Plans_Name", "LEN(LTRIM(RTRIM([Name]))) > 0");
 
                             t.HasCheckConstraint("CK_Plans_NonNegativeValues", "[WeeksToTrackDefault] >= 0 AND [CostPerBet] >= 0 AND [JokerCostPerBet] >= 0");
+
+                            t.UseSqlOutputClause(false);
                         });
                 });
 

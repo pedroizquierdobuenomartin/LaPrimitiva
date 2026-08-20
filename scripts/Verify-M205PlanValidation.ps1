@@ -48,6 +48,11 @@ Assert-Contains 'LaPrimitiva.Infrastructure\Repositories\PlanRepository.cs' @(
     'private async Task EnsureNoOverlapAsync(Plan plan)'
 )
 
+Assert-Contains 'LaPrimitiva.Infrastructure\PrimitivaDbContext.cs' @(
+    'table.HasTrigger("TR_Plans_PreventOverlap");',
+    'table.UseSqlOutputClause(false);'
+)
+
 Assert-Contains 'LaPrimitiva.App\Components\Pages\Plans.razor' @(
     'min="@Plan.MinBetsPerDraw"',
     'max="@Plan.MaxBetsPerDraw"',
@@ -76,7 +81,8 @@ Assert-Contains 'LaPrimitiva.Tests\DrawRecordTests.cs' @(
 Assert-Contains 'LaPrimitiva.Tests\Integration\PlanIntegrationTests.cs' @(
     'Repository_ShouldRejectInvalidPlan_WhenApplicationServiceIsBypassed',
     'SqlConstraint_ShouldRejectInvalidPlan_WhenEveryServiceIsBypassed',
-    'SqlTrigger_ShouldRejectOverlappingPeriods_WhenEveryServiceIsBypassed'
+    'SqlTrigger_ShouldRejectOverlappingPeriods_WhenEveryServiceIsBypassed',
+    'UpdatePlan_ShouldSucceed_WhenSqlOverlapTriggerIsEnabled'
 )
 
 Write-Host 'M-205 verificado estáticamente: dominio, UI, aplicación, repositorio, SQL, cálculos y pruebas están alineados.'

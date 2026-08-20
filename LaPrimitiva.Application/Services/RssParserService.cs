@@ -21,7 +21,7 @@ namespace LaPrimitiva.Application.Services
                 var doc = XDocument.Parse(xmlContent);
                 var items = doc.Descendants().Where(e => e.Name.LocalName == "item");
 
-                return items.Select(ParseItem).Where(x => x != null).Cast<RssDraw>();
+                return items.Select(ParseItem).Where(x => x != null).Cast<RssDraw>().ToArray();
             }
             catch
             {
@@ -53,7 +53,7 @@ namespace LaPrimitiva.Application.Services
                 return null;
 
             var numbers = numbersMatch.Groups[1].Value
-                .Split(" - ")
+                .Split('-', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries)
                 .Select(n => int.Parse(n))
                 .ToArray();
 

@@ -208,7 +208,7 @@
 - **Resultado:** `DrawRecord.RecalculateFinancials` define una única regla: coste total = fija + automática + Joker fija + Joker automática; premios totales siguen la misma composición y neto = premios − coste. Registro muestra y edita los componentes Joker, Dashboard/resúmenes/planes consumen los totales unificados y el ROI deriva de ellos. El repositorio impone el invariante al crear y actualizar, y el arranque repara de forma idempotente registros anteriores incoherentes.
 - **Decisiones:** se conservaron los importes por componente como fotografía histórica y se centralizó solo su agregación en dominio; se evitó recalcular desde el plan salvo al activar/desactivar `Played`, porque cambios posteriores del plan no deben reescribir costes históricos. No se modificó `BetsPerDraw`, cuya validación y aplicación pertenece expresamente a M-205, ni se avanzó a M-204.
 
-### [ ] M-204 — Robustecer el parser RSS
+### [x] M-204 — Robustecer el parser RSS
 
 **Problema:** la expresión regular admite separadores variables, pero el parseo divide únicamente por `" - "`; además, parte del trabajo diferido puede lanzar excepciones fuera del `try`.
 
@@ -217,6 +217,14 @@
 - Se parsean correctamente formatos con y sin espacios permitidos.
 - Los errores se capturan donde se materializa la secuencia.
 - Hay pruebas con entradas válidas, incompletas y malformadas.
+
+**Cierre (2026-08-20):**
+
+- **Referencia:** commit `M-204` (este commit), sobre `5b0c243` (`fix: unify financial totals with Joker`).
+- **Evidencia previa:** con la entrada válida `04-05-13-29-30-36`, la expresión regular existente encontraba la combinación (`Success = true`), pero `Split(" - ")` producía un único elemento y `int.Parse` lanzaba una excepción. Además, `ParseRss()` devolvía el `Select(ParseItem)` sin materializar, por lo que una `FormatException` generada al enumerar escapaba del `try`; ambas conductas se reprodujeron antes de editar.
+- **Pruebas realizadas:** línea base previa `dotnet test LaPrimitiva.Tests/LaPrimitiva.Tests.csproj --no-build --filter "FullyQualifiedName~RssParserServiceTests"` (2/2 correctas sobre los binarios existentes); análisis sintáctico correcto y ejecución satisfactoria de `scripts/Verify-M204RssParser.ps1`; `git diff --check` sin errores. Se añadieron casos xUnit para separadores sin espacios y con espacios irregulares, entrada incompleta, sorteo malformado con materialización segura y XML malformado. Esos casos nuevos no se ejecutaron porque la política del repositorio prohíbe compilar después de los cambios. El usuario verificó en ejecución que los sorteos obtenidos mediante RSS aparecen y se guardan correctamente.
+- **Resultado:** el parser separa ahora por el carácter `-`, recorta cada segmento y descarta segmentos vacíos, manteniendo alineado el parseo con los espacios que admite la expresión regular. La proyección de elementos se materializa mediante `ToArray()` dentro del `try`, de modo que cualquier error de parseo diferido queda capturado y produce una colección vacía en vez de escapar al consumidor.
+- **Decisiones:** se mantuvo el contrato tolerante actual —elementos incompletos o malformados se omiten y un feed inválido devuelve una colección vacía— y no se amplió el alcance con validación de rangos, cambios del cliente RSS ni trabajo de M-205. Se eligió `StringSplitOptions.TrimEntries | RemoveEmptyEntries` frente a otra expresión regular para que el separador aceptado tenga una única semántica simple y explícita.
 
 ### [ ] M-205 — Validar completamente los planes
 
@@ -454,7 +462,42 @@
 - Verificar registros, planes, premios y totales.
 - Documentar duración y pasos del proceso.
 
-**Criterio de cierre del plan:** todas las fases anteriores están completadas, verificadas y asociadas a evidencia reproducible.
+---
+
+## Fase 7 — Hallazgos y mejoras emergentes
+
+Esta es una fase viva para registrar problemas y oportunidades confirmados durante el uso real y la ejecución del plan que no estuvieran contemplados en la auditoría original.
+
+**Reglas de incorporación:**
+
+- Cada hallazgo debe incluir evidencia reproducible y un hito independiente.
+- Registrar el problema no implica implementarlo ni alterar el hito que esté en curso.
+- Cada hito debe definir criterios de aceptación y pruebas antes de cerrarse.
+- Los hitos aplicables de esta fase deben completarse antes del cierre definitivo del plan; si modifican comportamiento ya verificado, se repetirá la parte afectada de la Fase 6.
+
+### [ ] M-701 — Detectar todos los sorteos RSS pendientes aunque existan huecos históricos
+
+**Problema:** el popup calcula los sorteos pendientes conservando únicamente los posteriores a la fecha más reciente del histórico. Si se guarda primero el sorteo RSS más nuevo, esa fecha pasa a ser el límite y desaparecen del popup sorteos anteriores todavía no guardados. El flujo obliga incorrectamente a guardar del más antiguo al más reciente.
+
+**Evidencia (2026-08-20):** el usuario reprodujo el fallo durante la verificación real de M-204. `DrawNotificationService.CheckForNewDrawsAsync()` consulta `GetLatestDrawDateAsync()` y aplica `d.Date.Date > latestHistoricalDate.Value.Date`; después de cada guardado, `MainLayout.SaveToHistory()` vuelve a ejecutar esa comprobación. Por tanto, una fecha máxima no permite distinguir huecos anteriores.
+
+**Comportamiento esperado:**
+
+- El popup muestra cada sorteo presente en el RSS que todavía no exista en el histórico, independientemente de que sea anterior o posterior a la última fecha guardada.
+- Los sorteos pueden guardarse en cualquier orden.
+- Tras guardar un sorteo desaparece únicamente ese sorteo; los demás pendientes permanecen disponibles.
+- Un sorteo ya registrado no vuelve a ofrecerse ni puede duplicarse.
+
+**Criterios de aceptación:**
+
+- La detección compara el conjunto del RSS con los sorteos realmente almacenados mediante una identidad estable, en vez de usar solo la fecha máxima como marcador.
+- Existe una prueba con un histórico que contiene el sorteo más reciente pero conserva huecos anteriores.
+- Existe una prueba que guarda varios sorteos en orden no cronológico y verifica los pendientes después de cada guardado.
+- La restricción de unicidad por fecha continúa protegiendo frente a duplicados.
+
+**Dependencias:** M-204.
+
+**Criterio de cierre del plan:** todas las fases y todos los hitos emergentes aplicables están completados, verificados y asociados a evidencia reproducible.
 
 ---
 

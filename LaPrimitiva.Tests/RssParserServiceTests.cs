@@ -2,7 +2,6 @@ using System;
 using System.Linq;
 using LaPrimitiva.Application.Services;
 using LaPrimitiva.Domain.Models;
-using LaPrimitiva.Domain.Interfaces;
 using Xunit;
 
 namespace LaPrimitiva.Tests
@@ -57,5 +56,61 @@ namespace LaPrimitiva.Tests
             // Assert
             Assert.Empty(results);
         }
+
+        [Theory]
+        [InlineData("04-05-13-29-30-36")]
+        [InlineData("04 -05- 13  -  29 - 30-36")]
+        public void ParseRss_WithAllowedSeparatorSpacing_ReturnsCorrectNumbers(string numbers)
+        {
+            var xmlContent = BuildXml(
+                $"<b>{numbers}</b> Complementario: <b>C(09)</b> Reintegro: <b>R(4)</b>");
+
+            var draw = Assert.Single(_service.ParseRss(xmlContent));
+
+            Assert.Equal(new[] { 4, 5, 13, 29, 30, 36 }, draw.Numbers);
+        }
+
+        [Fact]
+        public void ParseRss_WithIncompleteItem_SkipsItem()
+        {
+            var xmlContent = BuildXml(
+                "<b>04 - 05 - 13 - 29 - 30 - 36</b> Complementario: <b>C(09)</b>");
+
+            var results = _service.ParseRss(xmlContent).ToList();
+
+            Assert.Empty(results);
+        }
+
+        [Fact]
+        public void ParseRss_WithMalformedDraw_SkipsItemWithoutThrowingDuringMaterialization()
+        {
+            var xmlContent = BuildXml(
+                "<b>04-XX-13-29-30-36</b> Complementario: <b>C(09)</b> Reintegro: <b>R(4)</b>");
+
+            List<RssDraw>? results = null;
+            var exception = Record.Exception(() => results = _service.ParseRss(xmlContent).ToList());
+
+            Assert.Null(exception);
+            Assert.Empty(results!);
+        }
+
+        [Fact]
+        public void ParseRss_WithMalformedXml_ReturnsEmptyList()
+        {
+            var results = _service.ParseRss("<rss><channel><item>").ToList();
+
+            Assert.Empty(results);
+        }
+
+        private static string BuildXml(string description) => $"""
+            <rss version="2.0">
+                <channel>
+                    <item>
+                        <description><![CDATA[{description}]]></description>
+                        <pubDate>Mon, 02 Feb 2026 22:16:16 +0100</pubDate>
+                    </item>
+                </channel>
+            </rss>
+            """;
     }
 }

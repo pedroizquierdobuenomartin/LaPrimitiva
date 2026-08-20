@@ -18,6 +18,5 @@ namespace LaPrimitiva.Domain.Repositories
         Task UpdateRangeAsync(IEnumerable<DrawRecord> draws);
         Task DeleteAsync(Guid id);
         Task DeleteRangeAsync(Expression<Func<DrawRecord, bool>> predicate);
-        Task SaveChangesAsync();
     }
 }

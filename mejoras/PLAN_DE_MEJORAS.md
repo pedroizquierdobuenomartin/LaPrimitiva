@@ -143,7 +143,7 @@
 
 ## Fase 2 — Errores funcionales
 
-### [ ] M-201 — Corregir el guardado de sorteos desconectados
+### [x] M-201 — Corregir el guardado de sorteos desconectados
 
 **Problema:** algunos sorteos se recuperan con `AsNoTracking()` y después se llama a `SaveChangesAsync()` sin adjuntar ni actualizar la entidad.
 
@@ -158,6 +158,15 @@
 - El cambio persiste después de crear un contexto nuevo.
 - Solo se modifican las columnas previstas.
 - Existe una prueba que falla con el comportamiento anterior.
+
+**Cierre:**
+
+- **Fecha:** 2026-08-20.
+- **Commit o referencia:** commit `M-201` (este commit), creado tras M-103.
+- **Evidencia previa:** `DrawRepository.GetListAsync()` devolvía `DrawRecord` mediante `AsNoTracking()`, mientras `Register.SaveDraw()` modificaba esa instancia y solo invocaba `DrawRepository.SaveChangesAsync()`. Al no existir ninguna entrada seguida ni estado `Modified`, EF Core no generaba una actualización. Además, el `UpdateAsync()` disponible usaba `DbSet.Update()`, marcando todas las propiedades como modificadas y sin limitar las columnas editables.
+- **Pruebas realizadas:** análisis sintáctico PowerShell correcto para `scripts/Verify-M201DisconnectedDrawSave.ps1`; ejecución del verificador M-201 correcta; y `git diff --check` sin errores. Se añadió `DisconnectedDrawPersistenceTests.UpdateAsync_PersistsEditableValuesWithoutChangingStructuralColumns`, que parte de la consulta sin seguimiento, actualiza mediante el repositorio y recarga con un contexto nuevo, comprobando tanto los valores editables como la preservación de `PlanId`, tipo, fecha, semana y `CreatedAt`. El usuario compiló la solución correctamente, con 0 errores y 8 advertencias `NU1903` preexistentes sobre `System.Security.Cryptography.Xml` 9.0.0, y verificó manualmente contra `PrimitivaAuditV2` en `localhost\LOCALSERVER` que la edición guarda, refleja los cambios y persiste tras recargar. La suite de integración modificada no se ejecutó.
+- **Resultado:** `Register.SaveDraw()` delega ahora en `IDrawRepository.UpdateAsync()`. El repositorio vuelve a cargar la fila como entidad seguida y copia explícitamente únicamente estado de juego, costes, premios, totales editables, notas y `UpdatedAt`; después persiste en una sola llamada. Se eliminó el `SaveChangesAsync()` genérico del contrato para impedir que la UI vuelva a confiar en el seguimiento accidental.
+- **Decisiones:** se eligió cargar la entidad seguida en vez de adjuntar el objeto completo, porque permite una lista blanca clara de columnas y conserva identidad, plan, fecha, tipo, semana, acumulado y fecha de creación. `UpdateRangeAsync()` reutiliza la misma lista blanca para que el guardado modal no mantenga una segunda semántica más permisiva. No se ha iniciado M-202.
 
 ### [ ] M-202 — Corregir la navegación a Registro
 
@@ -460,3 +469,4 @@ Estos descartes describen el código auditado y deben revisarse si cambian las f
 | M-000 | 2026-08-20 | Commit `M-000` (este commit), sobre `39d6d48` | Completado | Línea base en `mejoras/LINEA_BASE_M000.md`; 25/25 pruebas no integradas correctas antes del cambio y verificación estática M-000 correcta después. |
 | M-102 | 2026-08-20 | Commit `M-102` (este commit), sobre `b177788` | Completado | Backup real verificado y restaurado temporalmente; evidencia en `mejoras/evidencias/M-102-restore-20260820.json`; recuperación documentada. |
 | M-103 | 2026-08-20 | Commit `M-103` (este commit), sobre `d48abb7` | Completado | Base única por ejecución, migraciones, reset Respawn, borrado protegido, colección serializada y CSV portable; verificación estática doble correcta. |
+| M-201 | 2026-08-20 | Commit `M-201` (este commit), creado tras M-103 | Completado | Actualización explícita de sorteos desconectados con entidad seguida y lista blanca de columnas; prueba de integración añadida, build correcto y verificación visual satisfactoria. |

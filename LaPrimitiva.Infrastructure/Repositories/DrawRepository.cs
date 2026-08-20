@@ -38,28 +38,33 @@ namespace LaPrimitiva.Infrastructure.Repositories
 
         public async Task UpdateAsync(DrawRecord draw)
         {
-            var tracked = _context.DrawRecords.Local.FirstOrDefault(e => e.Id == draw.Id);
-            if (tracked != null)
-            {
-                _context.Entry(tracked).State = EntityState.Detached;
-            }
-
-            _context.DrawRecords.Update(draw);
+            var tracked = await GetTrackedDrawAsync(draw.Id);
+            ApplyEditableValues(tracked, draw);
             await _context.SaveChangesAsync();
         }
 
         public async Task UpdateRangeAsync(IEnumerable<DrawRecord> draws)
         {
-            foreach (var draw in draws)
+            var disconnectedDraws = draws.ToList();
+            var drawIds = disconnectedDraws.Select(draw => draw.Id).ToList();
+            var trackedDraws = await _context.DrawRecords
+                .Where(draw => drawIds.Contains(draw.Id))
+                .ToDictionaryAsync(draw => draw.Id);
+
+            var missingId = drawIds
+                .Where(id => !trackedDraws.ContainsKey(id))
+                .Cast<Guid?>()
+                .FirstOrDefault();
+            if (missingId.HasValue)
             {
-                var tracked = _context.DrawRecords.Local.FirstOrDefault(e => e.Id == draw.Id);
-                if (tracked != null)
-                {
-                    _context.Entry(tracked).State = EntityState.Detached;
-                }
+                throw new InvalidOperationException($"No existe el sorteo con identificador '{missingId}'.");
             }
 
-            _context.DrawRecords.UpdateRange(draws);
+            foreach (var draw in disconnectedDraws)
+            {
+                ApplyEditableValues(trackedDraws[draw.Id], draw);
+            }
+
             await _context.SaveChangesAsync();
             _context.ChangeTracker.Clear();
         }
@@ -78,9 +83,28 @@ namespace LaPrimitiva.Infrastructure.Repositories
                 .ExecuteDeleteAsync();
         }
 
-        public async Task SaveChangesAsync()
+        private async Task<DrawRecord> GetTrackedDrawAsync(Guid id)
         {
-            await _context.SaveChangesAsync();
+            return await _context.DrawRecords.SingleOrDefaultAsync(draw => draw.Id == id)
+                ?? throw new InvalidOperationException($"No existe el sorteo con identificador '{id}'.");
+        }
+
+        private static void ApplyEditableValues(DrawRecord target, DrawRecord source)
+        {
+            target.Played = source.Played;
+            target.FixedPrize = source.FixedPrize;
+            target.AutoPrize = source.AutoPrize;
+            target.JokerFixedPrize = source.JokerFixedPrize;
+            target.JokerAutoPrize = source.JokerAutoPrize;
+            target.Notes = source.Notes;
+            target.CosteFija = source.CosteFija;
+            target.CosteAuto = source.CosteAuto;
+            target.CosteJokerFija = source.CosteJokerFija;
+            target.CosteJokerAuto = source.CosteJokerAuto;
+            target.TotalCoste = source.TotalCoste;
+            target.TotalPremios = source.TotalPremios;
+            target.Neto = source.Neto;
+            target.UpdatedAt = source.UpdatedAt;
         }
     }
 }

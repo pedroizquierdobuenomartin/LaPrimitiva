@@ -702,9 +702,7 @@
     {
         RecalculateDraw(draw);
         draw.UpdatedAt = DateTime.UtcNow;
-        // In a real repo, we'd have Update, but for now we use SaveChanges if tracked 
-        // OR we add an UpdateAsync to IDrawRepository.
-        await DrawRepository.SaveChangesAsync();
+        await DrawRepository.UpdateAsync(draw);
         await LoadData();
         StateHasChanged();
     }

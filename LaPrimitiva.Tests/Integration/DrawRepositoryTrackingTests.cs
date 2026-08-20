@@ -6,14 +6,14 @@ using LaPrimitiva.Domain.Entities;
 using LaPrimitiva.Domain.Repositories;
 using LaPrimitiva.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Mvc.Testing;
 
 namespace LaPrimitiva.Tests.Integration
 {
-    public class DrawRepositoryTrackingTests : IntegrationTestBase, IClassFixture<WebApplicationFactory<LaPrimitiva.App.Program>>
+    [Collection(IntegrationTestCollection.Name)]
+    public class DrawRepositoryTrackingTests : IntegrationTestBase
     {
-        public DrawRepositoryTrackingTests(WebApplicationFactory<LaPrimitiva.App.Program> factory) 
-            : base(factory)
+        public DrawRepositoryTrackingTests(IntegrationTestFixture fixture)
+            : base(fixture)
         {
         }
 
@@ -24,7 +24,6 @@ namespace LaPrimitiva.Tests.Integration
             // Once fixed, we should update the assertion or the test logic to expect success.
             // But strict TDD says: write a failing test first.
             
-            await InitializeAsync();
             await ResetDatabaseAsync();
 
             using var scope = CreateScope();

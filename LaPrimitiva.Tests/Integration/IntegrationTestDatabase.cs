@@ -35,6 +35,12 @@ internal static class IntegrationTestDatabase
         var builder = new SqlConnectionStringBuilder(connectionString);
         var databaseName = builder.InitialCatalog?.Trim();
 
+        if (!string.IsNullOrWhiteSpace(builder.AttachDBFilename))
+        {
+            throw new InvalidOperationException(
+                "Las pruebas de integración no admiten AttachDBFilename.");
+        }
+
         if (string.IsNullOrWhiteSpace(databaseName) ||
             !databaseName.EndsWith(RequiredDatabaseSuffix, StringComparison.OrdinalIgnoreCase))
         {
@@ -42,6 +48,20 @@ internal static class IntegrationTestDatabase
                 $"La base de integración debe terminar en '{RequiredDatabaseSuffix}'. " +
                 $"Se recibió '{databaseName ?? "<sin nombre>"}'.");
         }
+    }
+
+    internal static string CreateIsolatedConnectionString(string connectionString)
+    {
+        EnsureSafe(connectionString);
+
+        var builder = new SqlConnectionStringBuilder(connectionString);
+        var databasePrefix = builder.InitialCatalog[..^RequiredDatabaseSuffix.Length];
+        var runId = $"{Environment.ProcessId}_{Guid.NewGuid():N}";
+
+        builder.InitialCatalog = $"{databasePrefix}_{runId}{RequiredDatabaseSuffix}";
+        EnsureSafe(builder.ConnectionString);
+
+        return builder.ConnectionString;
     }
 
     private static string ReadConnectionStringFromSettings()

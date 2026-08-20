@@ -113,7 +113,7 @@
 - **Resultado:** cada backup se crea con checksums de página, se valida antes de copiarse y recibe un fichero `.sha256`; cualquier fallo de creación, verificación, hash o copia finaliza con código `1`. `scripts/Test-DatabaseRestore.ps1` realiza un simulacro seguro con `FILELISTONLY`, archivos físicos independientes, `DBCC CHECKDB`, evidencia JSON y limpieza de la base temporal. `mejoras/RECUPERACION_BACKUPS.md` documenta ubicaciones, retención, verificación, periodicidad y recuperación real.
 - **Decisiones:** el simulacro exige el prefijo `PrimitivaRestoreTest_` y nunca puede sobrescribir `PrimitivaAuditV2`; se usa `MOVE` para impedir colisiones con sus archivos activos; la restauración temporal se elimina solo después de completarse correctamente para no ocultar un fallo a mitad de proceso; la validación funcional completa tras una recuperación real queda reservada a M-603. La prueba operativa usó `localhost\LOCALSERVER`, única instancia disponible en este equipo, sin cambiar el valor predeterminado `localhost\SQLEXPRESS` definido por la configuración de la aplicación y por M-101. M-103 no se ha iniciado.
 
-### [ ] M-103 — Aislar completamente las pruebas de integración
+### [x] M-103 — Aislar completamente las pruebas de integración
 
 **Problema:** las pruebas usan una conexión fija a LocalDB, rutas absolutas `f:\...` y un `ResetDatabaseAsync` vacío.
 
@@ -129,6 +129,15 @@
 - Las pruebas no pueden modificar la base de desarrollo.
 - Funcionan independientemente de la letra de unidad o carpeta del repositorio.
 - Dos ejecuciones consecutivas producen el mismo resultado.
+
+**Cierre:**
+
+- **Fecha:** 2026-08-20.
+- **Commit o referencia:** commit `M-103` (este commit), creado sobre `d48abb7`.
+- **Evidencia previa:** el repositorio estaba limpio en `d48abb7`. `IntegrationTestDatabase` solo validaba una base fija, `IntegrationTestBase.ResetDatabaseAsync()` no hacía nada y `WinningDrawSeederTests` leía dos CSV desde `f:\Repositorios\LaPrimitiva\.agent\assests`. La ejecución previa `dotnet test LaPrimitiva.Tests/LaPrimitiva.Tests.csproj --filter FullyQualifiedName~Integration --no-restore` confirmó que la suite no era reproducible en este equipo: 6 pruebas descubiertas, 1 correcta y 5 fallidas; la conexión fija a `localhost\SQLEXPRESS` no encontró la instancia y varios fallos secundarios intentaron escribir en el Event Log de Windows.
+- **Pruebas realizadas:** antes del cambio, ejecución dinámica anterior con resultado 1/6. Después del cambio, análisis sintáctico PowerShell correcto y `scripts/Verify-M103IntegrationIsolation.ps1` ejecutado dos veces consecutivas con resultado correcto en ambas; verifica nombre efímero protegido, migraciones, limpieza Respawn, eliminación, serialización de la colección, recurso portable y ausencia de rutas absolutas o conexiones que omitan el fixture. También se comprobó por reflexión la API usada de Respawn 7.0.0 y `git diff --check` sin errores. No se compiló ni ejecutó la suite modificada, conforme a la regla del repositorio de no construir después de cambios.
+- **Resultado:** cada sesión de pruebas genera un nombre único que conserva el sufijo obligatorio `_IntegrationTests`; el fixture aplica migraciones, reinicia datos antes de cada prueba mediante Respawn conservando `__EFMigrationsHistory` y elimina la base al terminar. Todas las pruebas de integración comparten una colección no paralela y la aplicación omite su seeding normal únicamente en el entorno `IntegrationTests`. El seeder usa ahora `LaPrimitiva.Tests/TestData/winning-draws.csv`, copiado al directorio de salida por el proyecto de pruebas.
+- **Decisiones:** se mantiene SQL Server para comprobar el proveedor y las migraciones reales, en vez de sustituirlo por EF InMemory o SQLite; se crea una base por ejecución, no una base fija compartida, para aislar procesos simultáneos; toda operación destructiva vuelve a validar el sufijo de seguridad; y Respawn limpia las tablas sin borrar el historial de migraciones. No se ha iniciado M-201.
 
 ---
 
@@ -450,3 +459,4 @@ Estos descartes describen el código auditado y deben revisarse si cambian las f
 |---|---|---|---|---|
 | M-000 | 2026-08-20 | Commit `M-000` (este commit), sobre `39d6d48` | Completado | Línea base en `mejoras/LINEA_BASE_M000.md`; 25/25 pruebas no integradas correctas antes del cambio y verificación estática M-000 correcta después. |
 | M-102 | 2026-08-20 | Commit `M-102` (este commit), sobre `b177788` | Completado | Backup real verificado y restaurado temporalmente; evidencia en `mejoras/evidencias/M-102-restore-20260820.json`; recuperación documentada. |
+| M-103 | 2026-08-20 | Commit `M-103` (este commit), sobre `d48abb7` | Completado | Base única por ejecución, migraciones, reset Respawn, borrado protegido, colección serializada y CSV portable; verificación estática doble correcta. |

@@ -6,15 +6,15 @@ using LaPrimitiva.Application.DTOs;
 using LaPrimitiva.Application.Services;
 using LaPrimitiva.Domain.Entities;
 using LaPrimitiva.App;
-using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
 namespace LaPrimitiva.Tests.Integration
 {
-    public class PlanIntegrationTests : IntegrationTestBase, IClassFixture<WebApplicationFactory<LaPrimitiva.App.Program>>
+    [Collection(IntegrationTestCollection.Name)]
+    public class PlanIntegrationTests : IntegrationTestBase
     {
-        public PlanIntegrationTests(WebApplicationFactory<LaPrimitiva.App.Program> factory) : base(factory)
+        public PlanIntegrationTests(IntegrationTestFixture fixture) : base(fixture)
         {
         }
 

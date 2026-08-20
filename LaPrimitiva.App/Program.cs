@@ -65,27 +65,30 @@ app.MapStaticAssets();
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
 
-// Seed data
-using (var scope = app.Services.CreateScope())
+// Integration tests own their database lifecycle and seed only explicit test resources.
+if (!app.Environment.IsEnvironment("IntegrationTests"))
 {
-    // Base Table and Data Initialization (Robust Check)
-    var winningSeeder = scope.ServiceProvider.GetRequiredService<WinningDrawSeeder>();
-    var seedPath = Path.Combine(AppContext.BaseDirectory, "SeedData");
-    
-    // This creates Tables if missing and seeds historical results
-    await winningSeeder.SeedFromDirectoryAsync(seedPath);
-
-    // Initial Plan Seed (Optional, currently disabled to ensure "sin datos" as requested)
-    /*
-    if (!context.Plans.Any())
+    using (var scope = app.Services.CreateScope())
     {
-        var plan = new LaPrimitiva.Domain.Entities.Plan
+        // Base Table and Data Initialization (Robust Check)
+        var winningSeeder = scope.ServiceProvider.GetRequiredService<WinningDrawSeeder>();
+        var seedPath = Path.Combine(AppContext.BaseDirectory, "SeedData");
+
+        // This creates Tables if missing and seeds historical results
+        await winningSeeder.SeedFromDirectoryAsync(seedPath);
+
+        // Initial Plan Seed (Optional, currently disabled to ensure "sin datos" as requested)
+        /*
+        if (!context.Plans.Any())
         {
-            Name = "Plan 2026",
-            // ...
+            var plan = new LaPrimitiva.Domain.Entities.Plan
+            {
+                Name = "Plan 2026",
+                // ...
+            }
         }
+        */
     }
-    */
 }
 
 app.Run();

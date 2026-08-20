@@ -10,31 +10,27 @@ using Xunit;
 
 namespace LaPrimitiva.Tests.Integration
 {
-    public class WinningDrawSeederTests
+    [Collection(IntegrationTestCollection.Name)]
+    public class WinningDrawSeederTests : IntegrationTestBase
     {
-        private PrimitivaDbContext GetDbContext()
+        private readonly IntegrationTestFixture _fixture;
+
+        public WinningDrawSeederTests(IntegrationTestFixture fixture) : base(fixture)
         {
-            var services = new ServiceCollection();
-            services.AddDbContext<PrimitivaDbContext>(options =>
-                options.UseSqlServer(IntegrationTestDatabase.GetConnectionString()));
-            
-            var serviceProvider = services.BuildServiceProvider();
-            return serviceProvider.GetRequiredService<PrimitivaDbContext>();
+            _fixture = fixture;
         }
 
         [Fact]
         public async Task SeedHistoricalData_ShouldInsertRecords()
         {
             // Arrange
-            var context = GetDbContext();
+            using var scope = CreateScope();
+            var context = scope.ServiceProvider.GetRequiredService<PrimitivaDbContext>();
             var seeder = new WinningDrawSeeder(context);
-            
-            var csv1 = @"f:\Repositorios\LaPrimitiva\.agent\assests\Histórico de Resultados - Primitiva - 1985 a 2012.csv";
-            var csv2 = @"f:\Repositorios\LaPrimitiva\.agent\assests\Histórico de Resultados - Primitiva - 2013 a 2025.csv";
+            var csvPath = Path.Combine(_fixture.TestDataDirectory, "winning-draws.csv");
 
             // Act
-            await seeder.SeedAsync(csv1);
-            await seeder.SeedAsync(csv2);
+            await seeder.SeedAsync(csvPath);
 
             // Assert
             var count = await context.WinningDraws.CountAsync();

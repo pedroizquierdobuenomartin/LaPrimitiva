@@ -1,8 +1,8 @@
-# .NET Core
-bin/
-obj/
+# .NET build and publish outputs
 [Bb]in/
 [Oo]bj/
+[Pp]ublish/
+[Aa]rtifacts/
 
 # Visual Studio
 .vs/
@@ -23,8 +23,6 @@ x86/
 [Aa][Rr][Mm]/
 [Aa][Rr][Mm]64/
 bld/
-[Bb]in/
-[Oo]bj/
 log/
 errorlog/
 

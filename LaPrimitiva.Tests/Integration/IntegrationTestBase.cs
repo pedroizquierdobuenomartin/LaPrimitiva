@@ -1,14 +1,8 @@
-using System.Data.Common;
-using System.Threading.Tasks;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
-using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
-using LaPrimitiva.App;
-using LaPrimitiva.Infrastructure.Persistence;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Storage;
 
 namespace LaPrimitiva.Tests.Integration
 {
@@ -17,47 +11,32 @@ namespace LaPrimitiva.Tests.Integration
     public abstract class IntegrationTestBase : IAsyncLifetime
     {
         protected readonly WebApplicationFactory<LaPrimitiva.App.Program> _factory;
-        private string? _connectionString;
-        private DbConnection? _dbConnection;
-        private IDbContextTransaction? _transaction;
 
         protected IntegrationTestBase(WebApplicationFactory<LaPrimitiva.App.Program> factory)
         {
-            // We use the base factory and customize it per instance if needed, 
-            // but the transactional integrity is what matters most here.
+            var connectionString = IntegrationTestDatabase.GetConnectionString();
+
             _factory = factory.WithWebHostBuilder(builder =>
             {
-                builder.ConfigureServices(services =>
+                builder.UseEnvironment("IntegrationTests");
+                builder.ConfigureAppConfiguration((_, configuration) =>
                 {
-                    var descriptor = services.SingleOrDefault(d => d.ServiceType == typeof(DbContextOptions<PrimitivaDbContext>));
-                    if (descriptor != null) services.Remove(descriptor);
-
-                    services.AddDbContext<PrimitivaDbContext>(options =>
+                    configuration.AddInMemoryCollection(new Dictionary<string, string?>
                     {
-                        if (_dbConnection != null)
-                        {
-                            options.UseSqlServer(_dbConnection);
-                        }
+                        ["ConnectionStrings:DefaultConnection"] = connectionString
                     });
                 });
             });
         }
 
-        public async Task InitializeAsync()
+        public Task InitializeAsync()
         {
             using var scope = _factory.Services.CreateScope();
             var configuration = scope.ServiceProvider.GetRequiredService<IConfiguration>();
-            _connectionString = configuration.GetConnectionString("DefaultConnection");
+            IntegrationTestDatabase.EnsureSafe(
+                configuration.GetConnectionString("DefaultConnection"));
 
-            if (!string.IsNullOrEmpty(_connectionString))
-            {
-                _dbConnection = new SqlConnection(_connectionString);
-                await _dbConnection.OpenAsync();
-                
-                using var innerScope = _factory.Services.CreateScope();
-                var context = innerScope.ServiceProvider.GetRequiredService<PrimitivaDbContext>();
-                _transaction = await context.Database.BeginTransactionAsync();
-            }
+            return Task.CompletedTask;
         }
 
         public async Task ResetDatabaseAsync()
@@ -65,18 +44,9 @@ namespace LaPrimitiva.Tests.Integration
             await Task.CompletedTask;
         }
 
-        public async Task DisposeAsync()
+        public Task DisposeAsync()
         {
-            if (_transaction != null)
-            {
-                await _transaction.RollbackAsync();
-                await _transaction.DisposeAsync();
-            }
-
-            if (_dbConnection != null)
-            {
-                await _dbConnection.DisposeAsync();
-            }
+            return Task.CompletedTask;
         }
 
         protected IServiceScope CreateScope() => _factory.Services.CreateScope();

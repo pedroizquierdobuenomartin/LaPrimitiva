@@ -29,4 +29,10 @@
     <ProjectReference Include="..\LaPrimitiva.App\LaPrimitiva.App.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="appsettings.IntegrationTests.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

@@ -4,8 +4,8 @@ App multipágina para registrar y auditar juegos de La Primitiva (España), comp
 
 ## 🚀 Requisitos y Configuración Local
 
-1. **Stack**: .NET 10, Blazor Server, EF Core, SQL Server LocalDB.
-2. **Base de Datos**: Usa LocalDB de Windows. El seeding es automático en el primer arranque.
+1. **Stack**: .NET 10, Blazor Server, EF Core y SQL Server Express.
+2. **Base de datos**: la configuración de desarrollo apunta a la instancia `localhost\\SQLEXPRESS` y a la base `PrimitivaAuditV2`. El seeding es automático en el primer arranque.
 3. **Ejecución**:
    - **Opción A (VS Code)**: Presiona `F5` y selecciona el perfil `.NET Core Launch (Web)`.
    - **Opción B (Terminal desde la raíz)**:
@@ -45,3 +45,5 @@ Ejecutar tests:
 ```bash
 dotnet test
 ```
+
+La preparación de SQL Server, la base exclusiva de integración, la matriz de flujos críticos y el resultado inicial verificable están documentados en [`mejoras/LINEA_BASE_M000.md`](mejoras/LINEA_BASE_M000.md).

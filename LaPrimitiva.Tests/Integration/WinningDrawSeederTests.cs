@@ -16,7 +16,7 @@ namespace LaPrimitiva.Tests.Integration
         {
             var services = new ServiceCollection();
             services.AddDbContext<PrimitivaDbContext>(options =>
-                options.UseSqlServer("Server=(localdb)\\mssqllocaldb;Database=PrimitivaAuditV2;Trusted_Connection=True;MultipleActiveResultSets=true;TrustServerCertificate=True"));
+                options.UseSqlServer(IntegrationTestDatabase.GetConnectionString()));
             
             var serviceProvider = services.BuildServiceProvider();
             return serviceProvider.GetRequiredService<PrimitivaDbContext>();

@@ -15,7 +15,7 @@
 
 | Fase | Objetivo | Estado |
 |---|---|---|
-| 0 | Preparación y línea base | Pendiente |
+| 0 | Preparación y línea base | Completada |
 | 1 | Integridad de datos y backups | Pendiente |
 | 2 | Errores funcionales | Pendiente |
 | 3 | Seguridad local robusta | Pendiente |
@@ -27,7 +27,7 @@
 
 ## Fase 0 — Preparación y línea base
 
-### [ ] M-000 — Crear una línea base verificable
+### [x] M-000 — Crear una línea base verificable
 
 **Objetivo:** poder demostrar que cada cambio mejora la aplicación sin introducir regresiones.
 
@@ -43,6 +43,15 @@
 - Existe una conexión de pruebas que nunca apunta a `PrimitivaAuditV2` de desarrollo.
 - Los flujos críticos están enumerados y tienen una comprobación reproducible.
 - Se conoce qué pruebas fallaban antes de comenzar las correcciones.
+
+**Ejecución:**
+
+- **Fecha:** 20 de agosto de 2026.
+- **Commit o referencia:** commit `M-000` (este commit), creado sobre `39d6d48`; evidencia en `mejoras/LINEA_BASE_M000.md`. La revisión funcional auditada sigue siendo `6f08f46`; `39d6d48` solo añadió este plan.
+- **Pruebas realizadas antes de modificar:** `dotnet test LaPrimitiva.Tests/LaPrimitiva.Tests.csproj --filter 'FullyQualifiedName!~Integration'` — 25 ejecutadas, 25 correctas y 0 fallidas. La conexión a `localhost\SQLEXPRESS` falló y las pruebas de integración no se ejecutaron para no tocar `PrimitivaAuditV2`.
+- **Verificación del hito:** `scripts/Verify-M000Baseline.ps1` — correcta; valida la base `PrimitivaAuditV2_IntegrationTests`, la ausencia de usos directos inseguros en `UseSqlServer` y los nueve flujos críticos documentados. El JSON de pruebas también se validó con `ConvertFrom-Json`.
+- **Resultado:** se documentaron el arranque y el estado inicial; se creó una conexión exclusiva con protección fail-fast basada en el sufijo `_IntegrationTests`; y se definió una matriz reproducible para planes, registro, premios, Joker, dashboard, histórico, RSS, exportación y generación.
+- **Decisiones:** M-000 separa y bloquea la conexión, pero no crea, limpia ni elimina la base. El ciclo de vida determinista, las rutas portables del seeder y las ejecuciones consecutivas quedan reservados para M-103. No se compiló ni ejecutó la suite después de los cambios, conforme a la regla del repositorio; la comprobación posterior fue estática.
 
 ---
 
@@ -419,4 +428,4 @@ Estos descartes describen el código auditado y deben revisarse si cambian las f
 
 | ID | Fecha | Commit/PR | Resultado | Notas |
 |---|---|---|---|---|
-| — | — | — | — | Añadir una fila al completar cada mejora. |
+| M-000 | 2026-08-20 | Commit `M-000` (este commit), sobre `39d6d48` | Completado | Línea base en `mejoras/LINEA_BASE_M000.md`; 25/25 pruebas no integradas correctas antes del cambio y verificación estática M-000 correcta después. |

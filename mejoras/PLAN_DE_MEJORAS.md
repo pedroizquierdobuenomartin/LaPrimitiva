@@ -59,7 +59,7 @@
 
 > Es la fase más urgente. Una aplicación local sigue necesitando datos recuperables y pruebas que no destruyan información real.
 
-### [ ] M-101 — Corregir el servidor del backup
+### [x] M-101 — Corregir el servidor del backup
 
 **Problema:** `scripts/BackupDatabases.ps1` utiliza `(localdb)\MSSQLLocalDB`, pero la aplicación trabaja con SQL Server Express.
 
@@ -75,6 +75,17 @@
 - El backup procede de la instancia y base correctas.
 - El script no informa éxito si `sqlcmd` falla.
 - La retención solo elimina archivos gestionados por este script.
+
+**Ejecución:**
+
+- **Fecha:** 20 de agosto de 2026.
+- **Commit o referencia:** commit `M-101` (este commit), creado sobre `ad39d46`; verificación reproducible en `scripts/Verify-M101Backup.ps1`.
+- **Evidencia previa:** `LaPrimitiva.App/appsettings.json` configuraba `Server=localhost\SQLEXPRESS;Database=PrimitivaAuditV2`, mientras `scripts/BackupDatabases.ps1` invocaba `sqlcmd -S "(localdb)\MSSQLLocalDB"`, incluía `CuentasClarasDB`, capturaba los errores sin devolver un código de fallo y aplicaba la retención a todos los archivos `*.bak` del directorio.
+- **Pruebas realizadas:** ejecución inicial en rojo de `scripts/Verify-M101Backup.ps1` contra el script anterior, que confirmó que no declaraba parámetros explícitos; ejecución final del mismo verificador — correcta. La prueba usa un doble de `sqlcmd` y valida la instancia `localhost\SQLEXPRESS`, la base `PrimitivaAuditV2`, el modificador `-b`, la creación y copia del archivo, los códigos distintos de cero ante fallos SQL y de copia, y que un `.bak` ajeno sobrevive a la retención.
+- **Resultado:** el servidor, las bases, los destinos, la retención y el ejecutable de `sqlcmd` son parámetros explícitos con valores seguros por defecto; el backup predeterminado queda limitado a `PrimitivaAuditV2`; y cualquier error SQL, ausencia del archivo esperado, error de copia o error de limpieza finaliza con código `1` sin anunciar éxito.
+- **Decisiones:** se añadió `-b` a `sqlcmd` para convertir errores SQL en códigos de salida; los archivos gestionados incorporan el marcador `_LaPrimitiva_` y solo ese patrón entra en retención; un destino remoto no montado conserva el comportamiento de backup solo local con advertencia, pero una copia iniciada que falle es fatal. No se ejecutó un backup real ni una restauración: la verificación de restauraciones pertenece exclusivamente a M-102. No se compiló la solución.
+
+---
 
 ### [ ] M-102 — Verificar restauraciones
 

@@ -1,72 +1,110 @@
-# ==============================================================================
-# SCRIPT DE BACKUP AUTOMATIZADO PARA SQL SERVER LOCALDB
-# ==============================================================================
-# Autor: Antigravity Assistant
-# Descripción: Genera archivos .bak de una lista de BBDD y los copia a Drive.
-# ==============================================================================
+[CmdletBinding()]
+param(
+    [Parameter()]
+    [ValidateNotNullOrEmpty()]
+    [string]$ServerInstance = "localhost\SQLEXPRESS",
 
-# --- CONFIGURACIÓN ---
+    [Parameter()]
+    [ValidateNotNullOrEmpty()]
+    [string[]]$DatabaseNames = @("PrimitivaAuditV2"),
 
-# Lista de bases de datos a procesar
-$dbNameList = @(
-    "PrimitivaAuditV2",
-    "CuentasClarasDB"
+    [Parameter()]
+    [ValidateNotNullOrEmpty()]
+    [string]$LocalBackupDir = "Z:\BBDD\Backups",
+
+    [Parameter()]
+    [ValidateNotNullOrEmpty()]
+    [string]$DriveBackupDir = "G:\Mi unidad\BBDD\Backups",
+
+    [Parameter()]
+    [ValidateRange(0, 3650)]
+    [int]$DaysToKeepLocal = 7,
+
+    [Parameter()]
+    [ValidateNotNullOrEmpty()]
+    [string]$SqlCmdExecutable = "sqlcmd"
 )
 
-# Directorio local donde se generarán los Backups (debe existir)
-$localBackupDir = "Z:\BBDD\Backups"
+$ErrorActionPreference = "Stop"
+Set-StrictMode -Version Latest
 
-# Directorio de Google Drive (Unidad H)
-$driveBackupDir = "G:\Mi unidad\BBDD\Backups"
-
-# Días para mantener los backups locales (limpieza)
-$daysToKeepLocal = 7
-
-# --- LOGICA DEL SCRIPT ---
-
-# Asegurar que las carpetas existen
-if (!(Test-Path $localBackupDir)) { New-Item -ItemType Directory -Path $localBackupDir | Out-Null }
-if (!(Test-Path $driveBackupDir)) { 
-    Write-Warning "No se pudo encontrar la unidad de Google Drive ($driveBackupDir). El script solo hará backup local."
-}
-
+$backupMarker = "LaPrimitiva"
 $timestamp = Get-Date -Format "yyyyMMdd_HHmmss"
-Write-Host "Iniciando proceso de backup a las $(Get-Date)..." -ForegroundColor Cyan
 
-foreach ($dbName in $dbNameList) {
-    Write-Host "Procesando: $dbName" -ForegroundColor Yellow
-    
-    $fileName = "$dbName`_$timestamp.bak"
-    $localFile = Join-Path $localBackupDir $fileName
-    
-    # Ejecutar Backup vía SQLCMD
-    $sqlCommand = "BACKUP DATABASE [$dbName] TO DISK = '$localFile' WITH FORMAT, NAME = 'Full Backup of $dbName';"
-    
-    try {
-        $result = sqlcmd -S "(localdb)\MSSQLLocalDB" -Q $sqlCommand -E
-        
-        if ($LASTEXITCODE -eq 0 -and (Test-Path $localFile)) {
-            Write-Host "  [OK] Backup local creado en $localFile" -ForegroundColor Green
-            
-            # Copiar a Drive si está disponible
-            if (Test-Path $driveBackupDir) {
-                $driveFile = Join-Path $driveBackupDir $fileName
-                Copy-Item -Path $localFile -Destination $driveFile -ErrorAction Stop
-                Write-Host "  [OK] Copiado a Google Drive con exito." -ForegroundColor Green
-            }
-        } else {
-            Write-Error "  [ERROR] Fallo el backup de ${dbName}."
-            Write-Host "  Detalles del error SQL:" -ForegroundColor Gray
-            Write-Host $result -ForegroundColor Red
-            Write-Host "  Verifica que la BBDD exista y el LocalDB este encendido." -ForegroundColor Gray
-        }
-    } catch {
-        Write-Error "  [CRITICO] Error al procesar ${dbName}: $_"
+function Get-SafeFileComponent {
+    param(
+        [Parameter(Mandatory)]
+        [string]$Value
+    )
+
+    $safeValue = $Value -replace '[^A-Za-z0-9_-]', '_'
+    if ([string]::IsNullOrWhiteSpace($safeValue)) {
+        throw "El nombre de base de datos '$Value' no permite generar un nombre de archivo seguro."
     }
+
+    return $safeValue
 }
 
-# --- LIMPIEZA DE ARCHIVOS ANTIGUOS ---
-Write-Host "Limpiando backups antiguos (>$daysToKeepLocal días)..." -ForegroundColor Gray
-Get-ChildItem $localBackupDir -Filter "*.bak" | Where-Object { $_.CreationTime -lt (Get-Date).AddDays(-$daysToKeepLocal) } | Remove-Item -Force
+try {
+    if (-not (Test-Path -LiteralPath $LocalBackupDir -PathType Container)) {
+        New-Item -ItemType Directory -Path $LocalBackupDir -ErrorAction Stop | Out-Null
+    }
 
-Write-Host "Proceso finalizado." -ForegroundColor Cyan
+    $copyToDrive = Test-Path -LiteralPath $DriveBackupDir -PathType Container
+    if (-not $copyToDrive) {
+        Write-Warning "No se encontró el directorio remoto '$DriveBackupDir'. Solo se crearán backups locales."
+    }
+
+    Write-Host "Iniciando backup en '$ServerInstance' a las $(Get-Date)..." -ForegroundColor Cyan
+
+    foreach ($databaseName in $DatabaseNames) {
+        if ([string]::IsNullOrWhiteSpace($databaseName)) {
+            throw "La lista de bases de datos contiene un nombre vacío."
+        }
+
+        $safeDatabaseName = Get-SafeFileComponent -Value $databaseName
+        $fileName = "${safeDatabaseName}_${backupMarker}_${timestamp}.bak"
+        $localFile = Join-Path $LocalBackupDir $fileName
+        $escapedDatabaseName = $databaseName.Replace("]", "]]" )
+        $escapedLocalFile = $localFile.Replace("'", "''")
+        $sqlCommand = "BACKUP DATABASE [$escapedDatabaseName] TO DISK = N'$escapedLocalFile' WITH FORMAT, NAME = N'Full Backup of $escapedDatabaseName';"
+
+        Write-Host "Procesando '$databaseName'..." -ForegroundColor Yellow
+        $sqlOutput = & $SqlCmdExecutable -b -S $ServerInstance -E -Q $sqlCommand 2>&1
+        $sqlExitCode = $LASTEXITCODE
+
+        if ($sqlExitCode -ne 0) {
+            $details = @($sqlOutput) -join [Environment]::NewLine
+            throw "sqlcmd falló para '$databaseName' con código $sqlExitCode. $details"
+        }
+
+        if (-not (Test-Path -LiteralPath $localFile -PathType Leaf)) {
+            throw "sqlcmd terminó sin error, pero no se creó '$localFile'."
+        }
+
+        Write-Host "  [OK] Backup local creado en '$localFile'." -ForegroundColor Green
+
+        if ($copyToDrive) {
+            $driveFile = Join-Path $DriveBackupDir $fileName
+            Copy-Item -LiteralPath $localFile -Destination $driveFile -Force -ErrorAction Stop
+            Write-Host "  [OK] Backup copiado a '$driveFile'." -ForegroundColor Green
+        }
+    }
+
+    $retentionLimit = (Get-Date).AddDays(-$DaysToKeepLocal)
+    Write-Host "Limpiando backups gestionados con más de $DaysToKeepLocal días..." -ForegroundColor Gray
+
+    foreach ($databaseName in $DatabaseNames) {
+        $safeDatabaseName = Get-SafeFileComponent -Value $databaseName
+        $managedPattern = "${safeDatabaseName}_${backupMarker}_*.bak"
+        Get-ChildItem -LiteralPath $LocalBackupDir -File -Filter $managedPattern -ErrorAction Stop |
+            Where-Object { $_.LastWriteTime -lt $retentionLimit } |
+            Remove-Item -Force -ErrorAction Stop
+    }
+
+    Write-Host "Proceso finalizado correctamente." -ForegroundColor Cyan
+}
+catch {
+    Write-Error "El proceso de backup ha fallado: $($_.Exception.Message)"
+    exit 1
+}

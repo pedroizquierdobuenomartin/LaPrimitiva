@@ -363,7 +363,7 @@
 - **Resultado:** los límites compartidos quedan fijados en 512 KiB, 100 elementos y 15 segundos. El cliente solicita solo las cabeceras inicialmente, rechaza tamaños declarados excesivos y lee el cuerpo incrementalmente comprobando cada bloque. El parser usa `XmlReader` asíncrono, limita caracteres y elementos y observa la cancelación. La actualización completa comparte un token enlazado con timeout y un semáforo estático impide que dos actualizaciones RSS se ejecuten a la vez.
 - **Decisiones:** el límite de bytes se valida tanto con `Content-Length` como durante la lectura porque la cabecera puede faltar o no ser fiable; el máximo de elementos cuenta cada `item`, sea válido o no, para que entradas malformadas no eludan el límite; una segunda actualización concurrente se descarta en lugar de encolarse; la cancelación externa se propaga, mientras que el timeout interno se convierte en un error visible; se mantuvo el contrato tolerante de M-204 para XML o sorteos malformados y se actualizó su verificador al nuevo parseo incremental. No se avanzó a M-305.
 
-### [ ] M-305 — Neutralizar fórmulas en exportaciones CSV
+### [x] M-305 — Neutralizar fórmulas en exportaciones CSV
 
 **Severidad de auditoría:** baja.
 
@@ -374,6 +374,38 @@
 - Las notas peligrosas se abren como texto literal.
 - Se mantienen correctamente comillas, comas y saltos de línea.
 - Existe una prueba con cada prefijo peligroso.
+
+- **Fecha de cierre:** 2026-08-24.
+- **Referencia:** commit de cierre M-305 (este commit), sobre `1534ad2`; release `v1.7.0`.
+- **Evidencia previa:** el repositorio estaba limpio en `main`, sincronizado `0/0` con
+  `origin/main`. `Data.razor` únicamente duplicaba las comillas de `Notes` y después encerraba el valor entre comillas
+  CSV; por tanto, las entradas `=1+1`, `+SUM(A1:A2)`, `-2+3` y `@SUM(A1:A2)` se exportaban respectivamente como
+  `"=1+1"`, `"+SUM(A1:A2)"`, `"-2+3"` y `"@SUM(A1:A2)"`, conservando intacto el prefijo que una hoja de cálculo
+  puede interpretar como fórmula. No existían pruebas de exportación CSV. La comprobación del archivo real
+  `LaPrimitiva_Export_20260824.csv` aportado por el usuario (SHA-256
+  `5547FE4D2A4ECEE4E85E5DA18105BE4C53BA4DEE5A2D2FA23BC3A6048670C2EF`) descubrió además que sus 92 filas tenían
+  29 columnas frente a las 17 cabeceras: los importes usaban coma decimal española sin encerrarse entre comillas.
+- **Pruebas realizadas:** línea base previa
+  `dotnet test LaPrimitiva.Tests/LaPrimitiva.Tests.csproj --no-build --filter "FullyQualifiedName~DrawRecordTests"`
+  correcta, 6/6 sobre los binarios existentes; `scripts/Verify-M305CsvFormulaNeutralization.ps1` correcto tras la
+  implementación; análisis estructural del primer CSV real mediante `TextFieldParser`, con 93 registros, 92/92 filas de
+  datos malformadas y 29 columnas por fila. Tras la corrección, el usuario compiló y generó
+  `LaPrimitiva_Export_20260824(1).csv` (SHA-256
+  `75732FA15690F46BFDDA279E2DC8CF54F19726FAF3DBEA1D9AB3EBBC3575164B`): cabecera exacta, 92/92 filas con 17
+  columnas, cero importes inválidos y cinco notas con saltos de línea conservados. Sobre los binarios compilados por el
+  usuario, `dotnet test LaPrimitiva.Tests/LaPrimitiva.Tests.csproj --no-build --filter "FullyQualifiedName~Csv"`
+  superó 6/6 casos, incluidos los cuatro prefijos, comillas, coma, saltos de línea y cultura `es-ES`;
+  `scripts/Verify-M305CsvFormulaNeutralization.ps1` correcto y `git diff --check` sin errores.
+- **Resultado:** `CsvFieldFormatter.Encode()` antepone un apóstrofo a las notas cuyo primer carácter es `=`, `+`, `-`
+  o `@` antes de aplicar el escapado CSV. `CsvExportBuilder.Build()` genera las 17 columnas y serializa todos los
+  importes con `InvariantCulture`, evitando que la coma decimal rompa las filas; la exportación de `/datos` usa este
+  generador y mantiene las notas entre comillas, duplicando las comillas internas y preservando comas y saltos de línea.
+- **Decisiones:** se neutralizó exclusivamente `Notes`, que es el campo libre controlado por el usuario; se eligió el
+  apóstrofo inicial por ser el marcador de texto literal reconocido por las hojas de cálculo, y se aplicó antes del
+  escapado para conservar un CSV válido. Se eligió el punto decimal invariante porque la coma es el delimitador del
+  archivo. El segundo artefacto real no contenía notas con prefijos peligrosos, pero la compilación del usuario permitió
+  ejecutar los cuatro casos focalizados sobre el código actualizado; junto con la validación estructural completa del
+  CSV real, esta evidencia satisface los criterios de aceptación. No se avanzó a M-306.
 
 ### [ ] M-306 — Habilitar HTTPS local con un certificado de confianza
 
@@ -915,4 +947,5 @@ Estos descartes describen el código auditado y deben revisarse si cambian las f
 | M-301 | 2026-08-24 | Commit de cierre sobre `c5b931a`; release `v1.3.0` | Completado | Arranque restringido a URLs loopback; clientes no locales rechazados con `403`; `AllowedHosts` limitado; publicación IIS local documentada para `http://laprimitiva.local/`; verificación estática correcta y casos xUnit añadidos sin ejecutar por la prohibición de compilar. |
 | M-303 | 2026-08-24 | Commit de cierre sobre `1605a57`; release `v1.5.0` | Completado | Validación multicapa de números, complementario, reintegro y Joker; defensa ante históricos corruptos; cinco `CHECK` SQL; verificador estático correcto, 19 casos xUnit añadidos y compilación correcta comunicada por el usuario. |
 | M-304 | 2026-08-24 | Commit de cierre sobre `191c8d5`; release `v1.6.0` | Completado | Descarga incremental limitada a 512 KiB, parser acotado a 100 elementos, timeout global de 15 segundos, cancelación y exclusión mutua; verificadores M-204/M-304 correctos y seis casos xUnit añadidos sin ejecutar por la prohibición de compilar. |
+| M-305 | 2026-08-24 | Commit de cierre sobre `1534ad2`; release `v1.7.0` | Completado | Fórmulas CSV neutralizadas; 92/92 filas del artefacto real validadas con 17 columnas e importes invariantes; seis casos CSV correctos sobre binarios compilados por el usuario y verificador estático correcto. |
 | M-702 | 2026-08-24 | `e2402f6`, `19defe6`, release `373561a`, tag `v1.1.0` | Completado | Generación uniforme y rediseño validados; títulos de Histórico y Combinación automática unificados con `PageTitle`; footer enlazado a la versión del ensamblado y release `1.1.0` publicada. Verificación estática correcta y validación visual del usuario; casos xUnit nuevos no ejecutados por la prohibición de compilar. |

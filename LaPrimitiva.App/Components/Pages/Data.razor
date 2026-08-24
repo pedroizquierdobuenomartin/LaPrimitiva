@@ -1,4 +1,5 @@
 @page "/datos"
+@using LaPrimitiva.App.Exporting
 @using LaPrimitiva.Infrastructure.Persistence
 @using Microsoft.EntityFrameworkCore
 @using System.Text
@@ -49,13 +50,7 @@
             .OrderBy(d => d.DrawDate)
             .ToListAsync();
 
-        var csv = new StringBuilder();
-        csv.AppendLine("Semana #,Sorteo,Fecha,Jugado,Coste Fija (€),Coste Auto (€),Coste Joker Fija (€),Coste Joker Auto (€),Total Coste (€),Premio Fija (€),Premio Auto (€),Premio Joker Fija (€),Premio Joker Auto (€),Total Premios (€),Neto (€),Neto Acumulado (€),Notas");
-
-        foreach (var d in draws)
-        {
-            csv.AppendLine($"{d.WeekNumber},{d.DrawType},{d.DrawDate:yyyy-MM-dd},{(d.Played ? 1 : 0)},{d.CosteFija},{d.CosteAuto},{d.CosteJokerFija},{d.CosteJokerAuto},{d.TotalCoste},{d.FixedPrize},{d.AutoPrize},{d.JokerFixedPrize},{d.JokerAutoPrize},{d.TotalPremios},{d.Neto},{d.Acumulado},\"{d.Notes?.Replace("\"", "\"\"")}\"");
-        }
+        var csv = CsvExportBuilder.Build(draws);
 
         var bytes = Encoding.UTF8.GetBytes(csv.ToString());
         var fileName = $"LaPrimitiva_Export_{DateTime.Now:yyyyMMdd}.csv";

@@ -1,8 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Xml;
 using System.Xml.Linq;
 using LaPrimitiva.Domain.Interfaces;
 using LaPrimitiva.Domain.Models;
@@ -11,21 +15,54 @@ namespace LaPrimitiva.Application.Services
 {
     public class RssParserService : IRssParserService
     {
-        public IEnumerable<RssDraw> ParseRss(string xmlContent)
+        public async Task<IReadOnlyList<RssDraw>> ParseRssAsync(
+            string xmlContent,
+            CancellationToken cancellationToken = default)
         {
             if (string.IsNullOrWhiteSpace(xmlContent))
-                return Enumerable.Empty<RssDraw>();
+                return Array.Empty<RssDraw>();
 
             try
             {
-                var doc = XDocument.Parse(xmlContent);
-                var items = doc.Descendants().Where(e => e.Name.LocalName == "item");
+                using var textReader = new StringReader(xmlContent);
+                using var reader = XmlReader.Create(textReader, new XmlReaderSettings
+                {
+                    Async = true,
+                    DtdProcessing = DtdProcessing.Prohibit,
+                    XmlResolver = null,
+                    MaxCharactersInDocument = RssFeedLimits.MaxBytes
+                });
 
-                return items.Select(ParseItem).Where(x => x != null).Cast<RssDraw>().ToArray();
+                var draws = new List<RssDraw>();
+                var itemCount = 0;
+
+                while (await reader.ReadAsync())
+                {
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                    if (reader.NodeType != XmlNodeType.Element || reader.LocalName != "item")
+                        continue;
+
+                    if (itemCount >= RssFeedLimits.MaxItems)
+                        break;
+
+                    itemCount++;
+                    using var subtree = reader.ReadSubtree();
+                    var item = await XElement.LoadAsync(subtree, LoadOptions.None, cancellationToken);
+                    var draw = ParseItem(item);
+                    if (draw is not null)
+                        draws.Add(draw);
+                }
+
+                return draws;
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
             }
             catch
             {
-                return Enumerable.Empty<RssDraw>();
+                return Array.Empty<RssDraw>();
             }
         }
 

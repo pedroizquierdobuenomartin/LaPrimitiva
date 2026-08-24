@@ -19,8 +19,8 @@ $tests = Read-ProjectFile 'LaPrimitiva.Tests\RssParserServiceTests.cs'
 
 Assert-Contains $parser "\.Split\('-'\s*,\s*StringSplitOptions\.TrimEntries\s*\|\s*StringSplitOptions\.RemoveEmptyEntries\)" `
     'El parser RSS no separa los números independientemente de los espacios alrededor del guion.'
-Assert-Contains $parser 'items\.Select\(ParseItem\).*\.ToArray\(\)' `
-    'La secuencia RSS no se materializa dentro del bloque de captura de errores.'
+Assert-Contains $parser 'XElement\.LoadAsync\(subtree, LoadOptions\.None, cancellationToken\)' `
+    'Los elementos RSS no se materializan de forma controlada dentro del bloque de captura de errores.'
 Assert-Contains $tests 'ParseRss_WithAllowedSeparatorSpacing_ReturnsCorrectNumbers' `
     'Faltan pruebas de separadores válidos con espacios variables.'
 Assert-Contains $tests 'ParseRss_WithIncompleteItem_SkipsItem' `

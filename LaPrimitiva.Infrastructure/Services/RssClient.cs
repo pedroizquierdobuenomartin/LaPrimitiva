@@ -1,6 +1,11 @@
+using System.Buffers;
+using System.IO;
 using System.Net.Http;
+using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using LaPrimitiva.Domain.Interfaces;
+using LaPrimitiva.Domain.Models;
 
 namespace LaPrimitiva.Infrastructure.Services
 {
@@ -8,11 +13,11 @@ namespace LaPrimitiva.Infrastructure.Services
     {
         private const string RssUrl = "https://www.loteriasyapuestas.es/es/la-primitiva/resultados/.formatoRSS";
 
-        public async Task<string?> GetRssXmlAsync()
+        public async Task<string?> GetRssXmlAsync(CancellationToken cancellationToken = default)
         {
             try
             {
-                var request = new HttpRequestMessage(HttpMethod.Get, RssUrl);
+                using var request = new HttpRequestMessage(HttpMethod.Get, RssUrl);
                 
                 request.Headers.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:134.0) Gecko/20100101 Firefox/134.0");
                 request.Headers.Add("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
@@ -24,15 +29,84 @@ namespace LaPrimitiva.Infrastructure.Services
                 request.Headers.Add("Sec-Fetch-Site", "none");
                 request.Headers.Add("Sec-Fetch-User", "?1");
 
-                var response = await httpClient.SendAsync(request);
+                using var response = await httpClient.SendAsync(
+                    request,
+                    HttpCompletionOption.ResponseHeadersRead,
+                    cancellationToken);
                 response.EnsureSuccessStatusCode();
-                
-                return await response.Content.ReadAsStringAsync();
+
+                if (response.Content.Headers.ContentLength > RssFeedLimits.MaxBytes)
+                {
+                    throw new InvalidDataException(
+                        $"El feed RSS supera el límite de {RssFeedLimits.MaxBytes} bytes.");
+                }
+
+                await using var responseStream = await response.Content.ReadAsStreamAsync(cancellationToken);
+                using var content = new MemoryStream();
+                var buffer = ArrayPool<byte>.Shared.Rent(81920);
+
+                try
+                {
+                    var totalBytes = 0;
+                    while (true)
+                    {
+                        var bytesToRead = Math.Min(buffer.Length, RssFeedLimits.MaxBytes - totalBytes + 1);
+                        var bytesRead = await responseStream.ReadAsync(
+                            buffer.AsMemory(0, bytesToRead),
+                            cancellationToken);
+
+                        if (bytesRead == 0)
+                            break;
+
+                        totalBytes += bytesRead;
+                        if (totalBytes > RssFeedLimits.MaxBytes)
+                        {
+                            throw new InvalidDataException(
+                                $"El feed RSS supera el límite de {RssFeedLimits.MaxBytes} bytes.");
+                        }
+
+                        await content.WriteAsync(buffer.AsMemory(0, bytesRead), cancellationToken);
+                    }
+                }
+                finally
+                {
+                    ArrayPool<byte>.Shared.Return(buffer);
+                }
+
+                content.Position = 0;
+                using var reader = new StreamReader(
+                    content,
+                    ResolveEncoding(response.Content.Headers.ContentType?.CharSet),
+                    detectEncodingFromByteOrderMarks: true);
+                return await reader.ReadToEndAsync(cancellationToken);
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
+            }
+            catch (InvalidDataException)
+            {
+                throw;
             }
             catch (Exception ex)
             {
                 // Rethrow the exception to be caught by DrawNotificationService
-                throw new Exception($"Error de red: {ex.Message}", ex); 
+                throw new Exception($"Error de red: {ex.Message}", ex);
+            }
+        }
+
+        private static Encoding ResolveEncoding(string? charset)
+        {
+            if (string.IsNullOrWhiteSpace(charset))
+                return Encoding.UTF8;
+
+            try
+            {
+                return Encoding.GetEncoding(charset.Trim('"'));
+            }
+            catch (ArgumentException)
+            {
+                return Encoding.UTF8;
             }
         }
     }

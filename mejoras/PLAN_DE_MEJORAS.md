@@ -506,6 +506,278 @@ Esta es una fase viva para registrar problemas y oportunidades confirmados duran
 
 **Dependencias:** M-204.
 
+### [ ] M-702 — Evaluar y rediseñar la generación de apuestas automáticas
+
+**Problema:** tras aproximadamente seis meses de uso real, el usuario indica que las combinaciones generadas automáticamente no han obtenido aciertos apreciables frente a la combinación fija. El generador actual presenta su resultado como una sugerencia basada en análisis bayesiano, pero no existe una evaluación retrospectiva que demuestre que supere a una selección aleatoria uniforme ni a la apuesta fija.
+
+**Evidencia (2026-08-24):** `AutomatedCombinationService.GenerateCombinationAsync()` pondera únicamente la frecuencia individual de los números con decaimiento temporal de 365 días y suavizado de Dirichlet, selecciona seis números mediante muestreo aleatorio ponderado y usa una semilla semanal. El botón `Regenerar` vuelve a invocar el servicio con esa misma semilla, por lo que devuelve la misma combinación mientras no cambie el histórico. El reintegro es uniforme y el valor p de la prueba chi-cuadrado es un marcador `-1`. No existen pruebas específicas del servicio ni backtesting walk-forward. El resultado de los seis meses es evidencia de uso aportada por el usuario; la base actual conserva premios y costes, pero no los números de las apuestas fijas o automáticas, así que esa comparación no puede reconstruirse a nivel de combinación.
+
+**Restricción estadística:** si los sorteos son independientes y uniformes, el histórico no permite predecir de forma fiable la combinación siguiente. La mejora deberá evitar prometer capacidad predictiva no demostrada y medir cualquier modelo fuera de muestra contra una línea base aleatoria.
+
+**Alternativas a valorar:**
+
+1. **Motor validado por backtesting (opción recomendada):** crear un evaluador walk-forward que compare el modelo actual, selección uniforme y variantes de hiperparámetros sin utilizar sorteos futuros. Adoptar un modelo solo si mejora de forma estable métricas predefinidas fuera de muestra; en caso contrario, usar la línea base honesta.
+2. **Optimizador de cobertura y diversificación:** dejar de intentar adivinar el siguiente sorteo y generar una o varias apuestas con mínima repetición entre sí, cobertura controlada y exclusión opcional de patrones populares. No aumenta la probabilidad de una combinación individual, pero aprovecha mejor un presupuesto de varias apuestas y puede reducir el riesgo de compartir premio.
+3. **Modelo de relaciones y ensemble temporal:** ampliar las frecuencias individuales con pares, tríos, intervalos entre apariciones, suma, paridad y ventanas temporales, combinando modelos regularizados. Solo sería admisible si supera las líneas base en backtesting walk-forward y mantiene el rendimiento en periodos separados; tiene el mayor coste y riesgo de sobreajuste.
+
+**Decisión (2026-08-24):** comenzar por la alternativa 1. La primera entrega incorporará un backtest walk-forward reproducible contra selección uniforme y corregirá `Regenerar` para solicitar una variación nueva sin cambiar el modelo estadístico evaluado.
+
+**Criterios para decidir:**
+
+- Medir por separado la capacidad predictiva, la cobertura conseguida y el coste por sorteo.
+- Comparar siempre contra selección uniforme, modelo actual y apuesta fija con el mismo número de apuestas y fechas.
+- Reservar un periodo final que no participe en el ajuste y publicar resultados reproducibles, incluidos los resultados negativos.
+- Favorecer la alternativa más sencilla que demuestre mejora fuera de muestra; si ninguna predice mejor, presentar la generación como diversificación y no como predicción.
+
+**Criterios de aceptación del hito:**
+
+- Existe un backtest walk-forward reproducible sin fuga de datos futuros.
+- El comportamiento actual queda cubierto por pruebas deterministas, incluida la semilla semanal, la selección sin reemplazo y el fallback sin histórico.
+- `Regenerar` produce otra candidata de la misma distribución y mantiene reproducible cada variación dentro de la sesión.
+- La alternativa elegida documenta hipótesis, métricas, coste, limitaciones y criterio de abandono.
+- La interfaz diferencia con claridad entre predicción validada y generación diversificada.
+- La decisión final y sus resultados quedan registrados antes de implementar el nuevo generador.
+
+**Dependencias:** histórico suficiente de sorteos ganadores; M-000 para la línea base de pruebas. La comparación futura con apuestas reales requiere empezar a persistir sus números, porque los seis meses anteriores no son reconstruibles a ese nivel.
+
+**Progreso (2026-08-24):** iniciada la alternativa 1. Se han añadido el contrato y motor inicial del backtest, métricas comparables del modelo ponderado y una línea base uniforme, casos xUnit diseñados antes de la implementación, presentación de resultados en la página y variaciones explícitas para que `Regenerar` no reutilice siempre la combinación semanal. La comparación con la apuesta fija queda marcada como no disponible porque sus números históricos no se persistían. Pendiente de compilación, ejecución de pruebas y verificación manual por el usuario conforme a la política del repositorio.
+
+**Resultado inicial (2026-08-24):** `scripts/Invoke-M702Backtest.ps1` evaluó en modo walk-forward 4.074 sorteos entre el 29 de octubre de 1987 y el 22 de agosto de 2026, después de reservar 104 sorteos iniciales para entrenamiento. El modelo ponderado obtuvo 3.067 coincidencias totales, media `0,752823`, máximo de 4 y 91 sorteos con al menos 3 aciertos; la línea base uniforme determinista obtuvo 3.062, media `0,751595`, máximo de 4 y 75 sorteos con al menos 3. Frente a la media uniforme teórica `0,734694`, el estadístico aproximado del modelo fue `z = 1,522576`, por debajo del umbral bilateral convencional `1,96`. **Conclusión provisional:** la pequeña diferencia observada no demuestra una ventaja predictiva estadísticamente convincente. Evidencia reproducible en `mejoras/evidencias/M-702-backtest-initial-20260824.json`; todavía deben evaluarse múltiples líneas base, periodos separados e hiperparámetros antes de decidir si conservar o abandonar el modelo.
+
+**Comparación observada de seis meses:** entre el 24 de febrero y el 24 de agosto de 2026 existen 71 sorteos jugados con 71 € registrados tanto para la apuesta fija como para la automática. La fija obtuvo premio en 11 sorteos y acumuló 25 €; la automática obtuvo premio en 7 sorteos y acumuló 15 €. Por tanto, la automática no quedó literalmente sin premios, pero sí rindió peor que la fija en el periodo comunicado. Esta evidencia financiera no permite recalcular aciertos por número porque las combinaciones jugadas no se persistían.
+
+**Comparación de las alternativas 2 y 3 (2026-08-24):** se evaluaron selección uniforme, modelo ponderado actual, cobertura diversificada y ensemble temporal/de pares con 5 apuestas por sorteo, 20.370 apuestas por estrategia y coste simulado idéntico. Uniforme obtuvo 368 premios principales; ponderado, 371; cobertura, 384; ensemble, 384. Ninguno produjo seis aciertos ni Especial; el ponderado generó el único caso de cinco aciertos. Las diferencias pareadas de cobertura (`z = 0,593769`) y ensemble (`z = 0,578812`) frente a uniforme quedaron muy por debajo de `±1,96`, por lo que ninguna demuestra ventaja predictiva. Informe en `mejoras/M-702_COMPARACION_ESTRATEGIAS.md`, evidencia en `mejoras/evidencias/M-702-strategy-comparison-20260824.json` y reproducción mediante `scripts/Invoke-M702StrategyComparison.ps1`.
+
+### [ ] M-703 — Persistir las apuestas realmente jugadas por sorteo
+
+**Problema:** el registro conserva los costes y premios separados entre apuesta fija y automática, pero no guarda como datos estructurados las combinaciones que se jugaron en cada sorteo. La combinación fija solo dispone de `Plan.FixedCombinationLabel`, una etiqueta libre compartida por el plan, y las combinaciones automáticas generadas no quedan vinculadas al `DrawRecord` correspondiente. Las notas se están usando manualmente para suplir esa carencia, por lo que no existe una base fiable para comprobar aciertos ni reconstruir qué se jugó.
+
+**Evidencia (2026-08-24):** en la captura aportada por el usuario, la columna Notas contiene textos como `A: 05 11 31 40 41 46 R: 05`. `DrawRecord` solo persiste importes y `Notes`; no contiene números, reintegro, Joker, origen de la apuesta ni ordinal cuando hay varias apuestas automáticas. M-702 ya confirmó que las combinaciones históricas no pueden reconstruirse a partir de los datos financieros actuales.
+
+**Comportamiento esperado:**
+
+- Cada sorteo jugado conserva una instantánea inmutable de todas sus apuestas: números, reintegro y Joker cuando corresponda.
+- Cada apuesta se identifica por su origen (`Fija`, `Automática` u otro futuro) y por un ordinal estable cuando exista más de una del mismo tipo.
+- Cambiar posteriormente un plan o regenerar una combinación no altera las apuestas ya asociadas a sorteos anteriores.
+- El usuario puede revisar y corregir las combinaciones antes de confirmar el registro, sin tener que copiarlas a Notas.
+- Los registros históricos sin combinación estructurada continúan siendo consultables y se muestran explícitamente como datos no disponibles, sin inventar ni inferir números desde las notas.
+
+**Criterios de aceptación:**
+
+- El modelo admite el número de apuestas configurado por `BetsPerDraw` y no presupone que siempre exista una única fija y una única automática.
+- Se validan seis números distintos entre 1 y 49, reintegro entre 0 y 9 y el formato de Joker aplicable.
+- Existen pruebas de persistencia, edición previa a confirmación, múltiples apuestas automáticas e inmutabilidad frente a cambios posteriores del plan.
+- La generación automática de M-702 puede entregar su candidata al registro sin transcripción manual.
+- La migración y la interfaz mantienen compatibilidad explícita con sorteos históricos que solo tienen importes y notas.
+
+**Dependencias:** M-401 para ejecutar el cambio de esquema mediante migración EF Core; coordinación con M-702 para capturar la combinación automática generada.
+
+### [ ] M-704 — Detectar y notificar automáticamente las apuestas premiadas
+
+**Problema:** al guardar desde el popup el resultado oficial de un sorteo, la aplicación únicamente confirma que se añadió al histórico. El usuario debe comparar manualmente los números oficiales con las apuestas de esa semana, identificar cuál obtuvo premio y escribirlo en Notas. Este flujo es lento, propenso a errores y oculta una de las conclusiones más valiosas de la aplicación.
+
+**Evidencia (2026-08-24):** `MainLayout.SaveToHistory()` llama a `WinningDrawService.SaveFromRssAsync()` y muestra el mensaje genérico `Sorteo guardado correctamente en el histórico.`. El resultado RSS sí contiene los seis números, complementario, reintegro y Joker, pero el flujo no busca el `DrawRecord` de la misma fecha ni evalúa sus apuestas. La captura del Registro muestra que hoy la identificación de la combinación jugada se mantiene manualmente en Notas.
+
+**Comportamiento esperado:**
+
+- Después de guardar o corregir un resultado oficial, la aplicación cruza todas las apuestas estructuradas del sorteo de la misma fecha y plan.
+- Por cada apuesta premiada indica de forma inequívoca cuál fue (`Fija`, `Automática 1`, `Automática 2`, etc.), sus aciertos y la categoría obtenida, incluidos reintegro y Joker cuando correspondan.
+- El resultado aparece en una alerta de éxito y queda accesible en el panel derecho como notificación persistente hasta que el usuario la revise.
+- Si no hay premio, se informa de que la comprobación terminó sin coincidencias premiadas; si faltan las combinaciones jugadas, se informa de que no fue posible comprobarlas automáticamente.
+- Repetir la comprobación o editar el resultado oficial es idempotente: actualiza la liquidación existente y no duplica alertas ni premios.
+- La detección de categoría no modifica automáticamente los importes económicos mientras la fuente RSS no proporcione una tabla de premios verificable; el usuario conserva el control de los importes o estos se obtienen de una fuente oficial separada en un hito futuro.
+
+**Criterios de aceptación:**
+
+- Las reglas de categorías están aisladas en un evaluador de dominio y cubiertas con casos límite: seis aciertos, cinco más complementario, cinco, cuatro, tres, reintegro, Joker y ausencia de premio.
+- Existen pruebas con varias apuestas ganadoras en un mismo sorteo y con varios planes aplicables a la fecha.
+- El cruce usa una identidad estable de sorteo y apuesta, no texto libre de Notas.
+- Guardar desde el popup, crear manualmente y corregir un resultado ejecutan la misma lógica de evaluación.
+- La notificación enlaza o permite navegar al registro concreto y muestra el estado incluso después de recargar la aplicación.
+- La verificación manual confirma los tres estados: con premio, sin premio y no comprobable por falta de datos históricos.
+
+**Dependencias:** M-703; M-701 para que todos los sorteos RSS pendientes puedan guardarse en cualquier orden.
+
+### [ ] M-705 — Rediseñar el Registro para distinguir inversión, premios y balance
+
+**Problema:** la tabla de escritorio presenta en una única línea muchas columnas con abreviaturas (`C. Fija`, `P. Auto`, `Total C.`, `Total P.`), pesos visuales muy parecidos y una columna de notas dominante. Aunque los datos existen, no se distingue de un vistazo qué se jugó, qué se ganó ni cuál fue el resultado neto; los premios nulos y los sorteos premiados reciben casi el mismo tratamiento visual.
+
+**Evidencia (2026-08-24):** la captura aportada del Registro muestra costes y premios en bloques contiguos con diferencias de fondo muy sutiles, valores `0,00 €` repetidos y notas truncadas ocupando gran parte de la fila. `Register.razor` usa encabezados abreviados y solo aplica el color positivo o negativo a Neto y Acumulado; la fila no comunica si contiene una apuesta premiada y depende demasiado del color para interpretar el resultado.
+
+**Comportamiento esperado:**
+
+- La tabla agrupa visual y semánticamente tres bloques: `Jugado`, `Ganado` y `Balance`, con encabezados completos o ayuda contextual para las abreviaturas.
+- Los sorteos con premio se reconocen de inmediato mediante una insignia y jerarquía visual que no dependa solo del color; los importes cero quedan atenuados.
+- La identidad de la apuesta premiada y su categoría se muestran como resumen estructurado, mientras Notas queda como información secundaria expandible.
+- Neto y acumulado conservan protagonismo, pero se diferencia claramente el resultado del sorteo del balance acumulado del plan.
+- En pantallas estrechas se usa una representación adaptada —tarjetas, detalle expandible o columnas prioritarias— en lugar de comprimir toda la tabla.
+
+**Criterios de aceptación:**
+
+- Una persona puede identificar en una revisión visual qué se jugó, qué se ganó y el balance sin abrir el formulario de edición.
+- La información crítica dispone de texto, icono o etiqueta además del color y mantiene contraste y navegación por teclado adecuados.
+- Existen estados visuales diferenciados para no jugado, jugado sin premio, premiado, pendiente de comprobar y no comprobable.
+- Se verifican al menos escritorio, tableta y móvil con datos largos, múltiples apuestas premiadas y notas extensas.
+- Los cálculos y datos persistidos no cambian como consecuencia del rediseño; se repiten las verificaciones afectadas de M-203 y la parte correspondiente de la Fase 6.
+
+**Dependencias:** M-703 y M-704 para mostrar apuestas y categorías estructuradas; puede prototiparse antes, pero su cierre requiere esos datos.
+
+### [ ] M-706 — Incorporar un ciclo de cierre auditado para cada sorteo
+
+**Problema:** el registro no expresa si un sorteo está esperando el resultado oficial, si ya fue comprobado, si tiene un premio cuyo importe todavía debe registrarse o si está completamente cerrado. La existencia de números, notas o importes no basta para distinguir esos estados, de modo que un sorteo puede quedar incompleto sin que la aplicación lo advierta.
+
+**Evidencia (2026-08-24):** `DrawRecord` persiste `Played`, costes, premios, notas y marcas de creación/actualización, pero no conserva un estado de conciliación ni evidencia de cuándo y contra qué resultado oficial se comprobó. `Register.razor` permite editar importes directamente y no diferencia entre un cero confirmado y un premio todavía pendiente de registrar.
+
+**Comportamiento esperado:**
+
+- Cada sorteo muestra un estado inequívoco: `Pendiente de resultado`, `Pendiente de comprobación`, `Premio pendiente de importe`, `Cerrado` o `No comprobable`.
+- Las transiciones normales se producen a partir de hechos verificables —resultado oficial disponible, apuestas persistidas y liquidación calculada— y no de texto libre.
+- El cierre conserva la fecha de comprobación, la identidad del resultado oficial utilizado y la procedencia de los importes registrados.
+- Corregir un resultado oficial o una apuesta reabre de forma controlada el sorteo afectado y obliga a repetir la conciliación.
+- Los registros históricos incompletos se clasifican como `No comprobable` o pendientes, sin asumir que un importe cero significa necesariamente ausencia de premio.
+
+**Criterios de aceptación:**
+
+- Existe una máquina de estados o regla de transición explícita, validada en dominio y compartida por todos los flujos de guardado.
+- No se puede marcar como `Cerrado` un sorteo jugado sin resultado oficial o sin una comprobación concluyente, salvo excepción manual justificada y auditada.
+- Las transiciones son idempotentes y conservan fecha, causa y estado anterior cuando se reabre un sorteo.
+- Existen pruebas para el recorrido completo, corrección posterior, premio pendiente, sorteo no jugado y datos históricos no comprobables.
+- La interfaz explica por qué un sorteo está pendiente y cuál es la siguiente acción necesaria.
+
+**Dependencias:** M-703 y M-704; coordinación con M-403 para evitar cierres perdidos ante ediciones concurrentes.
+
+### [ ] M-707 — Crear un centro de tareas pendientes y revisión
+
+**Problema:** las acciones que requieren intervención están repartidas entre el popup RSS, el histórico y el registro. El usuario debe recordar qué resultados faltan, qué apuestas no pueden comprobarse y qué premios necesitan importe, sin disponer de una cola única de trabajo.
+
+**Evidencia (2026-08-24):** el panel derecho de `MainLayout.razor` muestra resultados RSS pendientes de guardar, pero no agrega incidencias del Registro. Tras `SaveToHistory()` actualiza las notificaciones y los datos globales, sin presentar tareas de conciliación, premios pendientes ni sorteos incompletos.
+
+**Comportamiento esperado:**
+
+- El panel derecho incorpora una sección `Pendientes` con contadores y tareas accionables para resultados oficiales, apuestas sin registrar, comprobaciones pendientes, premios sin importe y registros no comprobables.
+- Cada tarea explica el motivo, muestra fecha, plan y prioridad, y navega directamente al registro o acción capaz de resolverla.
+- Las tareas desaparecen automáticamente cuando se resuelve su causa y no pueden descartarse de forma que oculte una inconsistencia real.
+- El usuario puede filtrar por tipo y plan, marcar una notificación informativa como vista y distinguir `requiere acción` de `solo información`.
+- El panel mantiene el comportamiento acotado y desplazable ya validado para las notificaciones RSS.
+
+**Criterios de aceptación:**
+
+- Los contadores se derivan del estado persistido y coinciden con los registros que aparecen al abrir cada filtro.
+- Existe al menos una prueba por tipo de tarea y una prueba de resolución que verifica su desaparición sin recargar manualmente.
+- Una misma causa produce una sola tarea estable aunque se repita la sincronización o se abra la aplicación varias veces.
+- Las consultas permanecen acotadas y no cargan todo el histórico para calcular el panel.
+- La verificación manual cubre panel vacío, varias clases de pendientes, navegación profunda y uso en móvil.
+
+**Dependencias:** M-701 y M-706; reutiliza el panel derecho evolucionado en M-204.
+
+### [ ] M-708 — Obtener y conciliar los importes oficiales por categoría
+
+**Problema:** M-704 puede determinar la categoría obtenida comparando números, pero el RSS actual no proporciona una tabla verificable con el importe de cada premio. Introducir manualmente esos importes mantiene una parte sensible del proceso expuesta a errores de transcripción.
+
+**Evidencia (2026-08-24):** `RssDraw` y `WinningDrawDto` contienen números, complementario, reintegro y Joker, pero no premios por categoría. La página oficial mostrada por el usuario publica una tabla de categorías, acertantes e importes; esa información no forma parte del flujo actual de `WinningDrawService.SaveFromRssAsync()`.
+
+**Enfoque y alternativas:**
+
+1. **Fuente oficial estructurada — opción preferida:** consumir una API, feed o recurso oficial estable y versionado si está disponible.
+2. **Adaptador HTML aislado:** extraer la tabla de la página oficial solo si no existe una fuente estructurada, con límites de descarga, fixtures capturados y detección explícita de cambios de formato. Es más frágil y exige mantenimiento.
+3. **Confirmación manual asistida:** presentar la categoría detectada y solicitar únicamente el importe cuando la fuente oficial no esté disponible. Mantiene el flujo operativo sin inventar datos.
+
+**Comportamiento esperado:**
+
+- Cada importe conserva categoría, cantidad, moneda, fuente oficial, instante de obtención y versión o huella de los datos usados.
+- La aplicación propone los importes correspondientes a las categorías detectadas, pero muestra su procedencia antes de confirmar la liquidación.
+- Una fuente ausente, incompleta o con formato desconocido no asigna importes silenciosamente: deja la tarea pendiente y activa el flujo manual asistido.
+- Las correcciones oficiales vuelven a conciliar únicamente los sorteos afectados y mantienen trazabilidad del valor anterior.
+- Los redondeos y categorías especiales, incluidos reintegro y Joker, se tratan mediante reglas explícitas y verificables.
+
+**Criterios de aceptación:**
+
+- Antes de elegir el adaptador se documenta y verifica la fuente oficial disponible, sus condiciones de uso, estabilidad y cobertura histórica.
+- El parser se prueba con fixtures reales de sorteos con y sin acertantes, botes, importes cero, reintegro y Joker.
+- Un cambio inesperado de esquema genera una alerta diagnóstica y nunca transforma texto dudoso en dinero.
+- La liquidación económica es idempotente y diferencia importe propuesto, confirmado y corregido.
+- Se conserva siempre una vía manual explícita y auditada.
+
+**Dependencias:** M-304 para límites de descarga y parseo; M-704 y M-706 para categoría y estado de conciliación.
+
+### [ ] M-709 — Comparar el rendimiento real de las estrategias jugadas
+
+**Problema:** el dashboard resume gasto, premios y efectividad global, pero no permite comparar de manera justa la combinación fija con las automáticas ni explicar qué estrategia produjo cada categoría. Las comparaciones manuales por periodos pueden mezclar distinto número de apuestas, costes o sorteos y conducir a conclusiones engañosas.
+
+**Evidencia (2026-08-24):** `SummaryService` agrega importes fijos y automáticos y M-702 cuantificó seis meses de resultados financieros, pero las combinaciones históricas no estaban persistidas. No existe una vista que alinee estrategias por las mismas fechas, presupuesto y número de apuestas, ni que muestre cobertura de datos faltantes.
+
+**Comportamiento esperado:**
+
+- La aplicación compara fija y automáticas sobre el mismo plan, intervalo y conjunto de sorteos jugados, mostrando cuándo la comparación no es homogénea.
+- Se presentan coste, premios, neto, ROI, sorteos con premio, categorías obtenidas, mejor/peor racha y evolución acumulada por estrategia.
+- Las métricas separan resultados económicos reales de los backtests simulados de M-702 y no presentan diferencias observadas como capacidad predictiva demostrada.
+- Cada informe indica cobertura, sorteos excluidos y proporción de registros sin combinaciones estructuradas.
+- El usuario puede alternar vista temporal, acumulada y por categoría sin perder el presupuesto comparable.
+
+**Criterios de aceptación:**
+
+- Todas las estrategias se comparan con igual coste simulado o se normalizan y etiquetan de forma explícita; nunca se enfrentan totales incomparables sin advertencia.
+- Los cálculos se contrastan contra casos manuales pequeños y contra los agregados financieros ya existentes.
+- Existen pruebas con periodos parciales, varias apuestas automáticas, planes diferentes, sorteos no jugados y datos históricos incompletos.
+- El informe distingue evidencia descriptiva, simulación retrospectiva y cualquier prueba estadística aplicada.
+- La interfaz evita lenguaje que sugiera predicción o causalidad no demostrada.
+
+**Dependencias:** M-702 para metodología de comparación; M-703 y M-704 para apuestas y categorías estructuradas.
+
+### [ ] M-710 — Añadir búsqueda, filtros y vistas operativas al Registro
+
+**Problema:** al crecer el histórico, seleccionar únicamente año y plan obliga a recorrer visualmente una tabla extensa para localizar premios, categorías o registros pendientes. El rediseño de M-705 mejora la lectura de cada fila, pero no resuelve la localización de subconjuntos relevantes.
+
+**Evidencia (2026-08-24):** `Register.razor` permite seleccionar año y plan, mientras que el listado no ofrece búsqueda ni filtros por estado, estrategia, categoría o presencia de premio. Las notas se truncan y no existe una vista rápida `Solo premiados`.
+
+**Comportamiento esperado:**
+
+- El Registro permite filtrar por estado de conciliación, jugado/no jugado, con/sin premio, estrategia ganadora, categoría, rango de fechas y plan.
+- Incluye accesos rápidos como `Solo premiados`, `Pendientes` y `No comprobables`, sincronizados con el centro de tareas.
+- La búsqueda localiza fecha, semana y texto de notas sin confundir números de apuesta con importes.
+- Los filtros activos son visibles, pueden limpiarse individualmente y se conservan al navegar al detalle y regresar.
+- Los resultados muestran el número de coincidencias y un estado vacío que explica qué filtros están excluyendo datos.
+
+**Criterios de aceptación:**
+
+- La combinación de filtros usa semántica documentada y produce resultados deterministas tanto en escritorio como en móvil.
+- Los filtros frecuentes se resuelven mediante consultas proyectadas y acotadas, sin cargar todo el histórico en memoria.
+- La navegación desde una tarea pendiente abre el Registro con los filtros correctos y permite volver sin perder contexto.
+- La exportación, si se ofrece desde la vista filtrada, indica claramente si exporta el conjunto visible o todo el año.
+- Existen pruebas para combinaciones de filtros, parámetros inválidos, estado vacío y persistencia del contexto de navegación.
+
+**Dependencias:** M-705 para la nueva presentación; M-706 y M-707 para estados y navegación desde tareas; M-704 para categorías estructuradas.
+
+### [ ] M-711 — Paginar la tabla del Registro y seleccionar el tamaño de página
+
+**Problema:** la tabla del Registro crece continuamente y actualmente carga y renderiza todos los sorteos del año y plan seleccionados en una sola vista. Esto aumenta el desplazamiento, dificulta localizar el punto de trabajo y hará que el coste de consulta y renderizado crezca con el histórico.
+
+**Evidencia (2026-08-24):** `Register.LoadData()` obtiene la lista completa mediante `DrawRepository.GetListAsync(...)`, filtra el plan en memoria y construye `drawsWithCumulative` con todos los resultados ordenados. Las vistas de escritorio y móvil recorren esa colección completa con `foreach`; no existen tamaño de página, página actual, recuento total ni controles de navegación.
+
+**Comportamiento esperado:**
+
+- Debajo de la tabla se muestra una paginación con página anterior, siguiente, primera, última y páginas cercanas a la actual.
+- El usuario puede seleccionar `10`, `25`, `50` o `100` registros por página; el valor inicial recomendado es `25`.
+- Se informa del intervalo visible y del total, por ejemplo: `Mostrando 26–50 de 184 registros`.
+- Cambiar año, plan, filtros o tamaño de página vuelve a la primera página; regresar desde el detalle conserva la página cuando el conjunto no ha cambiado.
+- Si una eliminación deja la página actual vacía, la vista retrocede automáticamente a la última página válida.
+- La ordenación es estable —fecha descendente y un segundo criterio determinista— para que un registro no salte entre páginas con fechas coincidentes.
+- El acumulado mostrado conserva el valor real dentro del plan y periodo completo; no se reinicia al comienzo de cada página.
+
+**Decisión técnica recomendada:** implementar paginación en la consulta —recuento total más proyección ordenada con `Skip`/`Take` o equivalente— en lugar de cargar todo el histórico y recortarlo únicamente en la interfaz. La paginación en memoria sería más sencilla, pero no resolvería el crecimiento del coste de acceso a datos.
+
+**Criterios de aceptación:**
+
+- Los tamaños disponibles son exactamente `10`, `25`, `50` y `100`, sin aceptar valores arbitrarios o manipulados.
+- El número de páginas se calcula a partir del total filtrado y ningún registro se duplica ni se omite al recorrerlas con un conjunto de datos estable.
+- La paginación se aplica después de los filtros de M-710 y el total refleja el mismo conjunto filtrado.
+- Existen pruebas para cero registros, una página exacta, una página parcial, cambio de tamaño, página fuera de rango y eliminación del último elemento de una página.
+- Los controles tienen etiquetas accesibles, estado deshabilitado correcto y funcionamiento mediante teclado; en móvil no provocan desbordamiento horizontal.
+- La consulta recupera únicamente la página solicitada y los datos mínimos necesarios para calcular totales y acumulados sin materializar todo el histórico de entidades.
+- La verificación manual recorre todos los tamaños y confirma que el acumulado de un mismo sorteo coincide independientemente de la página seleccionada.
+
+**Dependencias:** M-710 para componer paginación y filtros sobre una única consulta; coordinación con M-705 para integrar los controles en las vistas de escritorio y móvil. Puede implementarse antes de esos hitos si se conserva el contrato de integración.
+
 **Criterio de cierre del plan:** todas las fases y todos los hitos emergentes aplicables están completados, verificados y asociados a evidencia reproducible.
 
 ---

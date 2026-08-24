@@ -580,7 +580,9 @@ Esta es una fase viva para registrar problemas y oportunidades confirmados duran
 
 **Pruebas de cierre:** `scripts/Verify-M702UniformGenerator.ps1` correcto; análisis sintáctico correcto de los tres scripts PowerShell M-702; `python -m unittest scripts.tests.test_m702_strategy_comparison` con 4/4 pruebas correctas; RESX y SVG válidos; SVG sin scripts ni referencias externas; bloque `@code` de `AutomatedCombination.razor` idéntico a la instantánea previa al rediseño; y `git diff --check` sin errores. Los casos xUnit de `AutomatedCombinationServiceTests` quedan añadidos pero **no ejecutados**, porque la guía del repositorio prohíbe compilar tras los cambios; no se presenta ninguna ejecución sobre binarios antiguos como validación de código nuevo.
 
-**Resultado:** se cumplen los criterios funcionales y documentales de M-702 con una generación uniforme honesta, regeneración reproducible por variación, backtests walk-forward reproducibles y evidencia negativa publicada para los modelos predictivos. La validación manual del usuario completa el cierre visual y de interacción. **Commit o referencia:** commit de cierre M-702 (este commit). No se inicia M-703.
+**Resultado:** se cumplen los criterios funcionales y documentales de M-702 con una generación uniforme honesta, regeneración reproducible por variación, backtests walk-forward reproducibles y evidencia negativa publicada para los modelos predictivos. La validación manual del usuario completa el cierre visual y de interacción. **Commit o referencia:** `e2402f6`. No se inicia M-703.
+
+**Versión del hito:** `1.1.0`, incremento minor compatible con SemVer porque M-702 añade y rediseña funcionalidad sin declarar una ruptura de contrato. `LaPrimitiva.App.csproj` fija la versión del ensamblado y el footer la obtiene en ejecución mediante `Assembly.GetName().Version`, sin duplicar un literal en la vista. El hito queda marcado por el tag anotado `v1.1.0`. **Commit o referencia:** commit de versión (este commit).
 
 ### [ ] M-703 — Persistir las apuestas realmente jugadas por sorteo
 

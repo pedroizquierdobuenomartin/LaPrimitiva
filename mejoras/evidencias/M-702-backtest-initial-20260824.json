@@ -1,0 +1,70 @@
+{
+  "milestone": "M-702",
+  "generatedAt": "2026-08-24T06:37:31.3782248Z",
+  "database": "PrimitivaAuditV2",
+  "historicalDraws": 4178,
+  "minimumTrainingDraws": 104,
+  "evaluatedDraws": 4074,
+  "firstHistoricalDate": "1985-10-17",
+  "firstEvaluatedDate": "1987-10-29",
+  "lastEvaluatedDate": "2026-08-22",
+  "weightedModel": {
+    "totalMatches": 3067.0,
+    "averageMatches": 0.752823,
+    "maximumMatches": 4.0,
+    "drawsWithAtLeastThreeMatches": 91,
+    "matchDistribution": {
+      "0": 1761,
+      "1": 1655,
+      "2": 567,
+      "3": 86,
+      "4": 5,
+      "5": 0,
+      "6": 0
+    }
+  },
+  "uniformBaseline": {
+    "totalMatches": 3062.0,
+    "averageMatches": 0.751595,
+    "maximumMatches": 4.0,
+    "drawsWithAtLeastThreeMatches": 75,
+    "matchDistribution": {
+      "0": 1738,
+      "1": 1690,
+      "2": 571,
+      "3": 70,
+      "4": 5,
+      "5": 0,
+      "6": 0
+    }
+  },
+  "theoreticalUniformAverageMatches": 0.734694,
+  "statisticalAssessment": {
+    "weightedMinusDeterministicUniformAverage": 0.001227,
+    "weightedMinusTheoreticalUniformAverage": 0.018129,
+    "approximateAverageZScore": 1.522576,
+    "conventionalTwoSidedThreshold": 1.96,
+    "observedDrawsWithAtLeastThreeMatches": 91,
+    "theoreticalExpectedDrawsWithAtLeastThreeMatches": 75.929,
+    "conclusion": "This initial run does not demonstrate a statistically convincing predictive advantage at the conventional 95% threshold."
+  },
+  "fixedCombinationAvailable": false,
+  "observedSixMonthFinancialComparison": {
+    "from": "2026-02-24",
+    "through": "2026-08-24",
+    "playedDraws": 71,
+    "fixedWinningDraws": 11,
+    "automaticWinningDraws": 7,
+    "fixedPrizes": 25.0,
+    "automaticPrizes": 15.0,
+    "fixedCost": 71.0,
+    "automaticCost": 71.0,
+    "limitation": "Only financial outcomes were persisted; the played number combinations cannot be reconstructed."
+  },
+  "limitations": [
+    "Walk-forward simulation; only draws before each target were used.",
+    "Historical fixed and automatic bet numbers were not persisted.",
+    "The deterministic uniform comparator is one reproducible baseline, not the distribution of many random simulations.",
+    "Reintegro was not evaluated."
+  ]
+}

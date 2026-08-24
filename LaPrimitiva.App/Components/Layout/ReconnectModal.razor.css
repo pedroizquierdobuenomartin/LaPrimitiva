@@ -9,7 +9,7 @@
 	opacity: 0;
 	transition: display 0.5s allow-discrete, overlay 0.5s allow-discrete;
 	animation: components-reconnect-modal-fadeOutOpacity 0.5s both;
-	font-family: 'Inter', sans-serif;
+	font-family: 'Poppins', sans-serif;
 }
 
 #components-reconnect-modal[open] {

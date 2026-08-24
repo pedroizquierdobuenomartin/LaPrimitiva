@@ -45,18 +45,6 @@
   <data name="UniformSelectionNotice" xml:space="preserve"><value>Cada combinación válida tiene la misma probabilidad de salir.</value></data>
   <data name="UniformStrategyTitle" xml:space="preserve"><value>Selección uniforme adoptada</value></data>
   <data name="UniformStrategyDescription" xml:space="preserve"><value>La evaluación histórica no encontró una ventaja predictiva fiable en modelos ponderados. Regenerar crea otra candidata uniforme sin excluir resultados anteriores.</value></data>
-  <data name="ValidatedMethod" xml:space="preserve"><value>Método validado</value></data>
-  <data name="WeeklyBet" xml:space="preserve"><value>Una apuesta semanal</value></data>
-  <data name="Candidate" xml:space="preserve"><value>Candidata</value></data>
-  <data name="YourAutomaticBet" xml:space="preserve"><value>Tu jugada automática</value></data>
-  <data name="SixUniqueNumbers" xml:space="preserve"><value>Seis números únicos</value></data>
-  <data name="MainNumbers" xml:space="preserve"><value>Números principales</value></data>
-  <data name="NewCandidate" xml:space="preserve"><value>Generar otra</value></data>
-  <data name="EqualProbabilityDescription" xml:space="preserve"><value>Cada grupo válido de seis números parte con exactamente la misma probabilidad.</value></data>
-  <data name="PreviousWinnersTitle" xml:space="preserve"><value>Todo el bombo disponible</value></data>
-  <data name="PreviousWinnersDescription" xml:space="preserve"><value>Las combinaciones ganadoras anteriores siguen participando porque también pueden repetirse.</value></data>
-  <data name="EvidenceTitle" xml:space="preserve"><value>Evidencia y comparación</value></data>
-  <data name="EvidenceSubtitle" xml:space="preserve"><value>Consulta el backtest que sustenta la estrategia adoptada.</value></data>
   <data name="Reintegro" xml:space="preserve"><value>Reintegro</value></data>
   <data name="Regenerate" xml:space="preserve"><value>Regenerar</value></data>
   <data name="LuckyPrompt" xml:space="preserve"><value>¡Mucha suerte con tu jugada!</value></data>

@@ -18,56 +18,108 @@ namespace LaPrimitiva.Application.Services
             _repository = repository;
         }
 
-        public async Task<CombinationResult> GenerateCombinationAsync(double halfLifeDays = 365.0, double alpha = 1.0)
+        public Task<CombinationResult> GenerateCombinationAsync(int variation = 0)
         {
-            // 1. Fetch History
-            var draws = await _repository.GetListAsync();
-            var sortedDraws = draws.OrderBy(d => d.DrawDate).ToList();
-
-            if (!sortedDraws.Any())
+            if (variation < 0)
             {
-                // Fallback if no history
-                 return GenerateRandomCombination(null);
+                throw new ArgumentOutOfRangeException(nameof(variation), "La variación no puede ser negativa.");
             }
 
-            var asof = DateTime.Today;
-
-            // 2. Calculate Weighted Probabilities
-            var probabilities = CalculateWeightedProbabilities(sortedDraws, asof, halfLifeDays, alpha);
-
-            // 3. Pick Weighted Random Numbers
-            var seed = GetIsoWeekSeed(asof);
-            var random = new Random(seed);
-            
-            var pickedNumbers = PickWeekly(probabilities, random);
+            var random = new Random(GetVariationSeed(DateTime.Today, variation));
+            var pickedNumbers = GenerateUniformNumbers(random);
             var reintegro = PickReintegro(random);
 
-             // 4. Debug Info (Chi-Square) - simplified
-             var (chi2, pValue) = CalculateChiSquareUniformity(sortedDraws);
-
-            return new CombinationResult
+            return Task.FromResult(new CombinationResult
             {
                 Numbers = pickedNumbers,
                 Reintegro = reintegro,
                 DebugInfo = new Dictionary<string, object>
                 {
-                    { "half_life_days", halfLifeDays },
-                    { "alpha", alpha },
-                    { "draws_analyzed", sortedDraws.Count },
-                    { "chi2_uniformity", chi2 },
-                    { "pvalue_uniformity", pValue }, // Note: P-Value calculation requires a statistical library, simplified here or placeholder
-                    { "top10_by_model", probabilities.Select((p, i) => new { Num = i + 1, Prob = p }).OrderByDescending(x => x.Prob).Take(10).Select(x => x.Num).ToList() }
+                    { "strategy", "uniform_without_replacement" },
+                    { "variation", variation },
+                    { "possible_combinations", 13_983_816 }
                 }
-            };
+            });
         }
-        
-        private CombinationResult GenerateRandomCombination(int? seed)
+
+        public async Task<AutomatedCombinationBacktestResult> BacktestAsync(
+            int minimumTrainingDraws = 104,
+            double halfLifeDays = 365.0,
+            double alpha = 1.0)
         {
-             var random = seed.HasValue ? new Random(seed.Value) : new Random();
-             var numbers = Enumerable.Range(1, 49).OrderBy(x => random.Next()).Take(6).OrderBy(x => x).ToList();
-             var reintegro = random.Next(0, 10);
-             
-             return new CombinationResult { Numbers = numbers, Reintegro = reintegro, DebugInfo = new Dictionary<string, object> { { "note", "Random fallback (no history)" } } };
+            if (minimumTrainingDraws < 1)
+            {
+                throw new ArgumentOutOfRangeException(
+                    nameof(minimumTrainingDraws),
+                    "El backtest necesita al menos un sorteo de entrenamiento.");
+            }
+
+            ValidateModelParameters(halfLifeDays, alpha);
+
+            var draws = (await _repository.GetListAsync())
+                .OrderBy(draw => draw.DrawDate)
+                .ToList();
+            var cases = new List<PredictionBacktestCase>();
+
+            for (var index = minimumTrainingDraws; index < draws.Count; index++)
+            {
+                var target = draws[index];
+                var trainingDraws = draws.Take(index).ToList();
+                var probabilities = CalculateWeightedProbabilities(
+                    trainingDraws,
+                    target.DrawDate.Date,
+                    halfLifeDays,
+                    alpha);
+
+                var weightedNumbers = PickWeekly(
+                    probabilities,
+                    new Random(GetVariationSeed(target.DrawDate.Date, variation: 0)));
+                var uniformNumbers = GenerateUniformNumbers(
+                    new Random(GetUniformBaselineSeed(target.DrawDate.Date)));
+                var actualNumbers = GetNumbers(target);
+
+                cases.Add(new PredictionBacktestCase
+                {
+                    DrawDate = target.DrawDate,
+                    TrainingDraws = trainingDraws.Count,
+                    ActualNumbers = actualNumbers,
+                    WeightedNumbers = weightedNumbers,
+                    WeightedMatches = CountMatches(weightedNumbers, actualNumbers),
+                    UniformNumbers = uniformNumbers,
+                    UniformMatches = CountMatches(uniformNumbers, actualNumbers)
+                });
+            }
+
+            var weightedMetrics = BuildMetrics(cases.Select(item => item.WeightedMatches));
+            var uniformMetrics = BuildMetrics(cases.Select(item => item.UniformMatches));
+            const double theoreticalUniformAverage = 36.0 / 49.0;
+            const double uniformMatchVariance = 6.0 * (6.0 / 49.0) * (43.0 / 49.0) * (43.0 / 48.0);
+            var approximateZScore = cases.Count == 0
+                ? 0
+                : (weightedMetrics.AverageMatches - theoreticalUniformAverage) /
+                  Math.Sqrt(uniformMatchVariance / cases.Count);
+
+            return new AutomatedCombinationBacktestResult
+            {
+                HistoricalDraws = draws.Count,
+                MinimumTrainingDraws = minimumTrainingDraws,
+                EvaluatedDraws = cases.Count,
+                FirstEvaluatedDate = cases.FirstOrDefault()?.DrawDate,
+                LastEvaluatedDate = cases.LastOrDefault()?.DrawDate,
+                WeightedModel = weightedMetrics,
+                UniformBaseline = uniformMetrics,
+                TheoreticalUniformAverageMatches = theoreticalUniformAverage,
+                ApproximateAverageZScore = approximateZScore,
+                HasConventionalStatisticalAdvantage = Math.Abs(approximateZScore) >= 1.96,
+                FixedCombinationAvailable = false,
+                Limitations =
+                [
+                    "La aplicación no guarda los números de las apuestas fijas ni automáticas históricas; este resultado es una simulación walk-forward.",
+                    "La línea base uniforme es determinista y sirve para reproducibilidad, no como estimación completa de todos los resultados aleatorios posibles.",
+                    "El reintegro no se evalúa porque el modelo actual lo selecciona uniformemente y no aplica una hipótesis predictiva."
+                ],
+                Cases = cases
+            };
         }
 
         private double[] CalculateWeightedProbabilities(List<Domain.Entities.WinningDraw> draws, DateTime asof, double halfLifeDays, double alpha)
@@ -150,56 +202,70 @@ namespace LaPrimitiva.Application.Services
             return random.Next(0, 10);
         }
 
-        private int GetIsoWeekSeed(DateTime date)
+        private static List<int> GenerateUniformNumbers(Random random)
         {
-             // ISO 8601 Week
-             Calendar calendar = CultureInfo.InvariantCulture.Calendar;
-             int day = (int)calendar.GetDayOfWeek(date);
-             if (day >= 1 && day <= 3) // Monday-Wednesday
-             {
-                date = date.AddDays(3);
-             }
-             
-             int w = calendar.GetWeekOfYear(date, CalendarWeekRule.FirstFourDayWeek, DayOfWeek.Monday);
-             int y = date.Year;
-             
-             // Adjust year if week is 52/53 of previous year or 1 of next year
-             // But simpler heuristic from python: `y, w, _ = d.isocalendar()` which handles this naturally
-             
-             // .NET's ISOWeek class is available in newer .NET versions, checking...
-             // Assuming .NET 6+, we can use ISOWeek. 
-             // If not, use the logic above but carefully. 
-             // Let's stick to a robust implementation or ISOWeek.
-             
-             return ISOWeek.GetYear(date) * 100 + ISOWeek.GetWeekOfYear(date);
+            var numbers = Enumerable.Range(1, 49).ToArray();
+            for (var index = numbers.Length - 1; index > 0; index--)
+            {
+                var swapIndex = random.Next(index + 1);
+                (numbers[index], numbers[swapIndex]) = (numbers[swapIndex], numbers[index]);
+            }
+
+            return numbers.Take(6).OrderBy(number => number).ToList();
         }
 
-        private (double chi2, double pValue) CalculateChiSquareUniformity(List<Domain.Entities.WinningDraw> draws)
+        private static List<int> GetNumbers(Domain.Entities.WinningDraw draw) =>
+        [
+            draw.Number1,
+            draw.Number2,
+            draw.Number3,
+            draw.Number4,
+            draw.Number5,
+            draw.Number6
+        ];
+
+        private static int CountMatches(IEnumerable<int> predicted, IEnumerable<int> actual) =>
+            predicted.Intersect(actual).Count();
+
+        private static PredictionBacktestMetrics BuildMetrics(IEnumerable<int> matches)
         {
-             var counts = new double[49];
-             foreach (var draw in draws)
-             {
-                 counts[draw.Number1 - 1]++;
-                 counts[draw.Number2 - 1]++;
-                 counts[draw.Number3 - 1]++;
-                 counts[draw.Number4 - 1]++;
-                 counts[draw.Number5 - 1]++;
-                 counts[draw.Number6 - 1]++;
-             }
-             
-             var totalNumbers = draws.Count * 6;
-             var expected = totalNumbers / 49.0;
-             var chi2 = 0.0;
-             
-             foreach (var c in counts)
-             {
-                 chi2 += Math.Pow(c - expected, 2) / expected;
-             }
-             
-             // Approximate P-Value (requires Chi2 dist function)
-             // Python uses scipy.stats.chi2.sf(chi2, df=48)
-             // We will return -1 for P-Value as we don't have a math lib, allowing UI to handle it.
-             return (chi2, -1.0);
+            var values = matches.ToList();
+            var distribution = Enumerable.Range(0, 7)
+                .ToDictionary(value => value, value => values.Count(matchesCount => matchesCount == value));
+
+            return new PredictionBacktestMetrics
+            {
+                TotalMatches = values.Sum(),
+                AverageMatches = values.Count == 0 ? 0 : values.Average(),
+                MaximumMatches = values.Count == 0 ? 0 : values.Max(),
+                DrawsWithAtLeastThreeMatches = values.Count(value => value >= 3),
+                MatchDistribution = distribution
+            };
         }
+
+        private static void ValidateModelParameters(double halfLifeDays, double alpha)
+        {
+            if (halfLifeDays <= 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(halfLifeDays), "La vida media debe ser mayor que cero.");
+            }
+
+            if (alpha <= 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(alpha), "Alpha debe ser mayor que cero.");
+            }
+        }
+
+        private int GetVariationSeed(DateTime date, int variation) =>
+            unchecked(GetIsoWeekSeed(date) + variation * 104729);
+
+        private int GetUniformBaselineSeed(DateTime date) =>
+            unchecked(GetIsoWeekSeed(date) ^ (date.DayOfYear * 397) ^ 0x5f3759df);
+
+        private int GetIsoWeekSeed(DateTime date)
+        {
+            return ISOWeek.GetYear(date) * 100 + ISOWeek.GetWeekOfYear(date);
+        }
+
     }
 }

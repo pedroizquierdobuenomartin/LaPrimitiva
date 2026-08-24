@@ -1,0 +1,266 @@
+@page "/combinacion-automatica"
+@using LaPrimitiva.Domain.Localization
+@using Microsoft.Extensions.Localization
+@using LaPrimitiva.Application.Interfaces
+@using LaPrimitiva.Application.DTOs
+@inject IStringLocalizer<CombinationResource> L
+@inject IAutomatedCombinationService CombinationService
+
+<div class="flex flex-col h-full space-y-6 md:space-y-8">
+    <!-- Header -->
+    <div class="flex items-center justify-between flex-shrink-0 animate-in fade-in slide-in-from-top-4 duration-700">
+        <div class="space-y-1">
+            <h1 class="text-2xl md:text-4xl font-black text-gray-900 tracking-tight flex items-center gap-4">
+                <div class="p-3 bg-gradient-to-br from-[var(--brand-primary)]/20 to-[var(--brand-primary)]/5 rounded-2xl border border-[var(--brand-primary)]/10">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 md:h-8 md:w-8 text-[var(--brand-primary)]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
+                    </svg>
+                </div>
+                <span>@L["Creade"] <span class="text-[var(--brand-primary)]">@L["Combination"]</span> @L["Automated"]</span>
+            </h1>
+            <p class="text-sm md:text-base text-gray-400 font-medium ml-1 md:ml-16">
+                @L["AlgorithmSubtitle_Part1"] <span class="text-gray-600">@L["UniformSelection"]</span> @L["AlgorithmSubtitle_Part2"]
+            </p>
+        </div>
+    </div>
+
+    <!-- Main Card -->
+    <div class="flex-1 bg-white rounded-[40px] shadow-[0_20px_50px_rgba(0,0,0,0.04)] border border-gray-100 p-6 md:p-10 pb-12 md:pb-16 relative overflow-hidden animate-in fade-in zoom-in duration-700 delay-150 flex flex-col min-h-[450px]">
+
+        <!-- Background Ornaments -->
+        <div class="absolute -top-24 -right-24 w-64 h-64 bg-[var(--brand-primary)] opacity-[0.03] rounded-full blur-3xl pointer-events-none"></div>
+        <div class="absolute -bottom-24 -left-24 w-64 h-64 bg-[var(--brand-accent)] opacity-[0.03] rounded-full blur-3xl pointer-events-none"></div>
+
+        @if (_isGenerating)
+        {
+             <div class="absolute inset-0 bg-white/90 backdrop-blur-md z-20 flex flex-col items-center justify-center animate-in fade-in duration-500">
+                <div class="relative">
+                    <div class="h-16 w-16 border-4 border-[var(--brand-primary)]/10 border-t-[var(--brand-primary)] rounded-full animate-spin"></div>
+                    <div class="absolute inset-0 flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-[var(--brand-primary)] animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                        </svg>
+                    </div>
+                </div>
+                <p class="mt-6 text-sm font-black text-gray-800 tracking-tight animate-pulse uppercase tracking-[0.2em]">@L["AnalyzingHistory"]</p>
+            </div>
+        }
+
+        @if (_result == null)
+        {
+            <div class="flex-1 flex flex-col items-center justify-center text-center space-y-8 max-w-2xl mx-auto animate-in slide-in-from-bottom-5 duration-700">
+                <div class="relative group">
+                    <div class="h-28 w-28 bg-gradient-to-br from-[var(--brand-primary)]/10 to-[var(--brand-accent)]/10 rounded-[32px] flex items-center justify-center transform group-hover:rotate-12 transition-transform duration-700">
+                         <svg xmlns="http://www.w3.org/2000/svg" class="h-14 w-14 text-[var(--brand-primary)]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
+                        </svg>
+                    </div>
+                </div>
+
+                <div class="space-y-3">
+                    <h2 class="text-3xl md:text-5xl font-black text-gray-900 tracking-tighter uppercase leading-none">@L["Generator"] <span class="text-[var(--brand-primary)]">@L["Intelligent"]</span></h2>
+                    <p class="text-sm md:text-base text-gray-400 font-medium max-w-lg mx-auto">
+                        @L["GeneratorSubtitle"]
+                    </p>
+                </div>
+
+                <button @onclick="GenerateInitial" disabled="@_isGenerating" class="group relative overflow-hidden inline-flex items-center justify-center gap-4 px-8 py-5 min-h-[64px] bg-[var(--brand-accent)] hover:bg-[#eab308] text-white text-base font-black uppercase tracking-widest rounded-2xl transition-all shadow-[0_15px_30px_-5px_rgba(243,195,136,0.4)] hover:-translate-y-1 active:scale-95 disabled:opacity-50 w-full md:w-auto min-w-[280px] border border-white/20">
+                    <span class="relative z-10">@L["GeneratePlay"]</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 relative z-10 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                </button>
+            </div>
+        }
+        else
+        {
+             <div class="flex-1 flex flex-col items-center justify-center w-full animate-in zoom-in slide-in-from-bottom-10 duration-700">
+                <div class="w-full max-w-4xl">
+                    <!-- Title Section -->
+                    <div class="text-center mb-10 md:mb-12">
+                        <h3 class="text-2xl md:text-5xl font-black text-gray-900 tracking-tighter uppercase mb-2">@L["Combination"] <span class="text-[var(--brand-primary)]">@L["Suggested"]</span></h3>
+                        <p class="text-xs md:text-base text-gray-400 font-medium">@L["UniformSelectionNotice"]</p>
+                    </div>
+
+                    <!-- Balls Layout -->
+                    <div class="flex flex-col md:flex-row items-center justify-center gap-6 md:gap-10 mb-10 md:mb-12 px-4">
+                        <!-- Main Numbers -->
+                        <div class="grid grid-cols-3 md:flex md:flex-row gap-3 md:gap-4">
+                            @foreach (var n in _result.Numbers)
+                            {
+                                <div class="ball-container">
+                                    <div class="h-14 w-14 md:h-20 md:w-20 rounded-[18px] md:rounded-2xl bg-white shadow-[0_8px_20px_rgba(0,0,0,0.05)] border border-gray-100 flex items-center justify-center text-xl md:text-4xl font-black text-gray-900 transform transition-all duration-500 hover:-translate-y-2 hover:scale-110 hover:shadow-xl hover:rotate-3 cursor-pointer relative overflow-hidden group/ball">
+                                        <!-- Geometric 4-Leaf Clover SVG Background -->
+                                        <div class="absolute -bottom-1 -right-1 opacity-[0.15] pointer-events-none transform rotate-[15deg] group-hover/ball:rotate-[45deg] transition-transform duration-700">
+                                            <svg viewBox="0 0 24 24" class="h-10 w-10 md:h-16 md:w-16" xmlns="http://www.w3.org/2000/svg">
+                                                <g fill="#10b981">
+                                                    <!-- Top Leaf -->
+                                                    <path d="M12 11c0-1.5-1.5-3-3-3s-3 1.5-3 3 1.5 3 3 3c0 0 1.5 0 3-1.5" transform="rotate(0, 12, 12)"/>
+                                                    <path d="M12 11c0-1.5 1.5-3 3-3s3 1.5 3 3-1.5 3-3 3c0 0-1.5 0-3-1.5" transform="rotate(0, 12, 12)"/>
+                                                    <!-- Right Leaf -->
+                                                    <path d="M13 12c1.5 0 3-1.5 3-3s-1.5-3-3-3-3 1.5-3 3c0 0 0 1.5 1.5 3" transform="rotate(90, 12, 12)"/>
+                                                    <path d="M13 12c1.5 0 3 1.5 3 3s-1.5 3-3 3-3-1.5-3-3c0 0 0-1.5 1.5-3" transform="rotate(90, 12, 12)"/>
+                                                    <!-- Bottom Leaf -->
+                                                    <path d="M12 13c0 1.5 1.5 3 3 3s3-1.5 3-3-1.5-3-3-3c0 0-1.5 0-3 1.5" transform="rotate(180, 12, 12)"/>
+                                                    <path d="M12 13c0 1.5-1.5 3-3 3s-3-1.5-3-3 1.5-3 3-3c0 0 1.5 0 3 1.5" transform="rotate(180, 12, 12)"/>
+                                                    <!-- Left Leaf -->
+                                                    <path d="M11 12c-1.5 0-3 1.5-3 3s1.5 3 3 3 3-1.5 3-3c0 0 0-1.5-1.5-3" transform="rotate(270, 12, 12)"/>
+                                                    <path d="M11 12c-1.5 0-3-1.5-3-3s1.5-3-3-3 3 1.5 3 3c0 0 0 1.5-1.5 3" transform="rotate(270, 12, 12)"/>
+                                                    <!-- Stem -->
+                                                    <path d="M12 12c0 2 1 4 3 5" fill="none" stroke="#059669" stroke-width="1.5" stroke-linecap="round"/>
+                                                </g>
+                                            </svg>
+                                        </div>
+                                        <span class="relative z-10">@n</span>
+                                        <div class="absolute inset-0 bg-gradient-to-br from-[var(--brand-primary)]/5 to-transparent"></div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+
+                        <!-- Separator -->
+                        <div class="hidden md:flex flex-col gap-2 h-16 w-px bg-gray-100 mx-2"></div>
+
+                        <!-- Reintegro Ball -->
+                        <div class="flex flex-col items-center gap-2 group/reintegro">
+                            <div class="h-16 w-16 md:h-24 md:w-24 rounded-full bg-gradient-to-br from-[var(--brand-accent)] to-[#f97316] shadow-[0_12px_25px_-5px_rgba(249,115,22,0.3)] flex items-center justify-center text-2xl md:text-5xl font-black text-white border-4 border-white transform transition-all duration-500 hover:-translate-y-2 hover:scale-110 hover:shadow-[0_20px_40px_-5px_rgba(249,115,22,0.5)] cursor-pointer relative overflow-hidden">
+                                @(_result.Reintegro)
+                                <!-- Subtle Reflection Shine -->
+                                <div class="absolute inset-0 bg-gradient-to-tr from-white/0 via-white/20 to-white/0 -translate-x-full group-hover/reintegro:translate-x-full transition-transform duration-1000"></div>
+                            </div>
+                            <span class="text-[8px] md:text-[10px] font-black text-[var(--brand-accent)] uppercase tracking-[0.2em] group-hover/reintegro:scale-110 transition-transform">@L["Reintegro"]</span>
+                        </div>
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="flex flex-col items-center gap-6">
+                        <div class="animate-in fade-in slide-in-from-bottom-2 duration-1000 delay-500">
+                            <p class="text-sm md:text-lg font-medium text-gray-500 italic">
+                                @L["LuckyPrompt"] <span class="text-[var(--brand-primary)] font-bold">@L["FortunePrompt"]</span> @L["Today"]
+                            </p>
+                        </div>
+                        <button @onclick="Regenerate" disabled="@_isGenerating" class="px-10 py-4 min-h-[56px] bg-[var(--brand-accent)] hover:bg-[#eab308] text-white rounded-full text-xs font-black uppercase tracking-widest transition-all shadow-lg hover:-translate-y-1 flex items-center justify-center gap-3 border-4 border-white disabled:opacity-50">
+                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                            </svg>
+                            @L["Regenerate"]
+                        </button>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+    @if (_result != null)
+    {
+        <div class="bg-emerald-50 border border-emerald-100 rounded-[32px] p-6 md:p-8">
+            <h3 class="text-sm font-black text-emerald-900 uppercase tracking-widest">@L["UniformStrategyTitle"]</h3>
+            <p class="text-sm text-emerald-800 mt-2 font-medium">@L["UniformStrategyDescription"]</p>
+        </div>
+    }
+    <div class="bg-white rounded-[32px] border border-gray-100 p-6 md:p-8 shadow-sm space-y-6">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+                <h3 class="text-xl font-black text-gray-900 uppercase tracking-tight">@L["BacktestTitle"]</h3>
+                <p class="text-sm text-gray-400 font-medium mt-1">@L["BacktestDescription"]</p>
+            </div>
+            <button @onclick="RunBacktest" disabled="@_isBacktesting" class="px-6 py-3 rounded-2xl bg-gray-900 text-white text-xs font-black uppercase tracking-widest disabled:opacity-50">
+                @(_isBacktesting ? L["BacktestRunning"] : L["RunBacktest"])
+            </button>
+        </div>
+
+        @if (!string.IsNullOrWhiteSpace(_backtestError))
+        {
+            <div class="p-4 rounded-2xl bg-rose-50 text-rose-700 text-sm font-bold">@_backtestError</div>
+        }
+        else if (_backtest != null)
+        {
+            @if (_backtest.EvaluatedDraws == 0)
+            {
+                <div class="p-4 rounded-2xl bg-amber-50 text-amber-800 text-sm font-bold">@L["BacktestNoData"]</div>
+            }
+            else
+            {
+                <div class="text-xs font-bold text-gray-500 uppercase tracking-widest">
+                    @L["EvaluatedDraws"]: @_backtest.EvaluatedDraws
+                    (@_backtest.FirstEvaluatedDate?.ToString("dd/MM/yyyy") - @_backtest.LastEvaluatedDate?.ToString("dd/MM/yyyy"))
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="p-5 rounded-3xl bg-indigo-50 border border-indigo-100">
+                        <div class="text-xs font-black text-indigo-700 uppercase tracking-widest">@L["WeightedModel"]</div>
+                        <div class="text-3xl font-black text-gray-900 mt-3">@_backtest.WeightedModel.AverageMatches.ToString("F3")</div>
+                        <div class="text-xs text-gray-500 font-bold mt-1">@L["AverageMatches"]</div>
+                        <div class="text-xs text-gray-600 mt-3">@L["MaximumMatches"]: @_backtest.WeightedModel.MaximumMatches · @L["AtLeastThree"]: @_backtest.WeightedModel.DrawsWithAtLeastThreeMatches</div>
+                    </div>
+                    <div class="p-5 rounded-3xl bg-gray-50 border border-gray-100">
+                        <div class="text-xs font-black text-gray-600 uppercase tracking-widest">@L["UniformBaseline"]</div>
+                        <div class="text-3xl font-black text-gray-900 mt-3">@_backtest.UniformBaseline.AverageMatches.ToString("F3")</div>
+                        <div class="text-xs text-gray-500 font-bold mt-1">@L["AverageMatches"]</div>
+                        <div class="text-xs text-gray-600 mt-3">@L["MaximumMatches"]: @_backtest.UniformBaseline.MaximumMatches · @L["AtLeastThree"]: @_backtest.UniformBaseline.DrawsWithAtLeastThreeMatches</div>
+                    </div>
+                </div>
+                <div class="p-4 rounded-2xl bg-amber-50 text-amber-800 text-xs font-medium">@L["FixedComparisonUnavailable"]</div>
+                <div class="p-4 rounded-2xl @(_backtest.HasConventionalStatisticalAdvantage ? "bg-emerald-50 text-emerald-800" : "bg-slate-100 text-slate-700") text-xs font-bold">
+                    @(_backtest.HasConventionalStatisticalAdvantage ? L["BacktestAdvantageDetected"] : L["BacktestNoAdvantage"])
+                    Z ≈ @_backtest.ApproximateAverageZScore.ToString("F3") · @L["TheoreticalUniformAverage"]: @_backtest.TheoreticalUniformAverageMatches.ToString("F3")
+                </div>
+            }
+        }
+    </div>
+</div>
+@code {
+    private bool _isGenerating = false;
+    private bool _isBacktesting;
+    private int _variation;
+    private CombinationResult? _result;
+    private AutomatedCombinationBacktestResult? _backtest;
+    private string? _backtestError;
+
+    private async Task GenerateInitial()
+    {
+        _variation = 0;
+        await GenerateCurrentVariation();
+    }
+
+    private async Task Regenerate()
+    {
+        _variation++;
+        await GenerateCurrentVariation();
+    }
+
+    private async Task GenerateCurrentVariation()
+    {
+        _isGenerating = true;
+        // Delay visual para dar sensación de "cómputo pesado" premium
+        await Task.Delay(1200);
+
+        try
+        {
+            _result = await CombinationService.GenerateCombinationAsync(variation: _variation);
+        }
+        finally
+        {
+            _isGenerating = false;
+        }
+    }
+
+    private async Task RunBacktest()
+    {
+        if (_isBacktesting) return;
+
+        _isBacktesting = true;
+        _backtestError = null;
+        try
+        {
+            _backtest = await CombinationService.BacktestAsync();
+        }
+        catch (Exception)
+        {
+            _backtestError = L["BacktestError"];
+        }
+        finally
+        {
+            _isBacktesting = false;
+        }
+    }
+}

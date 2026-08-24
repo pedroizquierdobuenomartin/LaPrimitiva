@@ -6,248 +6,247 @@
 @inject IStringLocalizer<CombinationResource> L
 @inject IAutomatedCombinationService CombinationService
 
-<div class="flex flex-col h-full space-y-6 md:space-y-8">
-    <!-- Header -->
-    <div class="flex items-center justify-between flex-shrink-0 animate-in fade-in slide-in-from-top-4 duration-700">
-        <div class="space-y-1">
-            <h1 class="text-2xl md:text-4xl font-black text-gray-900 tracking-tight flex items-center gap-4">
-                <div class="p-3 bg-gradient-to-br from-[var(--brand-primary)]/20 to-[var(--brand-primary)]/5 rounded-2xl border border-[var(--brand-primary)]/10">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 md:h-8 md:w-8 text-[var(--brand-primary)]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
-                    </svg>
-                </div>
-                <span>@L["Creade"] <span class="text-[var(--brand-primary)]">@L["Combination"]</span> @L["Automated"]</span>
+<PageTitle>@L["Combination"] @L["Automated"] - La Primitiva Audit</PageTitle>
+
+<div class="flex flex-col min-h-full space-y-6 md:space-y-8">
+    <header class="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-5 animate-in fade-in slide-in-from-top-4 duration-700">
+        <div class="space-y-2">
+            <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-50 border border-emerald-100 text-[10px] font-black uppercase tracking-[0.18em] text-emerald-700">
+                <span class="h-2 w-2 rounded-full bg-emerald-500"></span>
+                @L["ValidatedMethod"]
+            </div>
+            <h1 class="text-3xl md:text-5xl font-black text-gray-950 tracking-[-0.04em] leading-none">
+                @L["Creade"] <span class="text-[var(--brand-primary)]">@L["Combination"]</span> @L["Automated"]
             </h1>
-            <p class="text-sm md:text-base text-gray-400 font-medium ml-1 md:ml-16">
-                @L["AlgorithmSubtitle_Part1"] <span class="text-gray-600">@L["BayesianAnalysis"]</span> @L["AlgorithmSubtitle_Part2"]
+            <p class="text-sm md:text-base text-gray-500 font-medium max-w-3xl">
+                @L["AlgorithmSubtitle_Part1"] <span class="text-gray-800 font-bold">@L["UniformSelection"]</span> @L["AlgorithmSubtitle_Part2"]
             </p>
         </div>
-    </div>
+        <div class="flex flex-wrap gap-2">
+            <span class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white border border-gray-200 text-[11px] font-black uppercase tracking-widest text-gray-600 shadow-sm">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-[var(--brand-primary)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                @L["WeeklyBet"]
+            </span>
+            <span class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gray-950 text-[11px] font-black uppercase tracking-widest text-white shadow-sm"><span class="text-amber-300">1</span> / 13.983.816</span>
+        </div>
+    </header>
 
-    <!-- Main Card -->
-    <div class="flex-1 bg-white rounded-[40px] shadow-[0_20px_50px_rgba(0,0,0,0.04)] border border-gray-100 p-6 md:p-10 pb-12 md:pb-16 relative overflow-hidden animate-in fade-in zoom-in duration-700 delay-150 flex flex-col min-h-[450px]">
-        
-        <!-- Background Ornaments -->
-        <div class="absolute -top-24 -right-24 w-64 h-64 bg-[var(--brand-primary)] opacity-[0.03] rounded-full blur-3xl pointer-events-none"></div>
-        <div class="absolute -bottom-24 -left-24 w-64 h-64 bg-[var(--brand-accent)] opacity-[0.03] rounded-full blur-3xl pointer-events-none"></div>
+    <section class="relative shrink-0 overflow-hidden rounded-[32px] md:rounded-[44px] bg-gradient-to-br from-[var(--brand-primary)] to-[var(--brand-secondary)] text-white shadow-xl min-h-[430px] animate-in fade-in zoom-in duration-700 delay-100">
+        <div class="absolute -top-40 -right-24 h-96 w-96 rounded-full bg-emerald-400/10 blur-3xl pointer-events-none"></div>
+        <div class="absolute -bottom-52 -left-24 h-96 w-96 rounded-full bg-amber-300/10 blur-3xl pointer-events-none"></div>
+        <div class="absolute inset-0 opacity-[0.035] pointer-events-none" style="background-image: radial-gradient(circle at 1px 1px, white 1px, transparent 0); background-size: 24px 24px;"></div>
 
         @if (_isGenerating)
         {
-             <div class="absolute inset-0 bg-white/90 backdrop-blur-md z-20 flex flex-col items-center justify-center animate-in fade-in duration-500">
-                <div class="relative">
-                    <div class="h-16 w-16 border-4 border-[var(--brand-primary)]/10 border-t-[var(--brand-primary)] rounded-full animate-spin"></div>
-                    <div class="absolute inset-0 flex items-center justify-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-[var(--brand-primary)] animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
-                        </svg>
+            <div class="combination-loading-overlay absolute inset-0 z-20 flex items-center justify-center p-6 animate-in fade-in duration-300" role="status" aria-live="polite">
+                <div class="combination-loading-card flex min-w-[220px] flex-col items-center rounded-[28px] px-9 py-8 text-center">
+                    <div class="relative">
+                        <div class="combination-spinner h-16 w-16 rounded-full border-4"></div>
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-[var(--brand-accent)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9M20 20v-5h-.581m0 0a8.003 8.003 0 01-15.357-2" /></svg>
+                        </div>
                     </div>
+                    <p class="mt-5 text-xs font-black uppercase tracking-[0.25em] text-white">@L["AnalyzingHistory"]</p>
                 </div>
-                <p class="mt-6 text-sm font-black text-gray-800 tracking-tight animate-pulse uppercase tracking-[0.2em]">@L["AnalyzingHistory"]</p>
             </div>
         }
 
         @if (_result == null)
         {
-            <div class="flex-1 flex flex-col items-center justify-center text-center space-y-8 max-w-2xl mx-auto animate-in slide-in-from-bottom-5 duration-700">
-                <div class="relative group">
-                    <div class="h-28 w-28 bg-gradient-to-br from-[var(--brand-primary)]/10 to-[var(--brand-accent)]/10 rounded-[32px] flex items-center justify-center transform group-hover:rotate-12 transition-transform duration-700">
-                         <svg xmlns="http://www.w3.org/2000/svg" class="h-14 w-14 text-[var(--brand-primary)]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
-                        </svg>
+            <div class="relative z-10 grid lg:grid-cols-[1.15fr_0.85fr] min-h-[430px]">
+                <div class="p-8 md:p-12 lg:p-14 flex flex-col justify-center">
+                    <span class="text-[11px] font-black uppercase tracking-[0.24em] text-emerald-300">@L["WeeklyBet"]</span>
+                    <h2 class="mt-4 text-4xl md:text-6xl font-black tracking-[-0.05em] leading-[0.95] max-w-2xl">@L["Generator"] <span class="text-amber-300">@L["Intelligent"]</span></h2>
+                    <p class="mt-5 text-sm md:text-base text-white/60 font-medium max-w-xl leading-relaxed">@L["GeneratorSubtitle"]</p>
+                    <button @onclick="GenerateInitial" disabled="@_isGenerating" class="mt-8 inline-flex w-full sm:w-fit items-center justify-center gap-3 px-7 py-4 min-h-[58px] rounded-2xl bg-[var(--brand-accent)] hover:brightness-105 text-[var(--brand-secondary)] text-xs font-black uppercase tracking-[0.16em] shadow-lg transition-all hover:-translate-y-1 active:translate-y-0 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-white/30 disabled:opacity-50">
+                        @L["GeneratePlay"]
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" /></svg>
+                    </button>
+                </div>
+                <div class="hidden lg:flex items-center justify-center p-12 border-l border-white/10">
+                    <div class="relative h-64 w-64">
+                        <div class="absolute inset-0 rounded-full border border-white/10"></div>
+                        <div class="absolute inset-8 rounded-full border border-dashed border-emerald-300/30 animate-spin motion-reduce:animate-none" style="animation-duration: 18s;"></div>
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <div class="h-32 w-32 rounded-[36px] bg-white/10 border border-white/15 backdrop-blur-sm flex items-center justify-center shadow-2xl rotate-6">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-amber-300 -rotate-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" /></svg>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                
-                <div class="space-y-3">
-                    <h2 class="text-3xl md:text-5xl font-black text-gray-900 tracking-tighter uppercase leading-none">@L["Generator"] <span class="text-[var(--brand-primary)]">@L["Intelligent"]</span></h2>
-                    <p class="text-sm md:text-base text-gray-400 font-medium max-w-lg mx-auto">
-                        @L["GeneratorSubtitle"]
-                    </p>
-                </div>
-
-                <button @onclick="Generate" disabled="@_isGenerating" class="group relative overflow-hidden inline-flex items-center justify-center gap-4 px-8 py-5 min-h-[64px] bg-[var(--brand-accent)] hover:bg-[#eab308] text-white text-base font-black uppercase tracking-widest rounded-2xl transition-all shadow-[0_15px_30px_-5px_rgba(243,195,136,0.4)] hover:-translate-y-1 active:scale-95 disabled:opacity-50 w-full md:w-auto min-w-[280px] border border-white/20">
-                    <span class="relative z-10">@L["GeneratePlay"]</span>
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 relative z-10 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
-                    </svg>
-                </button>
             </div>
         }
         else
         {
-             <div class="flex-1 flex flex-col items-center justify-center w-full animate-in zoom-in slide-in-from-bottom-10 duration-700">
-                <div class="w-full max-w-4xl">
-                    <!-- Title Section -->
-                    <div class="text-center mb-10 md:mb-12">
-                        <h3 class="text-2xl md:text-5xl font-black text-gray-900 tracking-tighter uppercase mb-2">@L["Combination"] <span class="text-[var(--brand-primary)]">@L["Suggested"]</span></h3>
-                        <p class="text-xs md:text-base text-gray-400 font-medium">@L["HistoryAnalyzed"] <span class="text-gray-700 font-bold">@_result.DebugInfo["draws_analyzed"]</span> @L["Draws"]</p>
+            <div class="relative z-10 p-6 md:p-10 lg:p-12 animate-in zoom-in slide-in-from-bottom-6 duration-500">
+                <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+                    <div>
+                        <div class="flex items-center gap-3">
+                            <span class="inline-flex items-center px-3 py-1 rounded-full bg-emerald-300/15 border border-emerald-300/20 text-[10px] font-black uppercase tracking-[0.18em] text-emerald-200">@L["UniformSelection"]</span>
+                            <span class="text-[10px] font-black uppercase tracking-[0.18em] text-white/40">@L["Candidate"] #@(_variation + 1)</span>
+                        </div>
+                        <h2 class="mt-4 text-3xl md:text-5xl font-black tracking-[-0.045em] leading-none">@L["YourAutomaticBet"]</h2>
+                        <p class="mt-3 text-sm text-white/55 font-medium">@L["UniformSelectionNotice"]</p>
                     </div>
+                    <div class="inline-flex items-center gap-2 self-start px-4 py-2 rounded-full bg-white/5 border border-white/10 text-[10px] font-black uppercase tracking-[0.18em] text-white/60">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-emerald-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                        @L["SixUniqueNumbers"]
+                    </div>
+                </div>
 
-                    <!-- Balls Layout -->
-                    <div class="flex flex-col md:flex-row items-center justify-center gap-6 md:gap-10 mb-10 md:mb-12 px-4">
-                        <!-- Main Numbers -->
-                        <div class="grid grid-cols-3 md:flex md:flex-row gap-3 md:gap-4">
+                <div class="mt-9 grid lg:grid-cols-[1fr_auto] gap-6 lg:gap-10 items-stretch">
+                    <div class="rounded-[28px] bg-white p-5 md:p-7 shadow-[0_20px_50px_-28px_rgba(0,0,0,0.8)] overflow-visible">
+                        <div class="flex items-center justify-between mb-5"><span class="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">@L["MainNumbers"]</span><span class="text-[10px] font-bold text-gray-400">1–49</span></div>
+                        <ol class="flex flex-wrap items-center justify-center xl:justify-between gap-3 md:gap-4" aria-label="@L["MainNumbers"]">
                             @foreach (var n in _result.Numbers)
                             {
-                                <div class="ball-container">
-                                    <div class="h-14 w-14 md:h-20 md:w-20 rounded-[18px] md:rounded-2xl bg-white shadow-[0_8px_20px_rgba(0,0,0,0.05)] border border-gray-100 flex items-center justify-center text-xl md:text-4xl font-black text-gray-900 transform transition-all duration-500 hover:-translate-y-2 hover:scale-110 hover:shadow-xl hover:rotate-3 cursor-pointer relative overflow-hidden group/ball">
-                                        <!-- Geometric 4-Leaf Clover SVG Background -->
-                                        <div class="absolute -bottom-1 -right-1 opacity-[0.15] pointer-events-none transform rotate-[15deg] group-hover/ball:rotate-[45deg] transition-transform duration-700">
-                                            <svg viewBox="0 0 24 24" class="h-10 w-10 md:h-16 md:w-16" xmlns="http://www.w3.org/2000/svg">
-                                                <g fill="#10b981">
-                                                    <!-- Top Leaf -->
-                                                    <path d="M12 11c0-1.5-1.5-3-3-3s-3 1.5-3 3 1.5 3 3 3c0 0 1.5 0 3-1.5" transform="rotate(0, 12, 12)"/>
-                                                    <path d="M12 11c0-1.5 1.5-3 3-3s3 1.5 3 3-1.5 3-3 3c0 0-1.5 0-3-1.5" transform="rotate(0, 12, 12)"/>
-                                                    <!-- Right Leaf -->
-                                                    <path d="M13 12c1.5 0 3-1.5 3-3s-1.5-3-3-3-3 1.5-3 3c0 0 0 1.5 1.5 3" transform="rotate(90, 12, 12)"/>
-                                                    <path d="M13 12c1.5 0 3 1.5 3 3s-1.5 3-3 3-3-1.5-3-3c0 0 0-1.5 1.5-3" transform="rotate(90, 12, 12)"/>
-                                                    <!-- Bottom Leaf -->
-                                                    <path d="M12 13c0 1.5 1.5 3 3 3s3-1.5 3-3-1.5-3-3-3c0 0-1.5 0-3 1.5" transform="rotate(180, 12, 12)"/>
-                                                    <path d="M12 13c0 1.5-1.5 3-3 3s-3-1.5-3-3 1.5-3 3-3c0 0 1.5 0 3 1.5" transform="rotate(180, 12, 12)"/>
-                                                    <!-- Left Leaf -->
-                                                    <path d="M11 12c-1.5 0-3 1.5-3 3s1.5 3 3 3 3-1.5 3-3c0 0 0-1.5-1.5-3" transform="rotate(270, 12, 12)"/>
-                                                    <path d="M11 12c-1.5 0-3-1.5-3-3s1.5-3-3-3 3 1.5 3 3c0 0 0 1.5-1.5 3" transform="rotate(270, 12, 12)"/>
-                                                    <!-- Stem -->
-                                                    <path d="M12 12c0 2 1 4 3 5" fill="none" stroke="#059669" stroke-width="1.5" stroke-linecap="round"/>
-                                                </g>
-                                            </svg>
-                                        </div>
-                                        <span class="relative z-10">@n</span>
-                                        <div class="absolute inset-0 bg-gradient-to-br from-[var(--brand-primary)]/5 to-transparent"></div>
-                                    </div>
-                                </div>
+                                <li class="group/ball relative overflow-hidden h-16 w-16 md:h-20 md:w-20 lg:h-24 lg:w-24 shrink-0 rounded-full bg-gradient-to-br from-white to-emerald-50 border-[3px] border-[var(--brand-primary)]/15 shadow-[inset_0_-8px_16px_rgba(0,112,65,0.08),0_8px_20px_rgba(0,77,45,0.08)] flex items-center justify-center text-2xl md:text-3xl font-black text-[var(--brand-secondary)] transition-transform hover:-translate-y-1" aria-label="Número @n">
+                                    <img data-ui="number-ball-clover" src="/images/trebol-suerte.svg" alt="" class="absolute -bottom-1 -right-1 h-10 w-10 md:h-14 md:w-14 lg:h-16 lg:w-16 opacity-[0.14] pointer-events-none rotate-[15deg] transition-transform duration-700 group-hover/ball:rotate-[45deg]" aria-hidden="true" />
+                                    <span class="relative z-10">@n</span>
+                                </li>
                             }
-                        </div>
-                        
-                        <!-- Separator -->
-                        <div class="hidden md:flex flex-col gap-2 h-16 w-px bg-gray-100 mx-2"></div>
+                        </ol>
+                    </div>
 
-                        <!-- Reintegro Ball -->
-                        <div class="flex flex-col items-center gap-2 group/reintegro">
-                            <div class="h-16 w-16 md:h-24 md:w-24 rounded-full bg-gradient-to-br from-[var(--brand-accent)] to-[#f97316] shadow-[0_12px_25px_-5px_rgba(249,115,22,0.3)] flex items-center justify-center text-2xl md:text-5xl font-black text-white border-4 border-white transform transition-all duration-500 hover:-translate-y-2 hover:scale-110 hover:shadow-[0_20px_40px_-5px_rgba(249,115,22,0.5)] cursor-pointer relative overflow-hidden">
-                                @(_result.Reintegro)
-                                <!-- Subtle Reflection Shine -->
-                                <div class="absolute inset-0 bg-gradient-to-tr from-white/0 via-white/20 to-white/0 -translate-x-full group-hover/reintegro:translate-x-full transition-transform duration-1000"></div>
+                    <div data-ui="reintegro-card" class="rounded-[28px] bg-white p-5 md:p-7 min-w-[180px] shadow-[0_20px_50px_-28px_rgba(0,0,0,0.8)]">
+                        <div data-ui="reintegro-header" class="flex items-center justify-between gap-4 mb-5"><span class="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">@L["Reintegro"]</span><span class="text-[10px] font-bold text-gray-400 whitespace-nowrap">0–9</span></div>
+                        <div class="flex items-center justify-center">
+                            <div data-ui="reintegro-ball" class="group/reintegro relative overflow-hidden h-16 w-16 md:h-20 md:w-20 lg:h-24 lg:w-24 shrink-0 rounded-full bg-gradient-to-br from-amber-50 to-orange-100 border-[3px] border-[var(--brand-accent)]/70 shadow-[inset_0_-8px_16px_rgba(243,195,136,0.18),0_8px_20px_rgba(59,33,7,0.10)] flex items-center justify-center text-2xl md:text-3xl font-black text-[var(--brand-secondary)] transition-transform hover:-translate-y-1" aria-label="@L["Reintegro"] @_result.Reintegro">
+                                <img data-ui="reintegro-ball-clover" src="/images/trebol-suerte.svg" alt="" class="absolute -bottom-1 -right-1 h-10 w-10 md:h-14 md:w-14 lg:h-16 lg:w-16 opacity-[0.14] pointer-events-none rotate-[15deg] transition-transform duration-700 group-hover/reintegro:rotate-[45deg]" aria-hidden="true" />
+                                <span class="relative z-10">@_result.Reintegro</span>
                             </div>
-                            <span class="text-[8px] md:text-[10px] font-black text-[var(--brand-accent)] uppercase tracking-[0.2em] group-hover/reintegro:scale-110 transition-transform">@L["Reintegro"]</span>
                         </div>
                     </div>
+                </div>
 
-                    <!-- Actions -->
-                    <div class="flex flex-col items-center gap-6">
-                        <div class="animate-in fade-in slide-in-from-bottom-2 duration-1000 delay-500">
-                            <p class="text-sm md:text-lg font-medium text-gray-500 italic">
-                                @L["LuckyPrompt"] <span class="text-[var(--brand-primary)] font-bold">@L["FortunePrompt"]</span> @L["Today"]
-                            </p>
-                        </div>
-                        <button @onclick="Generate" class="px-10 py-4 min-h-[56px] bg-[var(--brand-accent)] hover:bg-[#eab308] text-white rounded-full text-xs font-black uppercase tracking-widest transition-all shadow-lg hover:-translate-y-1 flex items-center justify-center gap-3 border-4 border-white">
-                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                            </svg>
-                            @L["Regenerate"]
-                        </button>
+                <p data-ui="generated-lucky-message" class="mt-6 flex flex-wrap items-center justify-center gap-2.5 text-center text-sm md:text-base font-medium italic text-white/70 animate-in fade-in duration-700">
+                    <span data-ui="lucky-message-clover" class="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-white/40 bg-white/90 p-1.5 shadow-sm -rotate-12" aria-hidden="true">
+                        <img src="/images/trebol-suerte.svg" alt="" class="h-full w-full object-contain" />
+                    </span>
+                    <span>@L["LuckyPrompt"] <span class="font-black text-[var(--brand-accent)]">@L["FortunePrompt"]</span> @L["Today"]</span>
+                    <span data-ui="lucky-message-clover" class="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-white/40 bg-white/90 p-1.5 shadow-sm rotate-12" aria-hidden="true">
+                        <img src="/images/trebol-suerte.svg" alt="" class="h-full w-full object-contain" />
+                    </span>
+                </p>
+
+                <div class="mt-6 flex flex-col md:flex-row md:items-center md:justify-between gap-5 pt-7 border-t border-white/10">
+                    <div class="flex items-start gap-3 max-w-2xl">
+                        <div class="h-9 w-9 rounded-xl bg-white/10 flex items-center justify-center shrink-0 text-emerald-300"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg></div>
+                        <p class="text-xs md:text-sm text-white/55 font-medium leading-relaxed">@L["UniformStrategyDescription"]</p>
                     </div>
+                    <button @onclick="Regenerate" disabled="@_isGenerating" class="inline-flex w-full md:w-auto items-center justify-center gap-3 px-7 py-4 min-h-[56px] rounded-2xl bg-[var(--brand-accent)] hover:brightness-105 text-[var(--brand-secondary)] text-xs font-black uppercase tracking-[0.16em] shadow-lg transition-all hover:-translate-y-1 active:translate-y-0 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-white/30 disabled:opacity-50">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9M20 20v-5h-.581m0 0a8.003 8.003 0 01-15.357-2" /></svg>
+                        @L["NewCandidate"]
+                    </button>
                 </div>
             </div>
         }
+    </section>
+
+    <div class="grid md:grid-cols-2 gap-4">
+        <article class="rounded-[28px] bg-white border border-gray-100 p-6 shadow-sm flex items-start gap-4">
+            <div class="h-11 w-11 rounded-2xl bg-emerald-50 text-emerald-700 flex items-center justify-center shrink-0"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg></div>
+            <div><h3 class="text-xs font-black uppercase tracking-[0.16em] text-gray-900">@L["UniformStrategyTitle"]</h3><p class="text-sm text-gray-500 mt-2 leading-relaxed">@L["EqualProbabilityDescription"]</p></div>
+        </article>
+        <article class="rounded-[28px] bg-white border border-gray-100 p-6 shadow-sm flex items-start gap-4">
+            <div class="h-11 w-11 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center shrink-0"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" /></svg></div>
+            <div><h3 class="text-xs font-black uppercase tracking-[0.16em] text-gray-900">@L["PreviousWinnersTitle"]</h3><p class="text-sm text-gray-500 mt-2 leading-relaxed">@L["PreviousWinnersDescription"]</p></div>
+        </article>
     </div>
 
-    <!-- Stats & Model Info Section -->
-    @if (_result != null && _result.DebugInfo.ContainsKey("chi2_uniformity"))
-    {
-        <div class="animate-in fade-in slide-in-from-bottom-10 duration-1000 delay-500">
-            <div class="bg-white/50 backdrop-blur-sm border border-gray-100 rounded-[32px] overflow-hidden transition-all duration-500 hover:shadow-xl hover:shadow-gray-200/50">
-                <details class="group">
-                    <summary class="flex items-center justify-between p-8 cursor-pointer select-none">
-                        <div class="flex items-center gap-6">
-                            <div class="h-12 w-12 rounded-2xl bg-gray-100 flex items-center justify-center text-gray-500 group-hover:scale-110 transition-transform">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h6a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                                </svg>
-                            </div>
-                            <div class="flex flex-col">
-                                <span class="text-xs font-black text-gray-900 uppercase tracking-widest">@L["ModelMetadata"]</span>
-                                <span class="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-0.5">@L["BayesianArchitecture"]</span>
-                            </div>
-                        </div>
-                        <div class="h-10 w-10 rounded-full border border-gray-100 flex items-center justify-center text-gray-400 group-hover:text-[var(--brand-primary)] group-hover:border-[var(--brand-primary)]/20 transition-all transform group-open:rotate-180">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                            </svg>
-                        </div>
-                    </summary>
-                    
-                    <div class="px-8 pb-8 animate-in slide-in-from-top-4 duration-500">
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                            <!-- Card 1 -->
-                            <div class="p-6 bg-white rounded-3xl border border-gray-50 shadow-sm hover:shadow-md transition-shadow">
-                                <span class="text-[9px] font-black text-gray-400 uppercase tracking-widest block mb-4">@L["WeightingParameter"]</span>
-                                <div class="flex items-end justify-between">
-                                    <span class="text-3xl font-black text-gray-900">@_result.DebugInfo["half_life_days"] <span class="text-sm font-medium text-gray-400 uppercase">@L["Days"]</span></span>
-                                    <div class="h-10 w-1 bg-gradient-to-t from-[var(--brand-primary)] to-transparent rounded-full"></div>
-                                </div>
-                                <p class="text-[10px] text-gray-400 mt-4 leading-relaxed uppercase font-bold tracking-tight">@L["RecencyDecay"]</p>
-                            </div>
-                            <!-- Card 2 -->
-                            <div class="p-6 bg-white rounded-3xl border border-gray-50 shadow-sm hover:shadow-md transition-shadow">
-                                <span class="text-[9px] font-black text-gray-400 uppercase tracking-widest block mb-4">@L["DirichletSmoothing"]</span>
-                                <div class="flex items-end justify-between">
-                                    <span class="text-3xl font-black text-gray-900">@_result.DebugInfo["alpha"]</span>
-                                    <div class="h-10 w-1 bg-gradient-to-t from-gray-200 to-transparent rounded-full"></div>
-                                </div>
-                                <p class="text-[10px] text-gray-400 mt-4 leading-relaxed uppercase font-bold tracking-tight">@L["SmoothingFactor"]</p>
-                            </div>
-                            <!-- Card 3 -->
-                            <div class="p-6 bg-white rounded-3xl border border-gray-50 shadow-sm hover:shadow-md transition-shadow">
-                                <span class="text-[9px] font-black text-gray-400 uppercase tracking-widest block mb-4">@L["ChiSquareStatistic"]</span>
-                                <div class="flex items-end justify-between">
-                                    <span class="text-3xl font-black text-gray-900">@(((double)_result.DebugInfo["chi2_uniformity"]).ToString("F2"))</span>
-                                    <div class="h-10 w-1 bg-gradient-to-t from-emerald-400 to-transparent rounded-full"></div>
-                                </div>
-                                <p class="text-[10px] text-gray-400 mt-4 leading-relaxed uppercase font-bold tracking-tight">@L["ChiSquareDesc"]</p>
-                            </div>
-                        </div>
-
-                        <!-- Top 10 High Prob Section -->
-                        <div class="bg-gray-900 rounded-[32px] p-8 text-white relative overflow-hidden group">
-                            <div class="absolute -top-12 -right-12 w-48 h-48 bg-white/5 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-1000"></div>
-                            <div class="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
-                                <div class="space-y-2 text-center md:text-left">
-                                    <h4 class="text-xl md:text-2xl font-black text-white uppercase tracking-tighter">@L["HotNumbersTitle"] <span class="text-white/40">@L["ModelFeed"]</span></h4>
-                                    <p class="text-white/40 text-[10px] font-bold uppercase tracking-widest">@L["HotNumbersDesc"]</p>
-                                </div>
-                                <div class="flex flex-wrap justify-center gap-2 md:gap-3">
-                                    @foreach(var n in (List<int>)_result.DebugInfo["top10_by_model"])
-                                    {
-                                        <div class="h-10 w-10 md:h-12 md:w-12 rounded-xl bg-white/10 backdrop-blur-md border border-white/10 flex items-center justify-center text-sm md:text-base font-black hover:bg-white text-white hover:text-gray-900 transition-all cursor-default">
-                                            @n
-                                        </div>
-                                    }
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </details>
+    <details class="group rounded-[28px] bg-white border border-gray-100 shadow-sm overflow-hidden">
+        <summary class="list-none cursor-pointer p-6 md:p-7 flex items-center justify-between gap-4 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-emerald-100">
+            <div class="flex items-center gap-4">
+                <div class="h-11 w-11 rounded-2xl bg-gray-100 text-gray-600 flex items-center justify-center shrink-0"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg></div>
+                <div><h3 class="text-sm font-black text-gray-900 uppercase tracking-[0.14em]">@L["EvidenceTitle"]</h3><p class="text-sm text-gray-400 font-medium mt-1">@L["EvidenceSubtitle"]</p></div>
             </div>
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400 transition-transform group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+        </summary>
+
+        <div class="border-t border-gray-100 p-6 md:p-7 space-y-6">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div><h4 class="text-lg font-black text-gray-900 uppercase tracking-tight">@L["BacktestTitle"]</h4><p class="text-sm text-gray-400 font-medium mt-1">@L["BacktestDescription"]</p></div>
+                <button @onclick="RunBacktest" disabled="@_isBacktesting" class="px-6 py-3 rounded-2xl bg-gray-950 hover:bg-gray-800 text-white text-xs font-black uppercase tracking-widest transition-colors focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-gray-200 disabled:opacity-50">@(_isBacktesting ? L["BacktestRunning"] : L["RunBacktest"])</button>
+            </div>
+
+            @if (!string.IsNullOrWhiteSpace(_backtestError))
+            {
+                <div class="p-4 rounded-2xl bg-rose-50 text-rose-700 text-sm font-bold">@_backtestError</div>
+            }
+            else if (_backtest != null)
+            {
+                @if (_backtest.EvaluatedDraws == 0)
+                {
+                    <div class="p-4 rounded-2xl bg-amber-50 text-amber-800 text-sm font-bold">@L["BacktestNoData"]</div>
+                }
+                else
+                {
+                    <div class="text-xs font-bold text-gray-500 uppercase tracking-widest">@L["EvaluatedDraws"]: @_backtest.EvaluatedDraws (@_backtest.FirstEvaluatedDate?.ToString("dd/MM/yyyy") - @_backtest.LastEvaluatedDate?.ToString("dd/MM/yyyy"))</div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="p-5 rounded-3xl bg-indigo-50 border border-indigo-100"><div class="text-xs font-black text-indigo-700 uppercase tracking-widest">@L["WeightedModel"]</div><div class="text-3xl font-black text-gray-900 mt-3">@_backtest.WeightedModel.AverageMatches.ToString("F3")</div><div class="text-xs text-gray-500 font-bold mt-1">@L["AverageMatches"]</div><div class="text-xs text-gray-600 mt-3">@L["MaximumMatches"]: @_backtest.WeightedModel.MaximumMatches · @L["AtLeastThree"]: @_backtest.WeightedModel.DrawsWithAtLeastThreeMatches</div></div>
+                        <div class="p-5 rounded-3xl bg-emerald-50 border border-emerald-100"><div class="text-xs font-black text-emerald-700 uppercase tracking-widest">@L["UniformBaseline"]</div><div class="text-3xl font-black text-gray-900 mt-3">@_backtest.UniformBaseline.AverageMatches.ToString("F3")</div><div class="text-xs text-gray-500 font-bold mt-1">@L["AverageMatches"]</div><div class="text-xs text-gray-600 mt-3">@L["MaximumMatches"]: @_backtest.UniformBaseline.MaximumMatches · @L["AtLeastThree"]: @_backtest.UniformBaseline.DrawsWithAtLeastThreeMatches</div></div>
+                    </div>
+                    <div class="p-4 rounded-2xl bg-amber-50 text-amber-800 text-xs font-medium">@L["FixedComparisonUnavailable"]</div>
+                    <div class="p-4 rounded-2xl @(_backtest.HasConventionalStatisticalAdvantage ? "bg-emerald-50 text-emerald-800" : "bg-slate-100 text-slate-700") text-xs font-bold">@(_backtest.HasConventionalStatisticalAdvantage ? L["BacktestAdvantageDetected"] : L["BacktestNoAdvantage"]) Z ≈ @_backtest.ApproximateAverageZScore.ToString("F3") · @L["TheoreticalUniformAverage"]: @_backtest.TheoreticalUniformAverageMatches.ToString("F3")</div>
+                }
+            }
         </div>
-    }
+    </details>
 </div>
+
 @code {
     private bool _isGenerating = false;
+    private bool _isBacktesting;
+    private int _variation;
     private CombinationResult? _result;
+    private AutomatedCombinationBacktestResult? _backtest;
+    private string? _backtestError;
 
-    private async Task Generate()
+    private async Task GenerateInitial()
+    {
+        _variation = 0;
+        await GenerateCurrentVariation();
+    }
+
+    private async Task Regenerate()
+    {
+        _variation++;
+        await GenerateCurrentVariation();
+    }
+
+    private async Task GenerateCurrentVariation()
     {
         _isGenerating = true;
         // Delay visual para dar sensación de "cómputo pesado" premium
-        await Task.Delay(1200); 
-        
+        await Task.Delay(1200);
+
         try
         {
-            _result = await CombinationService.GenerateCombinationAsync();
+            _result = await CombinationService.GenerateCombinationAsync(variation: _variation);
         }
         finally
         {
             _isGenerating = false;
+        }
+    }
+
+    private async Task RunBacktest()
+    {
+        if (_isBacktesting) return;
+
+        _isBacktesting = true;
+        _backtestError = null;
+        try
+        {
+            _backtest = await CombinationService.BacktestAsync();
+        }
+        catch (Exception)
+        {
+            _backtestError = L["BacktestError"];
+        }
+        finally
+        {
+            _isBacktesting = false;
         }
     }
 }

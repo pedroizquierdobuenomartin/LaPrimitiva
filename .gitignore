@@ -28,3 +28,7 @@ errorlog/
 
 # Roslyn cache directories
 *.ide/
+
+# Python verification scripts
+__pycache__/
+*.py[cod]

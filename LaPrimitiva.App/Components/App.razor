@@ -7,7 +7,6 @@
     <base href="/" />
     <ResourcePreloader />
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="@Assets["app.css"]" />
     <link rel="stylesheet" href="@Assets["LaPrimitiva.App.styles.css"]" />
     <ImportMap />
@@ -15,7 +14,7 @@
     <HeadOutlet @rendermode="InteractiveServer" />
 </head>
 
-<body class="h-full font-['Inter',sans-serif] text-slate-900 overflow-hidden">
+<body class="h-full text-slate-900 overflow-hidden">
     <Routes @rendermode="InteractiveServer" />
     <ReconnectModal />
     <script src="@Assets["_framework/blazor.web.js"]"></script>

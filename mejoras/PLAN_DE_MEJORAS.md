@@ -351,6 +351,29 @@
 - Se mantienen correctamente comillas, comas y saltos de línea.
 - Existe una prueba con cada prefijo peligroso.
 
+### [ ] M-306 — Habilitar HTTPS local con un certificado de confianza
+
+**Problema:** la publicación IIS local usa `http://laprimitiva.local/`, por lo que el tráfico no está cifrado. Un certificado autofirmado sin confianza local o sin el nombre DNS correcto produciría advertencias del navegador y no constituiría un cierre operativo válido.
+
+**Pasos:**
+
+1. Generar un certificado local con `laprimitiva.local` en el SAN mediante una autoridad o herramienta de desarrollo confiable para este equipo.
+2. Instalar la cadena de confianza y el certificado en los almacenes de Windows apropiados, sin guardar la clave privada en el repositorio.
+3. Configurar en IIS un binding HTTPS limitado a `127.0.0.1`, puerto `443` y host `laprimitiva.local`; habilitar SNI si comparte el puerto.
+4. Redirigir HTTP a HTTPS o retirar el binding HTTP una vez validado el acceso seguro.
+5. Documentar la creación, renovación, retirada y comprobación del certificado local.
+
+**Criterios de aceptación:**
+
+- `https://laprimitiva.local/` abre sin advertencias de certificado en el navegador del equipo.
+- El certificado está vigente, es de confianza y contiene `laprimitiva.local` en el SAN.
+- El binding HTTPS permanece restringido a loopback y una petición no local sigue siendo rechazada por M-301.
+- HTTP redirige a HTTPS o queda deshabilitado de forma explícita.
+- La clave privada y cualquier material sensible quedan fuera del control de versiones.
+- Existe evidencia reproducible de la configuración y de la verificación manual en IIS.
+
+**Dependencias:** M-301 completado. Debe coordinarse con M-302 para validar CSP, HSTS y el resto de cabeceras sobre el endpoint HTTPS definitivo, pero se mantiene como hito independiente porque protege el transporte y la operación del certificado, no la cadena de suministro JavaScript.
+
 ---
 
 ## Fase 4 — Persistencia y arquitectura

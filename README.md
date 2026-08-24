@@ -27,11 +27,55 @@ La aplicación está diseñada para ejecutarse sin autenticación **solo en el e
 - Durante cada petición, rechaza con `403` cualquier dirección remota que no sea loopback.
 - El filtrado de host solo admite `laprimitiva.local`, `localhost`, `127.0.0.1` y `[::1]`; cualquier otro host recibe `400`.
 
-Para publicar en IIS como `http://laprimitiva.local/`:
+Para publicar en IIS se usa exclusivamente `https://laprimitiva.local/`:
+
+La guía operativa completa, con instalación en el primer equipo, traslado a otros ordenadores, renovación, retirada y diagnóstico, está en [`mejoras/GUIA_M306_HTTPS_IIS.md`](mejoras/GUIA_M306_HTTPS_IIS.md).
 
 1. Añadir `127.0.0.1 laprimitiva.local` al archivo local `C:\Windows\System32\drivers\etc\hosts`.
-2. Configurar el binding HTTP del sitio con IP `127.0.0.1`, puerto `80` y nombre de host `laprimitiva.local`.
-3. No usar `Todos sin asignar`, una IP LAN ni un binding comodín. La aplicación rechazará clientes no locales aunque IIS quede configurado de forma más amplia, pero el binding de IIS también debe limitarse a loopback como primera barrera.
+2. Publicar la aplicación y crear el sitio IIS sin un binding accesible desde la LAN. El pool debe usar `No Managed Code`.
+3. Abrir **Windows PowerShell 5.1 como administrador** desde la raíz del repositorio. PowerShell 7 no carga de forma fiable el proveedor `WebAdministration` utilizado por el script.
+4. Crear la CA de desarrollo, confiar en ella, emitir el certificado con SAN y configurar el binding `127.0.0.1:443:laprimitiva.local` con SNI:
+   ```powershell
+   powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\scripts\Manage-M306LocalHttps.ps1 `
+     -Action Create -SiteName 'laprimitiva.local'
+   ```
+   Sustituir `laprimitiva.local` por el nombre exacto devuelto por `Get-Website` si el sitio se llama de otra forma. El script solicita la contraseña de exportación de la PFX, configura HTTPS y retira cualquier binding HTTP del mismo sitio para `laprimitiva.local:80`; no modifica bindings de otros hosts.
+5. Iniciar el sitio y realizar la comprobación operativa:
+   ```powershell
+   powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\scripts\Manage-M306LocalHttps.ps1 `
+     -Action Verify -SiteName 'laprimitiva.local'
+   ```
+   La verificación exige confianza de cadena, vigencia, SAN `laprimitiva.local`, SNI, resolución a `127.0.0.1`, ausencia del binding HTTP, respuesta `200` sin omitir errores TLS y cabecera HSTS.
+
+   Firefox debe confiar en la CA de Windows o tener importada `LaPrimitiva-Local-Root-CA.cer` como autoridad. Aceptar una excepción para continuar y conservar el indicador **No seguro** no satisface la validación; la guía contiene el procedimiento específico para Firefox.
+
+### Certificado instalable en otros ordenadores locales
+
+`-Action Create` exporta un paquete instalable en `artifacts\local-https`:
+
+- `LaPrimitiva-Local-Root-CA.cer`: certificado público de la CA; puede distribuirse para establecer la confianza.
+- `laprimitiva.local.cer`: certificado público del servidor para inspección.
+- `laprimitiva.local.pfx`: paquete secreto que contiene el certificado público del servidor y su clave privada, protegido con la contraseña solicitada; permite configurar otro IIS local con el mismo nombre.
+
+En el equipo que ejecuta `Create` no hay que importar manualmente ninguno de estos ficheros: el script ya instala los certificados y configura IIS. La tabla de la guía explica qué contiene cada formato y, para otro equipo, qué almacén corresponde a cada uno.
+
+La CA privada no se exporta. La PFX debe transferirse por un canal seguro y su contraseña por otro canal. **No se versiona** ningún PFX, contraseña ni clave privada; `artifacts\` y las extensiones de clave están ignoradas por Git. Para instalar el paquete descargado en otro equipo, copiar los dos ficheros necesarios fuera del repositorio y ejecutar:
+
+```powershell
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\scripts\Manage-M306LocalHttps.ps1 `
+  -Action Install -SiteName 'laprimitiva.local' `
+  -RootCertificatePath 'C:\Descargas\LaPrimitiva-Local-Root-CA.cer' `
+  -PfxPath 'C:\Descargas\laprimitiva.local.pfx'
+```
+
+Cada equipo debe conservar la entrada de `hosts` limitada a `127.0.0.1`. Para renovar, ejecutar de nuevo `-Action Create`: mientras siga vigente, se reutiliza la misma CA privada local, se emite un certificado de servidor nuevo, se cambia el binding, se retiran los certificados de servidor anteriores y se vuelve a exportar el paquete. Para retirar el servidor y su binding:
+
+```powershell
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\scripts\Manage-M306LocalHttps.ps1 `
+  -Action Remove -SiteName 'laprimitiva.local' -RemoveRoot
+```
+
+No usar `Todos sin asignar`, una IP LAN ni un binding comodín. La aplicación rechazará clientes no locales aunque IIS quede configurado de forma más amplia, pero el binding de IIS también debe limitarse a loopback como primera barrera.
 
 Esta política local no sustituye autenticación ni autorización. Si en el futuro se habilita acceso LAN, debe implementarse ese modelo de seguridad antes de retirar estas restricciones.
 

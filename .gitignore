@@ -3,6 +3,9 @@
 [Oo]bj/
 [Pp]ublish/
 [Aa]rtifacts/
+*.pfx
+*.p12
+*.key
 node_modules/
 
 # Visual Studio

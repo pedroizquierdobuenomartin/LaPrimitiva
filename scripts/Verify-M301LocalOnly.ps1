@@ -70,7 +70,7 @@ Assert-Contains $tests @(
 ) 'LocalOnlySecurityTests'
 
 Assert-Contains $readme @(
-    'http://laprimitiva.local/',
+    'https://laprimitiva.local/',
     '127.0.0.1',
     'Todos sin asignar'
 ) 'documentacion local de IIS'

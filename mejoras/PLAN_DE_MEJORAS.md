@@ -272,7 +272,7 @@
 
 ## Fase 3 — Seguridad local robusta
 
-### [ ] M-301 — Imponer técnicamente el límite local
+### [x] M-301 — Imponer técnicamente el límite local
 
 **Severidad de auditoría:** media.
 
@@ -288,6 +288,14 @@
 - La aplicación no arranca si intenta escuchar fuera de loopback.
 - Una petición con host no permitido es rechazada.
 - El comportamiento queda documentado.
+
+**Cierre (2026-08-24):**
+
+- **Referencia:** commit de cierre M-301 de esta publicación, sobre `c5b931a`; release `v1.3.0`.
+- **Evidencia previa:** `launchSettings.json` usaba `localhost`, pero `Program.cs` no validaba las direcciones efectivas de escucha y `appsettings.json` mantenía `AllowedHosts: "*"`. Por tanto, una sobrescritura mediante `urls`, `ASPNETCORE_URLS`, `HTTP_PORTS`, `HTTPS_PORTS` o un endpoint Kestrel podía publicar la aplicación fuera de loopback; tampoco existía una barrera de aplicación que rechazase clientes LAN servidos por IIS.
+- **Pruebas realizadas:** línea base estática previa `scripts/Verify-M206PlanTimestamps.ps1` y `scripts/Verify-M205PlanValidation.ps1` correcta; ejecución en rojo de `scripts/Verify-M301LocalOnly.ps1` antes del arreglo, al no existir la política local; ejecución final del verificador M-301 correcta y `git diff --check` sin errores. Se añadió `LocalOnlySecurityTests` para cubrir URLs loopback, URLs y puertos comodín no locales, endpoints Kestrel, clientes IPv4/IPv6 loopback y clientes externos. Estas pruebas xUnit no se ejecutaron porque la política del repositorio prohíbe compilar después de los cambios.
+- **Resultado:** el arranque valida las fuentes de configuración de escucha y lanza `InvalidOperationException` antes de construir el servidor cuando encuentra una URL no-loopback o una configuración de puertos comodín. Cada petición debe proceder de una IP loopback o recibe `403`; el filtro integrado de hosts queda limitado a `laprimitiva.local`, `localhost`, `127.0.0.1` y `[::1]`. `README.md` documenta la publicación IIS local en `http://laprimitiva.local/` y exige un binding `127.0.0.1:80`, no `Todos sin asignar`.
+- **Decisiones:** se mantiene el modo exclusivamente local y no se introduce autenticación, que corresponde a una futura decisión de acceso LAN. Se aplican tres barreras complementarias: validación de escucha para Kestrel, restricción de `Host` y validación de la IP remota para cubrir IIS. La aplicación no puede consultar de forma portable los bindings del metabase de IIS, por lo que el binding loopback se exige además como configuración operativa; aun si IIS se configura demasiado amplio, la aplicación rechaza clientes no locales. No se avanzó a M-302.
 
 ### [ ] M-302 — Eliminar JavaScript mutable de CDN y añadir CSP
 
@@ -857,4 +865,5 @@ Estos descartes describen el código auditado y deben revisarse si cambian las f
 | M-203 | 2026-08-20 | Commit `M-203` (este commit), sobre `07a58cc` | Completado | Totales de coste y premios incluyen los cuatro componentes; persistencia y reparación aplican el invariante; casos Joker y ROI añadidos; build, ejecución y comprobación visual satisfactorios comunicados por el usuario. |
 | M-205 | 2026-08-20 | `32d7876`, corrección `e315855` | Completado | Validación coherente en UI, Application, dominio, repositorio y SQL; `BetsPerDraw` aplicado a costes; verificación estática correcta, 14 casos xUnit añadidos y guardado de edición comprobado en ejecución por el usuario. |
 | M-206 | 2026-08-24 | Commit de cierre sobre `373561a`; release `v1.2.0` | Completado | Actualización con entidad seguida y lista blanca; `CreatedAt` preservado y `UpdatedAt` renovado; límites coincidentes rechazados al crear y editar; selector `Todos` validado en ejecución; footer de versión corregido y comprobado visualmente. |
+| M-301 | 2026-08-24 | Commit de cierre sobre `c5b931a`; release `v1.3.0` | Completado | Arranque restringido a URLs loopback; clientes no locales rechazados con `403`; `AllowedHosts` limitado; publicación IIS local documentada para `http://laprimitiva.local/`; verificación estática correcta y casos xUnit añadidos sin ejecutar por la prohibición de compilar. |
 | M-702 | 2026-08-24 | `e2402f6`, `19defe6`, release `373561a`, tag `v1.1.0` | Completado | Generación uniforme y rediseño validados; títulos de Histórico y Combinación automática unificados con `PageTitle`; footer enlazado a la versión del ensamblado y release `1.1.0` publicada. Verificación estática correcta y validación visual del usuario; casos xUnit nuevos no ejecutados por la prohibición de compilar. |

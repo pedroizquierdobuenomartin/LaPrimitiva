@@ -19,6 +19,22 @@ App multipágina para registrar y auditar juegos de La Primitiva (España), comp
      ```
    La aplicación estará disponible en `http://localhost:5007`.
 
+### Seguridad de acceso exclusivamente local
+
+La aplicación está diseñada para ejecutarse sin autenticación **solo en el equipo local**:
+
+- Al arrancar, rechaza cualquier `urls`, `ASPNETCORE_URLS` o endpoint Kestrel que no use `localhost`, `127.0.0.1` o `::1`. Las configuraciones abreviadas `HTTP_PORTS` y `HTTPS_PORTS` también se rechazan porque publican mediante comodín.
+- Durante cada petición, rechaza con `403` cualquier dirección remota que no sea loopback.
+- El filtrado de host solo admite `laprimitiva.local`, `localhost`, `127.0.0.1` y `[::1]`; cualquier otro host recibe `400`.
+
+Para publicar en IIS como `http://laprimitiva.local/`:
+
+1. Añadir `127.0.0.1 laprimitiva.local` al archivo local `C:\Windows\System32\drivers\etc\hosts`.
+2. Configurar el binding HTTP del sitio con IP `127.0.0.1`, puerto `80` y nombre de host `laprimitiva.local`.
+3. No usar `Todos sin asignar`, una IP LAN ni un binding comodín. La aplicación rechazará clientes no locales aunque IIS quede configurado de forma más amplia, pero el binding de IIS también debe limitarse a loopback como primera barrera.
+
+Esta política local no sustituye autenticación ni autorización. Si en el futuro se habilita acceso LAN, debe implementarse ese modelo de seguridad antes de retirar estas restricciones.
+
 ## 🛠️ Funcionalidades Implementadas
 
 - **Dashboard**: Vista clara de KPIs (Gasto, Ganado, Neto, ROI) y desglose por tipo de apuesta.

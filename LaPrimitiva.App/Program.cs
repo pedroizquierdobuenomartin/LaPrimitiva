@@ -10,8 +10,11 @@ using LaPrimitiva.Application.Interfaces;
 using LaPrimitiva.App.Components;
 using LaPrimitiva.Domain.Interfaces;
 using LaPrimitiva.Domain.Models;
+using LaPrimitiva.App.Security;
 
 var builder = WebApplication.CreateBuilder(args);
+
+LocalOnlyPolicy.ValidateStartupConfiguration(builder.Configuration);
 
 // Add services to the container.
 builder.Configuration.AddJsonFile("reconnection.json", optional: false, reloadOnChange: true);
@@ -57,6 +60,7 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 app.UseStatusCodePagesWithReExecute("/not-found", createScopeForStatusCodePages: true);
+app.UseMiddleware<LocalOnlyMiddleware>();
 app.UseHttpsRedirection();
 
 app.UseAntiforgery();

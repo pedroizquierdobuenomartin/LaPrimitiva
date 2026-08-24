@@ -83,15 +83,7 @@
                                 @((summary.FixedWon - summary.FixedSpent).ToString("N2"))€
                             </span>
                         </div>
-                        <div class="w-full bg-[var(--brand-bg)] rounded-full h-3 flex overflow-hidden shadow-inner">
-                            @{
-                                var fixedVol = summary.FixedSpent + summary.FixedWon;
-                            }
-                            <div class="bg-rose-400 h-full transition-all duration-1000 ease-out" 
-                                 style="width: @(GetBarWidthPercent(summary.FixedSpent, fixedVol).ToString("0.##", System.Globalization.CultureInfo.InvariantCulture))%"></div>
-                            <div class="bg-emerald-400 h-full transition-all duration-1000 ease-out" 
-                                 style="width: @(GetBarWidthPercent(summary.FixedWon, fixedVol).ToString("0.##", System.Globalization.CultureInfo.InvariantCulture))%"></div>
-                        </div>
+                        <BreakdownBar Spent="@summary.FixedSpent" Won="@summary.FixedWon" AriaLabel="@L["FixedCombination"]" />
                         <div class="flex justify-between text-xs font-bold text-[var(--brand-text-secondary)] mt-3">
                             <span>@L["Expense"]: @summary.FixedSpent.ToString("N2")€</span>
                             <span>@L["Prize"]: @summary.FixedWon.ToString("N2")€</span>
@@ -105,15 +97,7 @@
                                 @((summary.AutoWon - summary.AutoSpent).ToString("N2"))€
                             </span>
                         </div>
-                        <div class="w-full bg-[var(--brand-bg)] rounded-full h-3 flex overflow-hidden shadow-inner">
-                            @{
-                                var autoVol = summary.AutoSpent + summary.AutoWon;
-                            }
-                            <div class="bg-rose-400 h-full transition-all duration-1000 ease-out" 
-                                 style="width: @(GetBarWidthPercent(summary.AutoSpent, autoVol).ToString("0.##", System.Globalization.CultureInfo.InvariantCulture))%"></div>
-                            <div class="bg-emerald-400 h-full transition-all duration-1000 ease-out" 
-                                 style="width: @(GetBarWidthPercent(summary.AutoWon, autoVol).ToString("0.##", System.Globalization.CultureInfo.InvariantCulture))%"></div>
-                        </div>
+                        <BreakdownBar Spent="@summary.AutoSpent" Won="@summary.AutoWon" AriaLabel="@L["AutoCombination"]" />
                         <div class="flex justify-between text-xs font-bold text-[var(--brand-text-secondary)] mt-3">
                             <span>@L["Expense"]: @summary.AutoSpent.ToString("N2")€</span>
                             <span>@L["Prize"]: @summary.AutoWon.ToString("N2")€</span>
@@ -127,17 +111,9 @@
                                 @(((summary.JokerFixedWon + summary.JokerAutoWon) - (summary.JokerFixedSpent + summary.JokerAutoSpent)).ToString("N2"))€
                             </span>
                         </div>
-                        <div class="w-full bg-[var(--brand-bg)] rounded-full h-3 flex overflow-hidden shadow-inner">
-                            @{
-                                var js = summary.JokerFixedSpent + summary.JokerAutoSpent;
-                                var jw = summary.JokerFixedWon + summary.JokerAutoWon;
-                                var jokerVol = js + jw;
-                            }
-                            <div class="bg-rose-400 h-full transition-all duration-1000 ease-out" 
-                                 style="width: @(GetBarWidthPercent(js, jokerVol).ToString("0.##", System.Globalization.CultureInfo.InvariantCulture))%"></div>
-                            <div class="bg-emerald-400 h-full transition-all duration-1000 ease-out" 
-                                 style="width: @(GetBarWidthPercent(jw, jokerVol).ToString("0.##", System.Globalization.CultureInfo.InvariantCulture))%"></div>
-                        </div>
+                        <BreakdownBar Spent="@(summary.JokerFixedSpent + summary.JokerAutoSpent)"
+                                      Won="@(summary.JokerFixedWon + summary.JokerAutoWon)"
+                                      AriaLabel="Joker (Total)" />
                         <div class="flex justify-between text-xs font-bold text-[var(--brand-text-secondary)] mt-3">
                             <span>@L["Expense"]: @((summary.JokerFixedSpent + summary.JokerAutoSpent).ToString("N2"))€</span>
                             <span>@L["Prize"]: @((summary.JokerFixedWon + summary.JokerAutoWon).ToString("N2"))€</span>
@@ -257,8 +233,8 @@
                         intersect = false,
                         padding = 16,
                         backgroundColor = "rgba(0, 77, 45, 0.95)",
-                        titleFont = new { size = 14, weight = "bold", family = "Poppins" },
-                        bodyFont = new { size = 14, family = "Poppins" },
+                        titleFont = new { size = 14, weight = "bold", family = "system-ui" },
+                        bodyFont = new { size = 14, family = "system-ui" },
                         displayColors = false,
                         cornerRadius = 12
                     }
@@ -269,23 +245,16 @@
                     {
                         beginAtZero = false,
                         grid = new { color = "rgba(233, 236, 239, 1)" },
-                        ticks = new { font = new { family = "Poppins", size = 12 } }
+                        ticks = new { font = new { family = "system-ui", size = 12 } }
                     },
                     x = new
                     {
                         grid = new { display = false },
-                        ticks = new { font = new { family = "Poppins", size = 12 } }
+                        ticks = new { font = new { family = "system-ui", size = 12 } }
                     }
                 }
             }
         };
-    }
-
-    private double GetBarWidthPercent(decimal val, decimal total)
-    {
-        if (total == 0) return 0;
-        var percent = (double)(val / total * 100);
-        return Math.Min(100, Math.Abs(percent));
     }
 
     public void Dispose()

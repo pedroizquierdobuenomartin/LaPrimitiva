@@ -3,6 +3,7 @@
 [Oo]bj/
 [Pp]ublish/
 [Aa]rtifacts/
+node_modules/
 
 # Visual Studio
 .vs/

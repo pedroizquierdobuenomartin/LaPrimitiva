@@ -1,5 +1,3 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
-
 :root {
 	--brand-primary: #007041;
 	--brand-secondary: #004D2D;
@@ -21,7 +19,7 @@
 
 html,
 body {
-	font-family: 'Poppins', sans-serif;
+	font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 	background-color: var(--brand-bg);
 	color: var(--brand-text-primary);
 }
@@ -32,7 +30,33 @@ h3,
 h4,
 h5,
 h6 {
-	font-family: 'Poppins', sans-serif;
+	font-family: inherit;
+}
+
+.brand-clover-pulse {
+	animation-duration: 4s;
+}
+
+.brand-ball-bounce {
+	animation-duration: 6s;
+}
+
+.generator-pattern {
+	background-image: radial-gradient(circle at 1px 1px, white 1px, transparent 0);
+	background-size: 24px 24px;
+}
+
+.generator-orbit {
+	animation-duration: 18s;
+}
+
+.breakdown-bar {
+	display: block;
+	width: 100%;
+	height: 0.75rem;
+	background: var(--brand-bg);
+	border-radius: 9999px;
+	overflow: hidden;
 }
 
 a,

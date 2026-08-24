@@ -61,6 +61,7 @@ if (!app.Environment.IsDevelopment())
 }
 app.UseStatusCodePagesWithReExecute("/not-found", createScopeForStatusCodePages: true);
 app.UseMiddleware<LocalOnlyMiddleware>();
+app.UseMiddleware<SecurityHeadersMiddleware>();
 app.UseHttpsRedirection();
 
 app.UseAntiforgery();

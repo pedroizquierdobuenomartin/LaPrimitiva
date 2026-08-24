@@ -1,0 +1,12 @@
+{
+  "private": true,
+  "scripts": {
+    "build:css": "tailwindcss -c tailwind.config.js -i ./Styles/tailwind.css -o ./wwwroot/css/tailwind-3.4.17.min.css --minify"
+  },
+  "dependencies": {
+    "chart.js": "4.5.1"
+  },
+  "devDependencies": {
+    "tailwindcss": "3.4.17"
+  }
+}

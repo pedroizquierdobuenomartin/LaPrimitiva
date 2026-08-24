@@ -1,0 +1,27 @@
+.floating-animation {
+    animation: float 4s ease-in-out infinite;
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+
+.eye-blink {
+    transform-origin: center;
+    animation: blink 3s ease-in-out infinite;
+}
+
+@keyframes blink {
+    0%, 90%, 100% { transform: scaleY(1); }
+    95% { transform: scaleY(0.1); }
+}
+
+.mouth-sigh {
+    animation: sigh 4s ease-in-out infinite;
+}
+
+@keyframes sigh {
+    0%, 100% { d: path("M9 16C9.85038 15.3691 10.8846 15 12 15C13.1154 15 14.1496 15.3691 15 16"); }
+    50% { d: path("M8.5 16.5C9.5 15.5 11 15 12 15C13 15 14.5 15.5 15.5 16.5"); }
+}

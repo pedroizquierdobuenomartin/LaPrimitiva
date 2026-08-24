@@ -275,37 +275,6 @@
     </div>
 }
 
-<style>
-    .modal-input-circle {
-        width: 100%;
-        height: 3.5rem;
-        background-color: #f9fafb;
-        border: 1px solid #f3f4f6;
-        border-radius: 0.75rem;
-        padding: 0;
-        text-align: center;
-        font-size: 0.875rem;
-        font-weight: 900;
-        color: var(--brand-secondary);
-        outline: none;
-        transition: all 0.2s;
-        box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.05);
-    }
-    .modal-input-circle:focus {
-        border-color: var(--brand-accent);
-        background-color: white;
-        box-shadow: 0 0 0 4px rgba(243, 195, 136, 0.1), inset 0 2px 4px 0 rgba(0, 0, 0, 0.02);
-    }
-    input[type=number]::-webkit-inner-spin-button, 
-    input[type=number]::-webkit-outer-spin-button { 
-      -webkit-appearance: none; 
-      margin: 0; 
-    }
-    input[type=number] {
-      -moz-appearance: textfield;
-    }
-</style>
-
 @code {
     private List<WinningDrawDto>? _draws;
     private List<int>? _availableYears;

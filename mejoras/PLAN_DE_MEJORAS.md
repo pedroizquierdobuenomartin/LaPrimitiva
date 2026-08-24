@@ -297,7 +297,7 @@
 - **Resultado:** el arranque valida las fuentes de configuración de escucha y lanza `InvalidOperationException` antes de construir el servidor cuando encuentra una URL no-loopback o una configuración de puertos comodín. Cada petición debe proceder de una IP loopback o recibe `403`; el filtro integrado de hosts queda limitado a `laprimitiva.local`, `localhost`, `127.0.0.1` y `[::1]`. `README.md` documenta la publicación IIS local en `http://laprimitiva.local/` y exige un binding `127.0.0.1:80`, no `Todos sin asignar`.
 - **Decisiones:** se mantiene el modo exclusivamente local y no se introduce autenticación, que corresponde a una futura decisión de acceso LAN. Se aplican tres barreras complementarias: validación de escucha para Kestrel, restricción de `Host` y validación de la IP remota para cubrir IIS. La aplicación no puede consultar de forma portable los bindings del metabase de IIS, por lo que el binding loopback se exige además como configuración operativa; aun si IIS se configura demasiado amplio, la aplicación rechaza clientes no locales. No se avanzó a M-302.
 
-### [ ] M-302 — Eliminar JavaScript mutable de CDN y añadir CSP
+### [x] M-302 — Eliminar JavaScript mutable de CDN y añadir CSP
 
 **Severidad de auditoría:** media.
 
@@ -314,6 +314,14 @@
 
 - La aplicación funciona sin acceder a CDN externas.
 - La CSP no necesita `unsafe-inline` ni orígenes comodín.
+
+**Cierre (2026-08-24):**
+
+- **Referencia:** commit de cierre M-302 de esta publicación, sobre `48d26b1`; release `v1.4.0`.
+- **Evidencia previa:** `Components/App.razor` cargaba `https://cdn.tailwindcss.com` y `https://cdn.jsdelivr.net/npm/chart.js` sin versión fija ni SRI, definía `downloadFile` y `renderChart` en un bloque `<script>` inline y generaba además un import map inline. `wwwroot/app.css` importaba Poppins desde Google Fonts, varios componentes conservaban atributos o bloques de estilo inline y `Program.cs` no emitía CSP, `X-Content-Type-Options` ni `Referrer-Policy`.
+- **Pruebas realizadas:** repositorio inicialmente limpio en `main`, sincronizado `0/0` con `origin/main`; ejecución en rojo de `scripts/Verify-M302ContentSecurity.ps1` antes del arreglo por la carga externa de `App.razor`; ejecución final correcta de los verificadores estáticos M-302 y M-301; `node --check` correcto para `app-interop.js` y Chart.js; hashes SHA-256 y versiones exactas de los activos verificados; búsqueda sin atributos, bloques de estilo ni scripts inline en los componentes; búsqueda sin orígenes externos en los activos de entrada; `git diff --check` sin errores. La línea base `dotnet test --no-restore` se intentó antes de editar, pero no llegó a ejecutar pruebas porque una instancia abierta de la aplicación mantenía bloqueados los ensamblados de `LaPrimitiva.App`; `SecurityHeadersMiddlewareTests` se añadió, pero no se ejecutó porque la política del repositorio prohíbe compilar después de los cambios.
+- **Resultado:** Tailwind CSS 3.4.17 se compila como hoja local y Chart.js 4.5.1 queda autoalojado con versiones exactas, lockfile, licencias y hashes revisados; el interop se sirve desde `wwwroot/js/app-interop.js`; se eliminan el import map y los recursos de Google Fonts. Todas las respuestas incorporan una CSP basada en `'self'`, sin `unsafe-inline`, `unsafe-eval` ni orígenes comodín, junto con `X-Content-Type-Options: nosniff` y `Referrer-Policy: no-referrer`. Los estilos inline existentes se trasladaron a CSS estático o aislado y las barras dinámicas usan atributos SVG con formato invariante.
+- **Decisiones:** se autoaloja CSS ya compilado en vez del compilador JavaScript de Tailwind en el navegador; las dependencias quedan fijadas también en `package-lock.json` para poder regenerar el activo. Se usa la pila tipográfica del sistema en lugar de añadir otra descarga o incorporar Poppins al repositorio. La CSP se aplica mediante middleware antes de los endpoints; `connect-src` conserva `'self'` y añade únicamente el endpoint WebSocket exacto derivado del host actual para cubrir la conexión interactiva de Blazor sin comodines. No se añade HSTS ni se modifica la configuración HTTPS, que pertenecen a M-306, y no se avanzó a M-303.
 
 ### [ ] M-303 — Validar rangos de sorteos históricos
 

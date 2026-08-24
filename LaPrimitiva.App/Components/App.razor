@@ -6,10 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <base href="/" />
     <ResourcePreloader />
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="@Assets["css/tailwind-3.4.17.min.css"]" />
     <link rel="stylesheet" href="@Assets["app.css"]" />
     <link rel="stylesheet" href="@Assets["LaPrimitiva.App.styles.css"]" />
-    <ImportMap />
     <link rel="icon" type="image/png" href="favicon.png" />
     <HeadOutlet @rendermode="InteractiveServer" />
 </head>
@@ -18,29 +17,8 @@
     <Routes @rendermode="InteractiveServer" />
     <ReconnectModal />
     <script src="@Assets["_framework/blazor.web.js"]"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script>
-        window.downloadFile = (fileName, base64Data) => {
-            const link = document.createElement('a');
-            link.download = fileName;
-            link.href = 'data:text/csv;base64,' + base64Data;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        }
-
-        window.renderChart = (canvasId, config) => {
-            const ctx = document.getElementById(canvasId).getContext('2d');
-            
-            // Check if chart already exists and destroy it
-            const existingChart = Chart.getChart(canvasId);
-            if (existingChart) {
-                existingChart.destroy();
-            }
-
-            new Chart(ctx, config);
-        }
-    </script>
+    <script src="@Assets["lib/chart.js/4.5.1/chart.umd.min.js"]"></script>
+    <script src="@Assets["js/app-interop.js"]"></script>
 </body>
 
 </html>

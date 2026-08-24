@@ -1,0 +1,25 @@
+<svg class="breakdown-bar" viewBox="0 0 100 3" preserveAspectRatio="none" role="img" aria-label="@AriaLabel">
+    <rect x="0" y="0" width="@SpentPercent" height="3" fill="#fb7185" />
+    <rect x="@SpentPercent" y="0" width="@WonPercent" height="3" fill="#34d399" />
+</svg>
+
+@code {
+    [Parameter]
+    public decimal Spent { get; set; }
+
+    [Parameter]
+    public decimal Won { get; set; }
+
+    [Parameter]
+    public string AriaLabel { get; set; } = "";
+
+    private decimal Total => Spent + Won;
+    private string SpentPercent => FormatPercent(Spent);
+    private string WonPercent => FormatPercent(Won);
+
+    private string FormatPercent(decimal value)
+    {
+        var percent = Total <= 0 ? 0 : Math.Clamp(value / Total * 100, 0, 100);
+        return percent.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture);
+    }
+}

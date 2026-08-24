@@ -11,9 +11,25 @@ namespace LaPrimitiva.Application.Services
             get => _selectedYear;
             set
             {
-                if (_selectedYear != value)
+                if (_selectedYear != value || _showAllPlans)
                 {
                     _selectedYear = value;
+                    _showAllPlans = false;
+                    NotifyStateChanged();
+                    NotifyDataChanged();
+                }
+            }
+        }
+
+        private bool _showAllPlans;
+        public bool ShowAllPlans
+        {
+            get => _showAllPlans;
+            set
+            {
+                if (_showAllPlans != value)
+                {
+                    _showAllPlans = value;
                     NotifyStateChanged();
                     NotifyDataChanged();
                 }

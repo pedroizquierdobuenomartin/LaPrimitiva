@@ -33,6 +33,7 @@
   <data name="Plans" xml:space="preserve"><value>Planes</value></data>
   <data name="PlanManagement" xml:space="preserve"><value>Gestión de Planes</value></data>
   <data name="ConfigurePlanRules" xml:space="preserve"><value>Configura versiones de costes y reglas para el año</value></data>
+  <data name="ConfigureAllPlanRules" xml:space="preserve"><value>Consulta todas las versiones de costes, reglas y periodos.</value></data>
   <data name="NewPlan" xml:space="preserve"><value>Nuevo Plan</value></data>
   <data name="CostPerBet" xml:space="preserve"><value>Coste por Apuesta</value></data>
   <data name="BetsPerDraw" xml:space="preserve"><value>Apuestas/Sorteo</value></data>
@@ -51,6 +52,8 @@
   <data name="NetBalance" xml:space="preserve"><value>Balance Neto</value></data>
   <data name="NoPlansForYear" xml:space="preserve"><value>No hay planes para {0}</value></data>
   <data name="NoPlansForYearDesc" xml:space="preserve"><value>Crea un nuevo plan o cambia el año seleccionado para ver otros planes.</value></data>
+  <data name="NoPlansAvailable" xml:space="preserve"><value>No hay planes disponibles</value></data>
+  <data name="NoPlansAvailableDesc" xml:space="preserve"><value>Crea un nuevo plan para comenzar a configurar periodos y costes.</value></data>
   <data name="OverlappingDates" xml:space="preserve"><value>Fechas Superpuestas</value></data>
   <data name="Active" xml:space="preserve"><value>Activo</value></data>
   <data name="Inactive" xml:space="preserve"><value>Inactivo</value></data>

@@ -44,6 +44,7 @@
   <data name="Terms" xml:space="preserve"><value>Términos y Condiciones</value></data>
   <data name="Yes" xml:space="preserve"><value>SÍ</value></data>
   <data name="No" xml:space="preserve"><value>NO</value></data>
+  <data name="All" xml:space="preserve"><value>Todos</value></data>
   <data name="Edit" xml:space="preserve"><value>Editar</value></data>
   <data name="Delete" xml:space="preserve"><value>Borrar</value></data>
   <data name="CancelButton" xml:space="preserve"><value>Cancelar</value></data>

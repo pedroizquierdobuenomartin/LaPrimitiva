@@ -21,7 +21,7 @@
     <div class="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
         <div>
             <h2 class="text-3xl md:text-4xl font-bold text-[var(--brand-secondary)] tracking-tight">@L["PlanManagement"]</h2>
-            <p class="text-[var(--brand-text-secondary)] mt-2 font-medium text-sm md:text-base">@L["ConfigurePlanRules"] <span class="text-[var(--brand-primary)] font-bold">@GlobalState.SelectedYear</span>.</p>
+            <p class="text-[var(--brand-text-secondary)] mt-2 font-medium text-sm md:text-base">@PlanPageDescription</p>
         </div>
         <button @onclick="ShowCreateModal" class="bg-[var(--brand-accent)] hover:opacity-90 text-white md:px-8 md:py-3.5 px-6 py-3 rounded-xl font-bold shadow-xl shadow-[var(--brand-accent)]/20 transition-all flex items-center justify-center gap-2 transform hover:scale-105 active:scale-95 whitespace-nowrap text-sm md:text-base w-full md:w-auto">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -46,8 +46,8 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
                     </svg>
                 </div>
-                <h4 class="text-2xl font-bold text-[var(--brand-secondary)]">@string.Format(L["NoPlansForYear"], GlobalState.SelectedYear)</h4>
-                <p class="text-[var(--brand-text-secondary)] font-medium max-w-sm mt-2">@L["NoPlansForYearDesc"]</p>
+                <h4 class="text-2xl font-bold text-[var(--brand-secondary)]">@EmptyPlansTitle</h4>
+                <p class="text-[var(--brand-text-secondary)] font-medium max-w-sm mt-2">@EmptyPlansDescription</p>
             </div>
         }
         else
@@ -338,6 +338,15 @@
     private string? _deleteErrorMessage;
     private bool _hasLinkedDraws;
     private bool _isLoading;
+    private string PlanPageDescription => GlobalState.ShowAllPlans
+        ? L["ConfigureAllPlanRules"].Value
+        : string.Format("{0} {1}.", L["ConfigurePlanRules"].Value, GlobalState.SelectedYear);
+    private string EmptyPlansTitle => GlobalState.ShowAllPlans
+        ? L["NoPlansAvailable"].Value
+        : string.Format(L["NoPlansForYear"], GlobalState.SelectedYear);
+    private string EmptyPlansDescription => GlobalState.ShowAllPlans
+        ? L["NoPlansAvailableDesc"].Value
+        : L["NoPlansForYearDesc"].Value;
 
     protected override async Task OnInitializedAsync()
     {
@@ -360,7 +369,9 @@
         _isLoading = true;
         try 
         {
-            plans = await PlanService.GetPlansByYearAsync(GlobalState.SelectedYear);
+            plans = GlobalState.ShowAllPlans
+                ? await PlanService.GetPlansAsync()
+                : await PlanService.GetPlansByYearAsync(GlobalState.SelectedYear);
         }
         finally 
         {

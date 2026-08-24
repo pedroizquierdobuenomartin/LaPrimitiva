@@ -250,7 +250,7 @@
 - **Decisiones:** `BetsPerDraw` admite `1..100`; una apuesta se registra como fija y las restantes se agregan en el componente automático, preservando el modelo histórico de dos componentes. El Joker se cobra por cada apuesta. Los costes Joker históricos de planes con Joker desactivado se normalizan a cero antes de activar las restricciones; los solapamientos históricos no se corrigen de forma arbitraria, sino que bloquean la activación para exigir una decisión explícita. Se mantuvieron las fotografías de coste ya persistidas en sorteos anteriores y no se avanzó a M-206.
 - **Corrección posterior (2026-08-20):** la verificación manual al editar un plan reveló el error SQL Server 334: EF generaba `OUTPUT` sobre `Plans` sin conocer el trigger de solapamientos. Se declaró `TR_Plans_PreventOverlap` en el modelo y se desactivó explícitamente `UseSqlOutputClause` para esa tabla, conservando el trigger y usando el guardado compatible. El test de actualización existente se renombró para registrar expresamente esta regresión; `scripts/Verify-M205PlanValidation.ps1` y `git diff --check` volvieron a resultar correctos. Referencia: commit `e315855` (`fix: support plan trigger writes`), sobre `32d7876`. El usuario reconstruyó la aplicación y confirmó posteriormente que la edición del plan se guarda correctamente en ejecución.
 
-### [ ] M-206 — Preservar `CreatedAt` al actualizar planes
+### [x] M-206 — Preservar `CreatedAt` al actualizar planes
 
 **Problema:** reconstruir la entidad y marcarla completa como modificada puede reemplazar su fecha de creación.
 
@@ -259,6 +259,14 @@
 - `CreatedAt` nunca cambia en una edición normal.
 - `UpdatedAt` refleja la modificación.
 - Una prueba comprueba explícitamente ambas propiedades.
+
+**Cierre (2026-08-24):**
+
+- **Referencia:** commit de cierre M-206 de esta publicación, sobre `373561a`; release `v1.2.0`.
+- **Evidencia previa:** `Plans.razor` reconstruía para la edición una entidad `Plan` sin copiar `CreatedAt`, por lo que el inicializador de la entidad le asignaba un `DateTime.UtcNow` nuevo. `PlanRepository.UpdateAsync` desconectaba cualquier instancia seguida y marcaba esa entidad completa como `EntityState.Modified`, incluyendo `CreatedAt`; en consecuencia, el siguiente `SaveChangesAsync` podía reemplazar la fecha de creación persistida. El repositorio ya actualizaba `UpdatedAt`, pero no protegía `CreatedAt`.
+- **Pruebas realizadas:** línea base estática previa `scripts/Verify-M205PlanValidation.ps1` correcta; tras el cambio, `scripts/Verify-M206PlanTimestamps.ps1` correcto, regresión estática M-205 correcta y `git diff --check` sin errores. Se añadió `UpdatePlan_ShouldPreserveCreatedAt_AndRefreshUpdatedAt`, que envía una entidad desconectada con un `CreatedAt` manipulado y comprueba explícitamente que la fecha original permanece y que `UpdatedAt` avanza. La prueba xUnit nueva no se ejecutó porque la política del repositorio prohíbe compilar después de los cambios.
+- **Resultado:** `PlanRepository.UpdateAsync` carga el plan persistido y copia únicamente las propiedades editables. `CreatedAt` permanece en la entidad seguida y no se incluye en la actualización; `UpdatedAt` se establece en UTC en el momento de guardar.
+- **Decisiones:** se eligió actualizar una entidad seguida mediante lista blanca en vez de mantener el patrón de entidad desconectada marcada completamente como modificada. Así la protección no depende de que cada consumidor recuerde reenviar `CreatedAt`, se preservan también las navegaciones y se evita aceptar desde el exterior tanto `CreatedAt` como `UpdatedAt`. No se avanzó al siguiente hito.
 
 ---
 
@@ -848,3 +856,5 @@ Estos descartes describen el código auditado y deben revisarse si cambian las f
 | M-202 | 2026-08-20 | Commit `M-202` (este commit), sobre `4a7cfdf` | Completado | Ruta `/registro` centralizada en `AppRoutes.Registration`; verificador estático correcto y navegación Planes → Registro comprobada manualmente por el usuario. |
 | M-203 | 2026-08-20 | Commit `M-203` (este commit), sobre `07a58cc` | Completado | Totales de coste y premios incluyen los cuatro componentes; persistencia y reparación aplican el invariante; casos Joker y ROI añadidos; build, ejecución y comprobación visual satisfactorios comunicados por el usuario. |
 | M-205 | 2026-08-20 | `32d7876`, corrección `e315855` | Completado | Validación coherente en UI, Application, dominio, repositorio y SQL; `BetsPerDraw` aplicado a costes; verificación estática correcta, 14 casos xUnit añadidos y guardado de edición comprobado en ejecución por el usuario. |
+| M-206 | 2026-08-24 | Commit de cierre sobre `373561a`; release `v1.2.0` | Completado | Actualización con entidad seguida y lista blanca; `CreatedAt` preservado y `UpdatedAt` renovado; límites coincidentes rechazados al crear y editar; selector `Todos` validado en ejecución; footer de versión corregido y comprobado visualmente. |
+| M-702 | 2026-08-24 | `e2402f6`, `19defe6`, release `373561a`, tag `v1.1.0` | Completado | Generación uniforme y rediseño validados; títulos de Histórico y Combinación automática unificados con `PageTitle`; footer enlazado a la versión del ensamblado y release `1.1.0` publicada. Verificación estática correcta y validación visual del usuario; casos xUnit nuevos no ejecutados por la prohibición de compilar. |

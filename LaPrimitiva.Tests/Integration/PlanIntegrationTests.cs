@@ -83,6 +83,35 @@ namespace LaPrimitiva.Tests.Integration
         }
 
         [Fact]
+        public async Task CreatePlan_ShouldFail_WhenStartDateMatchesExistingEndDate()
+        {
+            await ResetDatabaseAsync();
+            using var scope = CreateScope();
+            var planService = scope.ServiceProvider.GetRequiredService<PlanService>();
+            var context = scope.ServiceProvider.GetRequiredService<PrimitivaDbContext>();
+            var existingPlan = new Plan
+            {
+                Name = "Existing Boundary Plan",
+                EffectiveFrom = new DateTime(2032, 1, 1),
+                EffectiveTo = new DateTime(2032, 12, 31),
+                BetsPerDraw = 2
+            };
+            await planService.CreatePlanAsync(existingPlan);
+
+            var matchingBoundaryPlan = new Plan
+            {
+                Name = "Matching Boundary Plan",
+                EffectiveFrom = existingPlan.EffectiveTo!.Value,
+                EffectiveTo = new DateTime(2033, 12, 30),
+                BetsPerDraw = 2
+            };
+
+            await Assert.ThrowsAsync<InvalidOperationException>(
+                () => planService.CreatePlanAsync(matchingBoundaryPlan));
+            Assert.Equal(1, await context.Plans.CountAsync());
+        }
+
+        [Fact]
         public async Task Repository_ShouldRejectInvalidPlan_WhenApplicationServiceIsBypassed()
         {
             await ResetDatabaseAsync();
@@ -182,6 +211,94 @@ namespace LaPrimitiva.Tests.Integration
             // Assert
             var result = await planService.GetPlanByIdAsync(testPlan.Id);
             Assert.Equal("Update Test Plan Updated", result?.Name);
+        }
+
+        [Fact]
+        public async Task UpdatePlan_ShouldFail_WhenEndDateMatchesAnotherStartDate()
+        {
+            await ResetDatabaseAsync();
+            using var scope = CreateScope();
+            var planService = scope.ServiceProvider.GetRequiredService<PlanService>();
+            var context = scope.ServiceProvider.GetRequiredService<PrimitivaDbContext>();
+            var editablePlan = new Plan
+            {
+                Name = "Editable Boundary Plan",
+                EffectiveFrom = new DateTime(2033, 1, 1),
+                EffectiveTo = new DateTime(2033, 12, 31),
+                BetsPerDraw = 2
+            };
+            var existingPlan = new Plan
+            {
+                Name = "Existing Next Plan",
+                EffectiveFrom = new DateTime(2034, 1, 1),
+                EffectiveTo = new DateTime(2034, 12, 31),
+                BetsPerDraw = 2
+            };
+            await planService.CreatePlanAsync(editablePlan);
+            await planService.CreatePlanAsync(existingPlan);
+
+            var overlappingUpdate = new Plan
+            {
+                Id = editablePlan.Id,
+                Name = editablePlan.Name,
+                EffectiveFrom = editablePlan.EffectiveFrom,
+                EffectiveTo = existingPlan.EffectiveFrom,
+                CostPerBet = editablePlan.CostPerBet,
+                BetsPerDraw = editablePlan.BetsPerDraw
+            };
+
+            await Assert.ThrowsAsync<InvalidOperationException>(
+                () => planService.UpdatePlanAsync(overlappingUpdate));
+            var persisted = await context.Plans
+                .AsNoTracking()
+                .SingleAsync(plan => plan.Id == editablePlan.Id);
+            Assert.Equal(new DateTime(2033, 12, 31), persisted.EffectiveTo);
+        }
+
+        [Fact]
+        public async Task UpdatePlan_ShouldPreserveCreatedAt_AndRefreshUpdatedAt()
+        {
+            // Arrange
+            await ResetDatabaseAsync();
+            using var scope = CreateScope();
+            var planService = scope.ServiceProvider.GetRequiredService<PlanService>();
+            var context = scope.ServiceProvider.GetRequiredService<PrimitivaDbContext>();
+            var originalCreatedAt = new DateTime(2020, 1, 2, 3, 4, 5, DateTimeKind.Utc);
+            var originalUpdatedAt = new DateTime(2020, 1, 3, 3, 4, 5, DateTimeKind.Utc);
+            var testPlan = new Plan
+            {
+                Name = "Timestamp Test Plan",
+                EffectiveFrom = new DateTime(2031, 1, 1),
+                EffectiveTo = new DateTime(2031, 12, 31),
+                CostPerBet = 1.0m,
+                BetsPerDraw = 2,
+                CreatedAt = originalCreatedAt,
+                UpdatedAt = originalUpdatedAt
+            };
+            await planService.CreatePlanAsync(testPlan);
+
+            var disconnectedPlan = new Plan
+            {
+                Id = testPlan.Id,
+                Name = "Timestamp Test Plan Updated",
+                EffectiveFrom = testPlan.EffectiveFrom,
+                EffectiveTo = testPlan.EffectiveTo,
+                CostPerBet = testPlan.CostPerBet,
+                BetsPerDraw = testPlan.BetsPerDraw,
+                CreatedAt = originalCreatedAt.AddYears(10),
+                UpdatedAt = originalUpdatedAt
+            };
+
+            // Act
+            await planService.UpdatePlanAsync(disconnectedPlan);
+
+            // Assert
+            var persisted = await context.Plans
+                .AsNoTracking()
+                .SingleAsync(plan => plan.Id == testPlan.Id);
+            Assert.Equal("Timestamp Test Plan Updated", persisted.Name);
+            Assert.Equal(originalCreatedAt, persisted.CreatedAt);
+            Assert.True(persisted.UpdatedAt > originalUpdatedAt);
         }
     }
 }

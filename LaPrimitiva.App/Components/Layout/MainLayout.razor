@@ -124,10 +124,14 @@
                 {
                     <div class="flex items-center gap-2">
                         <span class="text-[10px] font-bold text-[var(--brand-text-secondary)] uppercase tracking-wider hidden sm:block">@LD["SelectedYear"]</span>
-                        <select @bind="GlobalState.SelectedYear" disabled="@GlobalState.IsHistoricalView" 
+                        <select value="@YearFilterValue" @onchange="HandleYearFilterChanged" disabled="@GlobalState.IsHistoricalView"
                                 class="bg-gray-50 border border-[var(--brand-borders)] text-[var(--brand-secondary)] text-xs rounded-lg px-2 py-1 outline-none focus:ring-1 focus:ring-[var(--brand-primary)]">
                             @if (_availableYears != null)
                             {
+                                @if (_isPlansPage)
+                                {
+                                    <option value="all">@L["All"]</option>
+                                }
                                 @foreach (var y in _availableYears)
                                 {
                                     <option value="@y">@y</option>
@@ -201,7 +205,7 @@
                 <footer class="h-12 border-t border-gray-200/50 bg-[#f8fafc] flex items-center justify-between px-8 text-[10px] text-gray-400 font-medium tracking-wider flex-shrink-0">
                     <div class="flex items-center gap-2">
                         <span>&copy; 2026 LA PRIMITIVA AUDIT</span>
-                        <span aria-label="Versión de la aplicación">v@AppVersion</span>
+                        <span aria-label="Versión de la aplicación">@($"v{AppVersion}")</span>
                     </div>
                     <div class="flex gap-4">
                         <a href="ayuda" class="hover:text-[var(--brand-primary)]">@L["Help"]</a>
@@ -491,6 +495,7 @@
     private bool _showRightMobileMenu = false;
     private bool _isDashboard = false;
     private bool _isHistoricalPage = false;
+    private bool _isPlansPage = false;
     private bool _showNotifications = false;
     private List<int>? _availableYears;
     
@@ -513,6 +518,7 @@
         NavigationManager.LocationChanged += HandleLocationChanged;
         _isDashboard = IsDashboard(NavigationManager.Uri);
         _isHistoricalPage = IsHistoricalPage(NavigationManager.Uri);
+        _isPlansPage = IsPlansPage(NavigationManager.Uri);
         await LoadYears();
     }
 
@@ -538,6 +544,7 @@
     {
         var isDash = IsDashboard(e.Location);
         var isHist = IsHistoricalPage(e.Location);
+        var isPlans = IsPlansPage(e.Location);
         bool changed = false;
 
         if (_isDashboard != isDash)
@@ -557,6 +564,12 @@
             changed = true;
         }
 
+        if (_isPlansPage != isPlans)
+        {
+            _isPlansPage = isPlans;
+            changed = true;
+        }
+
         if (changed)
         {
             StateHasChanged();
@@ -573,6 +586,31 @@
     {
         var relative = NavigationManager.ToBaseRelativePath(uri);
         return relative.StartsWith("historico");
+    }
+
+    private bool IsPlansPage(string uri)
+    {
+        var relative = NavigationManager.ToBaseRelativePath(uri);
+        return relative.StartsWith("planes");
+    }
+
+    private string YearFilterValue => _isPlansPage && GlobalState.ShowAllPlans
+        ? "all"
+        : GlobalState.SelectedYear.ToString();
+
+    private void HandleYearFilterChanged(ChangeEventArgs args)
+    {
+        var value = args.Value?.ToString();
+        if (_isPlansPage && string.Equals(value, "all", StringComparison.Ordinal))
+        {
+            GlobalState.ShowAllPlans = true;
+            return;
+        }
+
+        if (int.TryParse(value, out var year))
+        {
+            GlobalState.SelectedYear = year;
+        }
     }
 
     private async void HandleStateChange()

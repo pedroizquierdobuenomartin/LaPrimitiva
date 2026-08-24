@@ -47,8 +47,9 @@ Assert-Contains $page '@L["UniformSelectionNotice"]' 'La interfaz no explica la 
 Assert-Contains $page '@L["UniformStrategyTitle"]' 'La interfaz no identifica la estrategia adoptada.'
 Assert-Contains $page 'from-[var(--brand-primary)] to-[var(--brand-secondary)]' 'El panel principal no usa la paleta oficial de la aplicación.'
 Assert-Contains $appCss "family=Poppins:wght@300;400;500;600;700" 'No se cargan todos los pesos Poppins utilizados por la aplicación.'
-Assert-Contains $appProject '<Version>1.1.0</Version>' 'La aplicación no declara la versión de cierre M-702.'
-Assert-Contains $mainLayout '<span aria-label="Versión de la aplicación">v@AppVersion</span>' 'El footer no muestra la versión real de la aplicación.'
+if ($appProject -notmatch '<Version>\d+\.\d+\.\d+</Version>') { throw 'La aplicación no declara una versión semántica.' }
+Assert-Contains $mainLayout '<span aria-label="Versión de la aplicación">@($"v{AppVersion}")</span>' 'El footer no muestra la versión real de la aplicación mediante una expresión Razor explícita.'
+Assert-NotContains $mainLayout '<span aria-label="Versión de la aplicación">v@AppVersion</span>' 'El footer conserva la sintaxis ambigua que renderiza v@AppVersion como texto literal.'
 Assert-Contains $mainLayout 'typeof(MainLayout).Assembly.GetName().Version' 'El footer no obtiene la versión desde el ensamblado.'
 Assert-NotContains $mainLayout '<span aria-label="Versión de la aplicación">v1.1.0</span>' 'La versión del footer está escrita manualmente.'
 Assert-Contains $appCss "font-family: 'Poppins', sans-serif;" 'La fuente base global no es Poppins con fallback sans-serif.'

@@ -66,18 +66,21 @@ namespace LaPrimitiva.Infrastructure.Repositories
         {
             plan.Validate();
             await EnsureNoOverlapAsync(plan);
-            plan.UpdatedAt = DateTime.UtcNow;
-            
-            var local = _context.Set<Plan>()
-                .Local
-                .FirstOrDefault(entry => entry.Id.Equals(plan.Id));
 
-            if (local != null)
-            {
-                _context.Entry(local).State = EntityState.Detached;
-            }
+            var existing = await _context.Plans.SingleOrDefaultAsync(existing => existing.Id == plan.Id)
+                ?? throw new InvalidOperationException("No se ha encontrado el plan que se quiere actualizar.");
 
-            _context.Entry(plan).State = EntityState.Modified;
+            existing.Name = plan.Name;
+            existing.EffectiveFrom = plan.EffectiveFrom;
+            existing.EffectiveTo = plan.EffectiveTo;
+            existing.WeeksToTrackDefault = plan.WeeksToTrackDefault;
+            existing.CostPerBet = plan.CostPerBet;
+            existing.BetsPerDraw = plan.BetsPerDraw;
+            existing.EnableJoker = plan.EnableJoker;
+            existing.JokerCostPerBet = plan.JokerCostPerBet;
+            existing.FixedCombinationLabel = plan.FixedCombinationLabel;
+            existing.UpdatedAt = DateTime.UtcNow;
+
             await _context.SaveChangesAsync();
         }
 

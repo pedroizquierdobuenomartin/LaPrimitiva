@@ -108,6 +108,22 @@ public class AutomatedCombinationServiceTests
         Assert.Contains(result.Limitations, limitation => limitation.Contains("no guarda", StringComparison.OrdinalIgnoreCase));
     }
 
+    [Fact]
+    public async Task BacktestAsync_IgnoresCorruptHistoricalDraws()
+    {
+        var draws = CreateDraws(3);
+        draws.Insert(1, CreateDraw(new DateTime(2020, 1, 3), [0, 2, 3, 4, 5, 6]));
+        _repository
+            .Setup(r => r.GetListAsync(It.IsAny<Expression<Func<WinningDraw, bool>>?>()))
+            .ReturnsAsync(draws);
+        var service = new AutomatedCombinationService(_repository.Object);
+
+        var result = await service.BacktestAsync(minimumTrainingDraws: 1);
+
+        Assert.Equal(3, result.HistoricalDraws);
+        Assert.Equal(2, result.EvaluatedDraws);
+    }
+
     private static List<WinningDraw> CreateDraws(int count)
     {
         var start = new DateTime(2020, 1, 2);
@@ -134,7 +150,7 @@ public class AutomatedCombinationServiceTests
         Number4 = numbers[3],
         Number5 = numbers[4],
         Number6 = numbers[5],
-        Complementario = 1,
+        Complementario = Enumerable.Range(1, 49).First(number => !numbers.Contains(number)),
         Reintegro = 0
     };
 }

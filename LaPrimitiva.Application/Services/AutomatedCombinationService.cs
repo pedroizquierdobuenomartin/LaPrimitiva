@@ -57,6 +57,7 @@ namespace LaPrimitiva.Application.Services
             ValidateModelParameters(halfLifeDays, alpha);
 
             var draws = (await _repository.GetListAsync())
+                .Where(draw => draw.IsValid())
                 .OrderBy(draw => draw.DrawDate)
                 .ToList();
             var cases = new List<PredictionBacktestCase>();

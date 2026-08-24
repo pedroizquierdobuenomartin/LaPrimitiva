@@ -102,9 +102,14 @@ namespace LaPrimitiva.Infrastructure.Persistence.Seed
                         [Number6] int NOT NULL,
                         [Complementario] int NOT NULL,
                         [Reintegro] int NOT NULL,
-                        [Joker] nvarchar(10) NULL,
+                        [Joker] nvarchar(7) NULL,
                         [CreatedAt] datetime2 NOT NULL,
-                        CONSTRAINT [PK_WinningDraws] PRIMARY KEY ([Id])
+                        CONSTRAINT [PK_WinningDraws] PRIMARY KEY ([Id]),
+                        CONSTRAINT [CK_WinningDraws_MainNumbersRange] CHECK ([Number1] BETWEEN 1 AND 49 AND [Number2] BETWEEN 1 AND 49 AND [Number3] BETWEEN 1 AND 49 AND [Number4] BETWEEN 1 AND 49 AND [Number5] BETWEEN 1 AND 49 AND [Number6] BETWEEN 1 AND 49),
+                        CONSTRAINT [CK_WinningDraws_MainNumbersDistinct] CHECK ([Number1] NOT IN ([Number2], [Number3], [Number4], [Number5], [Number6]) AND [Number2] NOT IN ([Number3], [Number4], [Number5], [Number6]) AND [Number3] NOT IN ([Number4], [Number5], [Number6]) AND [Number4] NOT IN ([Number5], [Number6]) AND [Number5] <> [Number6]),
+                        CONSTRAINT [CK_WinningDraws_Complementario] CHECK ([Complementario] BETWEEN 1 AND 49 AND [Complementario] NOT IN ([Number1], [Number2], [Number3], [Number4], [Number5], [Number6])),
+                        CONSTRAINT [CK_WinningDraws_Reintegro] CHECK ([Reintegro] BETWEEN 0 AND 9),
+                        CONSTRAINT [CK_WinningDraws_Joker] CHECK ([Joker] IS NULL OR (DATALENGTH([Joker]) = 14 AND [Joker] NOT LIKE '%[^0-9]%'))
                     );
                     CREATE UNIQUE INDEX [IX_WinningDraws_DrawDate] ON [WinningDraws] ([DrawDate]);
                 END;";
@@ -114,7 +119,51 @@ namespace LaPrimitiva.Infrastructure.Persistence.Seed
             await _context.Database.ExecuteSqlRawAsync(sqlWinningDraws);
 
             await EnsurePlanConstraintsAsync();
+            await EnsureWinningDrawConstraintsAsync();
             await RepairFinancialTotalsAsync();
+        }
+
+        private async Task EnsureWinningDrawConstraintsAsync()
+        {
+            var constraintsSql = @"
+                UPDATE [WinningDraws]
+                SET [Joker] = NULL
+                WHERE LTRIM(RTRIM([Joker])) = '';
+
+                UPDATE [WinningDraws]
+                SET [Joker] = RIGHT(REPLICATE('0', 7) + [Joker], 7)
+                WHERE [Joker] NOT LIKE '%[^0-9]%'
+                  AND DATALENGTH([Joker]) BETWEEN 2 AND 12;
+
+                IF EXISTS (
+                    SELECT 1 FROM [WinningDraws]
+                    WHERE [Number1] NOT BETWEEN 1 AND 49 OR [Number2] NOT BETWEEN 1 AND 49
+                       OR [Number3] NOT BETWEEN 1 AND 49 OR [Number4] NOT BETWEEN 1 AND 49
+                       OR [Number5] NOT BETWEEN 1 AND 49 OR [Number6] NOT BETWEEN 1 AND 49
+                       OR [Number1] IN ([Number2], [Number3], [Number4], [Number5], [Number6])
+                       OR [Number2] IN ([Number3], [Number4], [Number5], [Number6])
+                       OR [Number3] IN ([Number4], [Number5], [Number6])
+                       OR [Number4] IN ([Number5], [Number6]) OR [Number5] = [Number6]
+                       OR [Complementario] NOT BETWEEN 1 AND 49
+                       OR [Complementario] IN ([Number1], [Number2], [Number3], [Number4], [Number5], [Number6])
+                       OR [Reintegro] NOT BETWEEN 0 AND 9
+                       OR ([Joker] IS NOT NULL AND (DATALENGTH([Joker]) <> 14 OR [Joker] LIKE '%[^0-9]%')))
+                    THROW 51002, 'No se pueden activar las restricciones: existen sorteos históricos inválidos.', 1;
+
+                ALTER TABLE [WinningDraws] ALTER COLUMN [Joker] nvarchar(7) NULL;
+
+                IF NOT EXISTS (SELECT 1 FROM sys.check_constraints WHERE name = 'CK_WinningDraws_MainNumbersRange')
+                    ALTER TABLE [WinningDraws] ADD CONSTRAINT [CK_WinningDraws_MainNumbersRange] CHECK ([Number1] BETWEEN 1 AND 49 AND [Number2] BETWEEN 1 AND 49 AND [Number3] BETWEEN 1 AND 49 AND [Number4] BETWEEN 1 AND 49 AND [Number5] BETWEEN 1 AND 49 AND [Number6] BETWEEN 1 AND 49);
+                IF NOT EXISTS (SELECT 1 FROM sys.check_constraints WHERE name = 'CK_WinningDraws_MainNumbersDistinct')
+                    ALTER TABLE [WinningDraws] ADD CONSTRAINT [CK_WinningDraws_MainNumbersDistinct] CHECK ([Number1] NOT IN ([Number2], [Number3], [Number4], [Number5], [Number6]) AND [Number2] NOT IN ([Number3], [Number4], [Number5], [Number6]) AND [Number3] NOT IN ([Number4], [Number5], [Number6]) AND [Number4] NOT IN ([Number5], [Number6]) AND [Number5] <> [Number6]);
+                IF NOT EXISTS (SELECT 1 FROM sys.check_constraints WHERE name = 'CK_WinningDraws_Complementario')
+                    ALTER TABLE [WinningDraws] ADD CONSTRAINT [CK_WinningDraws_Complementario] CHECK ([Complementario] BETWEEN 1 AND 49 AND [Complementario] NOT IN ([Number1], [Number2], [Number3], [Number4], [Number5], [Number6]));
+                IF NOT EXISTS (SELECT 1 FROM sys.check_constraints WHERE name = 'CK_WinningDraws_Reintegro')
+                    ALTER TABLE [WinningDraws] ADD CONSTRAINT [CK_WinningDraws_Reintegro] CHECK ([Reintegro] BETWEEN 0 AND 9);
+                IF NOT EXISTS (SELECT 1 FROM sys.check_constraints WHERE name = 'CK_WinningDraws_Joker')
+                    ALTER TABLE [WinningDraws] ADD CONSTRAINT [CK_WinningDraws_Joker] CHECK ([Joker] IS NULL OR (DATALENGTH([Joker]) = 14 AND [Joker] NOT LIKE '%[^0-9]%'));";
+
+            await _context.Database.ExecuteSqlRawAsync(constraintsSql);
         }
 
         private async Task EnsurePlanConstraintsAsync()
@@ -276,6 +325,7 @@ namespace LaPrimitiva.Infrastructure.Persistence.Seed
                         Joker = (parts.Length > 9 && !string.IsNullOrWhiteSpace(parts[9])) ? parts[9] : null
                     };
 
+                    draw.Validate();
                     newDraws.Add(draw);
                 }
                 catch (Exception ex)

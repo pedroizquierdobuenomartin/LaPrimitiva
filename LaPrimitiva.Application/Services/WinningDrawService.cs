@@ -38,7 +38,8 @@ namespace LaPrimitiva.Application.Services
 
         public async Task<Result<WinningDrawDto>> CreateAsync(WinningDrawDto dto)
         {
-            var validation = ValidateUniqueNumbers(dto);
+            var entity = MapToEntity(dto);
+            var validation = Validate(entity);
             if (!validation.IsSuccess) return Result<WinningDrawDto>.Failure(validation.Error!);
 
             var exists = await _repository.AnyAsync(d => d.DrawDate.Date == dto.DrawDate.Date);
@@ -47,7 +48,6 @@ namespace LaPrimitiva.Application.Services
                 return Result<WinningDrawDto>.Failure("Ya existe un sorteo para la fecha especificada.");
             }
 
-            var entity = MapToEntity(dto);
             await _repository.CreateAsync(entity);
             
             return Result<WinningDrawDto>.Success(MapToDto(entity));
@@ -55,7 +55,8 @@ namespace LaPrimitiva.Application.Services
 
         public async Task<Result> UpdateAsync(WinningDrawDto dto)
         {
-            var validation = ValidateUniqueNumbers(dto);
+            var entity = MapToEntity(dto);
+            var validation = Validate(entity);
             if (!validation.IsSuccess) return validation;
 
             var exists = await _repository.AnyAsync(d => d.DrawDate.Date == dto.DrawDate.Date && d.Id != dto.Id);
@@ -64,28 +65,22 @@ namespace LaPrimitiva.Application.Services
                 return Result.Failure("Ya existe otro sorteo para la fecha especificada.");
             }
 
-            var entity = MapToEntity(dto);
             await _repository.UpdateAsync(entity);
             
             return Result.Success();
         }
 
-        private static Result ValidateUniqueNumbers(WinningDrawDto dto)
+        private static Result Validate(WinningDraw draw)
         {
-            var numbers = new[] 
+            try
             { 
-                dto.Number1, dto.Number2, dto.Number3, 
-                dto.Number4, dto.Number5, dto.Number6, 
-                dto.Complementario 
-            };
-
-            var duplicates = numbers.Where(n => n > 0).GroupBy(n => n).Where(g => g.Count() > 1).Select(g => g.Key).ToList();
-            if (duplicates.Any())
-            {
-                return Result.Failure($"Los números ganadores y el complementario no se pueden repetir. Duplicados: {string.Join(", ", duplicates)}");
+                draw.Validate();
+                return Result.Success();
             }
-
-            return Result.Success();
+            catch (InvalidOperationException exception)
+            {
+                return Result.Failure(exception.Message);
+            }
         }
 
         public async Task<Result> DeleteAsync(Guid id)
@@ -107,7 +102,7 @@ namespace LaPrimitiva.Application.Services
                 Number6 = rssDraw.Numbers[5],
                 Complementario = rssDraw.Complementary,
                 Reintegro = rssDraw.Reintegro,
-                Joker = rssDraw.Joker?.ToString()
+                Joker = rssDraw.Joker?.ToString($"D{WinningDraw.JokerLength}")
             };
 
             return await CreateAsync(dto);
@@ -147,7 +142,7 @@ namespace LaPrimitiva.Application.Services
                 Number6 = sortedNumbers[5],
                 Complementario = dto.Complementario,
                 Reintegro = dto.Reintegro,
-                Joker = dto.Joker
+                Joker = string.IsNullOrWhiteSpace(dto.Joker) ? null : dto.Joker.Trim()
             };
         }
     }

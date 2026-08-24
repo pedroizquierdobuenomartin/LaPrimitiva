@@ -46,7 +46,7 @@ namespace LaPrimitiva.Tests
         public async Task CreateAsync_WhenDuplicateDate_ShouldReturnFailure()
         {
             // Arrange
-            var dto = new WinningDrawDto(Guid.NewGuid(), DateTime.Now.Date, 1, 2, 3, 4, 5, 6, 7, 8, "J");
+            var dto = new WinningDrawDto(Guid.NewGuid(), DateTime.Now.Date, 1, 2, 3, 4, 5, 6, 7, 8, "1234567");
             _repositoryMock.Setup(r => r.AnyAsync(It.IsAny<Expression<Func<WinningDraw, bool>>>())).ReturnsAsync(true);
 
             // Act
@@ -61,7 +61,7 @@ namespace LaPrimitiva.Tests
         public async Task CreateAsync_WhenValid_ShouldReturnSuccess()
         {
             // Arrange
-            var dto = new WinningDrawDto(Guid.NewGuid(), DateTime.Now.Date, 1, 2, 3, 4, 5, 6, 7, 8, "J");
+            var dto = new WinningDrawDto(Guid.NewGuid(), DateTime.Now.Date, 1, 2, 3, 4, 5, 6, 7, 8, "1234567");
             _repositoryMock.Setup(r => r.AnyAsync(It.IsAny<Expression<Func<WinningDraw, bool>>>())).ReturnsAsync(false);
 
             // Act
@@ -76,7 +76,7 @@ namespace LaPrimitiva.Tests
         public async Task UpdateAsync_WhenValid_ShouldReturnSuccess()
         {
             // Arrange
-            var dto = new WinningDrawDto(Guid.NewGuid(), DateTime.Now.Date, 1, 2, 3, 4, 5, 6, 7, 8, "J");
+            var dto = new WinningDrawDto(Guid.NewGuid(), DateTime.Now.Date, 1, 2, 3, 4, 5, 6, 7, 8, "1234567");
             _repositoryMock.Setup(r => r.AnyAsync(It.IsAny<Expression<Func<WinningDraw, bool>>>())).ReturnsAsync(false);
 
             // Act
@@ -91,7 +91,7 @@ namespace LaPrimitiva.Tests
         public async Task CreateAsync_WhenDuplicateNumbers_ShouldReturnFailure()
         {
             // Arrange
-            var dto = new WinningDrawDto(Guid.NewGuid(), DateTime.Now.Date, 3, 3, 3, 4, 5, 6, 7, 8, "J");
+            var dto = new WinningDrawDto(Guid.NewGuid(), DateTime.Now.Date, 3, 3, 3, 4, 5, 6, 7, 8, "1234567");
 
             // Act
             var result = await _service.CreateAsync(dto);
@@ -105,7 +105,7 @@ namespace LaPrimitiva.Tests
         public async Task CreateAsync_ShouldSortWinningNumbers()
         {
             // Arrange
-            var dto = new WinningDrawDto(Guid.NewGuid(), DateTime.Now.Date, 45, 12, 33, 1, 9, 22, 10, 5, "J");
+            var dto = new WinningDrawDto(Guid.NewGuid(), DateTime.Now.Date, 45, 12, 33, 1, 9, 22, 10, 5, "1234567");
             _repositoryMock.Setup(r => r.AnyAsync(It.IsAny<Expression<Func<WinningDraw, bool>>>())).ReturnsAsync(false);
 
             // Act
@@ -152,7 +152,7 @@ namespace LaPrimitiva.Tests
                 d.Number1 == 1 &&
                 d.Complementario == 7 &&
                 d.Reintegro == 8 &&
-                d.Joker == "12345")), Times.Once);
+                d.Joker == "0012345")), Times.Once);
         }
 
         [Fact]
@@ -168,6 +168,32 @@ namespace LaPrimitiva.Tests
             // Assert
             Assert.False(result.IsSuccess);
             Assert.Equal("Ya existe un sorteo para la fecha especificada.", result.Error);
+        }
+
+        [Theory]
+        [InlineData(0)]
+        [InlineData(50)]
+        public async Task CreateAsync_WhenMainNumberIsOutsideRange_ShouldReturnFailure(int invalidNumber)
+        {
+            var dto = new WinningDrawDto(Guid.NewGuid(), DateTime.Now.Date, invalidNumber, 2, 3, 4, 5, 6, 7, 8, "1234567");
+
+            var result = await _service.CreateAsync(dto);
+
+            Assert.False(result.IsSuccess);
+            _repositoryMock.Verify(r => r.CreateAsync(It.IsAny<WinningDraw>()), Times.Never);
+        }
+
+        [Theory]
+        [InlineData(-1)]
+        [InlineData(10)]
+        public async Task UpdateAsync_WhenReintegroIsOutsideRange_ShouldReturnFailure(int invalidReintegro)
+        {
+            var dto = new WinningDrawDto(Guid.NewGuid(), DateTime.Now.Date, 1, 2, 3, 4, 5, 6, 7, invalidReintegro, "1234567");
+
+            var result = await _service.UpdateAsync(dto);
+
+            Assert.False(result.IsSuccess);
+            _repositoryMock.Verify(r => r.UpdateAsync(It.IsAny<WinningDraw>()), Times.Never);
         }
     }
 }

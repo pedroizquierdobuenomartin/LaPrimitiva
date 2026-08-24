@@ -47,12 +47,14 @@ namespace LaPrimitiva.Infrastructure.Repositories
 
         public async Task CreateAsync(WinningDraw draw)
         {
+            draw.Validate();
             await _context.WinningDraws.AddAsync(draw);
             await _context.SaveChangesAsync();
         }
 
         public async Task UpdateAsync(WinningDraw draw)
         {
+            draw.Validate();
             var tracked = _context.WinningDraws.Local.FirstOrDefault(e => e.Id == draw.Id);
             if (tracked != null)
             {

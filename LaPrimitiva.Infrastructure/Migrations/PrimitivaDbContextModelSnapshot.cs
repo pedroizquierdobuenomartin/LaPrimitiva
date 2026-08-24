@@ -190,8 +190,8 @@ namespace LaPrimitiva.Infrastructure.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Joker")
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)");
+                        .HasMaxLength(7)
+                        .HasColumnType("nvarchar(7)");
 
                     b.Property<int>("Number1")
                         .HasColumnType("int");
@@ -219,7 +219,18 @@ namespace LaPrimitiva.Infrastructure.Migrations
                     b.HasIndex("DrawDate")
                         .IsUnique();
 
-                    b.ToTable("WinningDraws");
+                    b.ToTable("WinningDraws", t =>
+                        {
+                            t.HasCheckConstraint("CK_WinningDraws_Complementario", "[Complementario] BETWEEN 1 AND 49 AND [Complementario] NOT IN ([Number1], [Number2], [Number3], [Number4], [Number5], [Number6])");
+
+                            t.HasCheckConstraint("CK_WinningDraws_Joker", "[Joker] IS NULL OR (DATALENGTH([Joker]) = 14 AND [Joker] NOT LIKE '%[^0-9]%')");
+
+                            t.HasCheckConstraint("CK_WinningDraws_MainNumbersDistinct", "[Number1] NOT IN ([Number2], [Number3], [Number4], [Number5], [Number6]) AND [Number2] NOT IN ([Number3], [Number4], [Number5], [Number6]) AND [Number3] NOT IN ([Number4], [Number5], [Number6]) AND [Number4] NOT IN ([Number5], [Number6]) AND [Number5] <> [Number6]");
+
+                            t.HasCheckConstraint("CK_WinningDraws_MainNumbersRange", "[Number1] BETWEEN 1 AND 49 AND [Number2] BETWEEN 1 AND 49 AND [Number3] BETWEEN 1 AND 49 AND [Number4] BETWEEN 1 AND 49 AND [Number5] BETWEEN 1 AND 49 AND [Number6] BETWEEN 1 AND 49");
+
+                            t.HasCheckConstraint("CK_WinningDraws_Reintegro", "[Reintegro] BETWEEN 0 AND 9");
+                        });
                 });
 
             modelBuilder.Entity("LaPrimitiva.Domain.Entities.DrawRecord", b =>

@@ -202,12 +202,12 @@
                 <div class="space-y-3">
                     <label class="text-[10px] font-black text-[var(--brand-text-secondary)] uppercase tracking-widest ml-1">@L["Numbers"]</label>
                     <div class="grid grid-cols-3 md:grid-cols-6 gap-3">
-                        <input type="number" @bind="_editingDraw.Number1" class="modal-input-circle @(IsDuplicate(_editingDraw.Number1) ? "border-red-500 bg-red-50/30 font-black" : "font-black")" placeholder="1" />
-                        <input type="number" @bind="_editingDraw.Number2" class="modal-input-circle @(IsDuplicate(_editingDraw.Number2) ? "border-red-500 bg-red-50/30" : "")" placeholder="2" />
-                        <input type="number" @bind="_editingDraw.Number3" class="modal-input-circle @(IsDuplicate(_editingDraw.Number3) ? "border-red-500 bg-red-50/30" : "")" placeholder="3" />
-                        <input type="number" @bind="_editingDraw.Number4" class="modal-input-circle @(IsDuplicate(_editingDraw.Number4) ? "border-red-500 bg-red-50/30" : "")" placeholder="4" />
-                        <input type="number" @bind="_editingDraw.Number5" class="modal-input-circle @(IsDuplicate(_editingDraw.Number5) ? "border-red-500 bg-red-50/30" : "")" placeholder="5" />
-                        <input type="number" @bind="_editingDraw.Number6" class="modal-input-circle @(IsDuplicate(_editingDraw.Number6) ? "border-red-500 bg-red-50/30" : "")" placeholder="6" />
+                        <input type="number" min="1" max="49" @bind="_editingDraw.Number1" class="modal-input-circle @(IsDuplicate(_editingDraw.Number1) ? "border-red-500 bg-red-50/30 font-black" : "font-black")" placeholder="1" />
+                        <input type="number" min="1" max="49" @bind="_editingDraw.Number2" class="modal-input-circle @(IsDuplicate(_editingDraw.Number2) ? "border-red-500 bg-red-50/30" : "")" placeholder="2" />
+                        <input type="number" min="1" max="49" @bind="_editingDraw.Number3" class="modal-input-circle @(IsDuplicate(_editingDraw.Number3) ? "border-red-500 bg-red-50/30" : "")" placeholder="3" />
+                        <input type="number" min="1" max="49" @bind="_editingDraw.Number4" class="modal-input-circle @(IsDuplicate(_editingDraw.Number4) ? "border-red-500 bg-red-50/30" : "")" placeholder="4" />
+                        <input type="number" min="1" max="49" @bind="_editingDraw.Number5" class="modal-input-circle @(IsDuplicate(_editingDraw.Number5) ? "border-red-500 bg-red-50/30" : "")" placeholder="5" />
+                        <input type="number" min="1" max="49" @bind="_editingDraw.Number6" class="modal-input-circle @(IsDuplicate(_editingDraw.Number6) ? "border-red-500 bg-red-50/30" : "")" placeholder="6" />
                     </div>
                 </div>
 
@@ -215,18 +215,18 @@
                 <div class="grid grid-cols-2 gap-4">
                     <div class="space-y-2">
                         <label class="text-[10px] font-black text-blue-500 uppercase tracking-widest ml-1">COMPLEMENTARIO</label>
-                        <input type="number" @bind="_editingDraw.Complementario" class="w-full bg-blue-50/50 border rounded-xl p-4 text-center text-sm font-black text-blue-700 outline-none focus:ring-2 focus:ring-blue-200 transition-all h-14 @(IsDuplicate(_editingDraw.Complementario) ? "border-red-500 bg-red-50/30" : "border-blue-100")" />
+                        <input type="number" min="1" max="49" @bind="_editingDraw.Complementario" class="w-full bg-blue-50/50 border rounded-xl p-4 text-center text-sm font-black text-blue-700 outline-none focus:ring-2 focus:ring-blue-200 transition-all h-14 @(IsDuplicate(_editingDraw.Complementario) ? "border-red-500 bg-red-50/30" : "border-blue-100")" />
                     </div>
                     <div class="space-y-2">
                         <label class="text-[10px] font-black text-red-500 uppercase tracking-widest ml-1">REINTEGRO</label>
-                        <input type="number" @bind="_editingDraw.Reintegro" class="w-full bg-red-50/50 border border-red-100 rounded-xl p-4 text-center text-sm font-black text-red-700 outline-none focus:ring-2 focus:ring-red-200 transition-all h-14" />
+                        <input type="number" min="0" max="9" @bind="_editingDraw.Reintegro" class="w-full bg-red-50/50 border border-red-100 rounded-xl p-4 text-center text-sm font-black text-red-700 outline-none focus:ring-2 focus:ring-red-200 transition-all h-14" />
                     </div>
                 </div>
 
                 <!-- Joker -->
                 <div class="space-y-2">
                     <label class="text-[10px] font-black text-[var(--brand-text-secondary)] uppercase tracking-widest ml-1">@LG["Joker"] <span class="text-[8px] opacity-40 ml-1">(OPCIONAL)</span></label>
-                    <input type="text" @bind="_editingDraw.Joker" placeholder="P. ej. 1234567" class="w-full bg-white border border-[var(--brand-borders)] rounded-xl p-4 text-sm font-black text-[var(--brand-secondary)] outline-none focus:ring-2 focus:ring-[var(--brand-primary)]/20 transition-all tracking-[0.3em] h-14 text-center uppercase" />
+                    <input type="text" inputmode="numeric" maxlength="7" pattern="[0-9]{7}" @bind="_editingDraw.Joker" placeholder="P. ej. 1234567" class="w-full bg-white border border-[var(--brand-borders)] rounded-xl p-4 text-sm font-black text-[var(--brand-secondary)] outline-none focus:ring-2 focus:ring-[var(--brand-primary)]/20 transition-all tracking-[0.3em] h-14 text-center uppercase" />
                 </div>
 
                 @if (!string.IsNullOrEmpty(_errorMessage))
@@ -348,14 +348,6 @@
     private async Task SaveDraw()
     {
         _errorMessage = null;
-
-        // Basic Validation
-        if (_editingDraw.Number1 <= 0 || _editingDraw.Number2 <= 0 || _editingDraw.Number3 <= 0 || 
-            _editingDraw.Number4 <= 0 || _editingDraw.Number5 <= 0 || _editingDraw.Number6 <= 0)
-        {
-            _errorMessage = "Todos los números principales son obligatorios.";
-            return;
-        }
 
         Result result;
         if (_isEditing)

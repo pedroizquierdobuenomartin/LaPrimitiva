@@ -199,7 +199,10 @@
 
                 <!-- Footer -->
                 <footer class="h-12 border-t border-gray-200/50 bg-[#f8fafc] flex items-center justify-between px-8 text-[10px] text-gray-400 font-medium tracking-wider flex-shrink-0">
-                    <div>&copy; 2026 LA PRIMITIVA AUDIT</div>
+                    <div class="flex items-center gap-2">
+                        <span>&copy; 2026 LA PRIMITIVA AUDIT</span>
+                        <span aria-label="Versión de la aplicación">v@AppVersion</span>
+                    </div>
                     <div class="flex gap-4">
                         <a href="ayuda" class="hover:text-[var(--brand-primary)]">@L["Help"]</a>
                         <a href="privacidad" class="hover:text-[var(--brand-primary)]">@L["Privacy"]</a>
@@ -480,6 +483,8 @@
 }
 
 @code {
+    private static readonly string AppVersion = GetAppVersion();
+
     private bool _isCollapsed = false;
     private bool _isHovered = false;
     private bool _showMobileMenu = false;
@@ -493,6 +498,14 @@
     private string? _feedbackMessage;
     private bool _isFeedbackError;
     private System.Threading.Timer? _feedbackTimer;
+
+    private static string GetAppVersion()
+    {
+        var version = typeof(MainLayout).Assembly.GetName().Version;
+        return version is null
+            ? "0.0.0"
+            : $"{version.Major}.{version.Minor}.{version.Build}";
+    }
 
     protected override async Task OnInitializedAsync()
     {

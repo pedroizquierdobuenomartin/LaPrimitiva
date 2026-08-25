@@ -75,11 +75,12 @@ if (!app.Environment.IsEnvironment("IntegrationTests"))
 {
     using (var scope = app.Services.CreateScope())
     {
-        // Base Table and Data Initialization (Robust Check)
+        // Data initialization only. Schema changes are applied administratively
+        // through scripts/Invoke-M401DatabaseMigration.ps1 before startup.
         var winningSeeder = scope.ServiceProvider.GetRequiredService<WinningDrawSeeder>();
         var seedPath = Path.Combine(AppContext.BaseDirectory, "SeedData");
 
-        // This creates Tables if missing and seeds historical results
+        // This repairs derived totals and seeds historical results; it never runs DDL.
         await winningSeeder.SeedFromDirectoryAsync(seedPath);
 
         // Initial Plan Seed (Optional, currently disabled to ensure "sin datos" as requested)

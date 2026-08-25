@@ -11,105 +11,45 @@ namespace LaPrimitiva.Infrastructure.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AddColumn<decimal>(
-                name: "Acumulado",
-                table: "DrawRecords",
-                type: "decimal(12,2)",
-                precision: 12,
-                scale: 2,
-                nullable: false,
-                defaultValue: 0m);
+            migrationBuilder.Sql(@"
+                IF COL_LENGTH(N'[DrawRecords]', N'Acumulado') IS NULL
+                    ALTER TABLE [DrawRecords] ADD [Acumulado] decimal(12,2) NOT NULL CONSTRAINT [DF_DrawRecords_Acumulado] DEFAULT 0 WITH VALUES;
+                IF COL_LENGTH(N'[DrawRecords]', N'CosteAuto') IS NULL
+                    ALTER TABLE [DrawRecords] ADD [CosteAuto] decimal(10,2) NOT NULL CONSTRAINT [DF_DrawRecords_CosteAuto] DEFAULT 0 WITH VALUES;
+                IF COL_LENGTH(N'[DrawRecords]', N'CosteFija') IS NULL
+                    ALTER TABLE [DrawRecords] ADD [CosteFija] decimal(10,2) NOT NULL CONSTRAINT [DF_DrawRecords_CosteFija] DEFAULT 0 WITH VALUES;
+                IF COL_LENGTH(N'[DrawRecords]', N'CosteJokerAuto') IS NULL
+                    ALTER TABLE [DrawRecords] ADD [CosteJokerAuto] decimal(10,2) NOT NULL CONSTRAINT [DF_DrawRecords_CosteJokerAuto] DEFAULT 0 WITH VALUES;
+                IF COL_LENGTH(N'[DrawRecords]', N'CosteJokerFija') IS NULL
+                    ALTER TABLE [DrawRecords] ADD [CosteJokerFija] decimal(10,2) NOT NULL CONSTRAINT [DF_DrawRecords_CosteJokerFija] DEFAULT 0 WITH VALUES;
+                IF COL_LENGTH(N'[DrawRecords]', N'Neto') IS NULL
+                    ALTER TABLE [DrawRecords] ADD [Neto] decimal(10,2) NOT NULL CONSTRAINT [DF_DrawRecords_Neto] DEFAULT 0 WITH VALUES;
+                IF COL_LENGTH(N'[DrawRecords]', N'TotalCoste') IS NULL
+                    ALTER TABLE [DrawRecords] ADD [TotalCoste] decimal(10,2) NOT NULL CONSTRAINT [DF_DrawRecords_TotalCoste] DEFAULT 0 WITH VALUES;
+                IF COL_LENGTH(N'[DrawRecords]', N'TotalPremios') IS NULL
+                    ALTER TABLE [DrawRecords] ADD [TotalPremios] decimal(10,2) NOT NULL CONSTRAINT [DF_DrawRecords_TotalPremios] DEFAULT 0 WITH VALUES;
 
-            migrationBuilder.AddColumn<decimal>(
-                name: "CosteAuto",
-                table: "DrawRecords",
-                type: "decimal(10,2)",
-                precision: 10,
-                scale: 2,
-                nullable: false,
-                defaultValue: 0m);
+                IF OBJECT_ID(N'[WinningDraws]', N'U') IS NULL
+                BEGIN
+                    CREATE TABLE [WinningDraws] (
+                        [Id] uniqueidentifier NOT NULL,
+                        [DrawDate] datetime2 NOT NULL,
+                        [Number1] int NOT NULL,
+                        [Number2] int NOT NULL,
+                        [Number3] int NOT NULL,
+                        [Number4] int NOT NULL,
+                        [Number5] int NOT NULL,
+                        [Number6] int NOT NULL,
+                        [Complementario] int NOT NULL,
+                        [Reintegro] int NOT NULL,
+                        [Joker] nvarchar(10) NULL,
+                        [CreatedAt] datetime2 NOT NULL,
+                        CONSTRAINT [PK_WinningDraws] PRIMARY KEY ([Id])
+                    );
+                END;
 
-            migrationBuilder.AddColumn<decimal>(
-                name: "CosteFija",
-                table: "DrawRecords",
-                type: "decimal(10,2)",
-                precision: 10,
-                scale: 2,
-                nullable: false,
-                defaultValue: 0m);
-
-            migrationBuilder.AddColumn<decimal>(
-                name: "CosteJokerAuto",
-                table: "DrawRecords",
-                type: "decimal(10,2)",
-                precision: 10,
-                scale: 2,
-                nullable: false,
-                defaultValue: 0m);
-
-            migrationBuilder.AddColumn<decimal>(
-                name: "CosteJokerFija",
-                table: "DrawRecords",
-                type: "decimal(10,2)",
-                precision: 10,
-                scale: 2,
-                nullable: false,
-                defaultValue: 0m);
-
-            migrationBuilder.AddColumn<decimal>(
-                name: "Neto",
-                table: "DrawRecords",
-                type: "decimal(10,2)",
-                precision: 10,
-                scale: 2,
-                nullable: false,
-                defaultValue: 0m);
-
-            migrationBuilder.AddColumn<decimal>(
-                name: "TotalCoste",
-                table: "DrawRecords",
-                type: "decimal(10,2)",
-                precision: 10,
-                scale: 2,
-                nullable: false,
-                defaultValue: 0m);
-
-            migrationBuilder.AddColumn<decimal>(
-                name: "TotalPremios",
-                table: "DrawRecords",
-                type: "decimal(10,2)",
-                precision: 10,
-                scale: 2,
-                nullable: false,
-                defaultValue: 0m);
-
-            migrationBuilder.CreateTable(
-                name: "WinningDraws",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    DrawDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Number1 = table.Column<int>(type: "int", nullable: false),
-                    Number2 = table.Column<int>(type: "int", nullable: false),
-                    Number3 = table.Column<int>(type: "int", nullable: false),
-                    Number4 = table.Column<int>(type: "int", nullable: false),
-                    Number5 = table.Column<int>(type: "int", nullable: false),
-                    Number6 = table.Column<int>(type: "int", nullable: false),
-                    Complementario = table.Column<int>(type: "int", nullable: false),
-                    Reintegro = table.Column<int>(type: "int", nullable: false),
-                    Joker = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: true),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_WinningDraws", x => x.Id);
-                });
-
-            migrationBuilder.CreateIndex(
-                name: "IX_WinningDraws_DrawDate",
-                table: "WinningDraws",
-                column: "DrawDate",
-                unique: true);
+                IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE [object_id] = OBJECT_ID(N'[WinningDraws]') AND [name] = N'IX_WinningDraws_DrawDate')
+                    CREATE UNIQUE INDEX [IX_WinningDraws_DrawDate] ON [WinningDraws] ([DrawDate]);");
         }
 
         /// <inheritdoc />

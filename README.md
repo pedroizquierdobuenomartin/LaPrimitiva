@@ -5,7 +5,7 @@ App multipágina para registrar y auditar juegos de La Primitiva (España), comp
 ## 🚀 Requisitos y Configuración Local
 
 1. **Stack**: .NET 10, Blazor Server, EF Core y SQL Server Express.
-2. **Base de datos**: la configuración de desarrollo apunta a la instancia `localhost\\SQLEXPRESS` y a la base `PrimitivaAuditV2`. El seeding es automático en el primer arranque.
+2. **Base de datos**: la configuración local apunta a la instancia y base definidas en `LaPrimitiva.App/appsettings.json`. El esquema se administra exclusivamente mediante migraciones EF Core; el seeding de datos históricos se ejecuta al arrancar, una vez migrada la base.
 3. **Ejecución**:
    - **Opción A (VS Code)**: Presiona `F5` y selecciona el perfil `.NET Core Launch (Web)`.
    - **Opción B (Terminal desde la raíz)**:
@@ -18,6 +18,24 @@ App multipágina para registrar y auditar juegos de La Primitiva (España), comp
      dotnet run
      ```
    La aplicación estará disponible en `http://localhost:5007`.
+
+### Migraciones de base de datos
+
+La aplicación **no crea ni modifica tablas al arrancar**. Antes del primer arranque y antes de desplegar una versión con migraciones nuevas, una identidad administrativa separada debe aplicar las migraciones:
+
+```powershell
+.\scripts\Invoke-M401DatabaseMigration.ps1 -Action Update
+```
+
+La conexión puede indicarse con `-ConnectionString` o mediante `LAPRIMITIVA_MIGRATION_CONNECTION`; si no se proporciona, el script usa `ConnectionStrings:DefaultConnection` de `LaPrimitiva.App/appsettings.json`. Conviene realizar antes el backup verificado descrito en M-101. Las migraciones iniciales reconocen el esquema legado que el seeder creaba sin historial, registran la cadena de migraciones y conservan sus filas.
+
+Para entregar el cambio a un administrador de base de datos sin conceder DDL a la identidad de ejecución de la aplicación, generar un script idempotente derivado de EF Core:
+
+```powershell
+.\scripts\Invoke-M401DatabaseMigration.ps1 -Action Script
+```
+
+El fichero queda en `artifacts\database\LaPrimitiva.Migrations.sql` (fuera de Git). Tras aplicarlo, la identidad normal de la aplicación solo necesita los permisos de lectura y escritura requeridos por sus casos de uso; no necesita permisos permanentes para crear o alterar tablas. `-NoBuild` solo debe usarse cuando los binarios ya se hayan compilado con exactamente la versión que se va a migrar.
 
 ### Seguridad de acceso exclusivamente local
 

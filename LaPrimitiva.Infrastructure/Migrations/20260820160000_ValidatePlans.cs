@@ -25,30 +25,17 @@ namespace LaPrimitiva.Infrastructure.Migrations
                       AND (secondPlan.[EffectiveTo] IS NULL OR secondPlan.[EffectiveTo] >= firstPlan.[EffectiveFrom]))
                     THROW 51000, 'No se pueden activar las restricciones: existen planes solapados.', 1;");
 
-            migrationBuilder.AddCheckConstraint(
-                name: "CK_Plans_EffectivePeriod",
-                table: "Plans",
-                sql: "[EffectiveTo] IS NULL OR [EffectiveFrom] <= [EffectiveTo]");
-
-            migrationBuilder.AddCheckConstraint(
-                name: "CK_Plans_Name",
-                table: "Plans",
-                sql: "LEN(LTRIM(RTRIM([Name]))) > 0");
-
-            migrationBuilder.AddCheckConstraint(
-                name: "CK_Plans_NonNegativeValues",
-                table: "Plans",
-                sql: "[WeeksToTrackDefault] >= 0 AND [CostPerBet] >= 0 AND [JokerCostPerBet] >= 0");
-
-            migrationBuilder.AddCheckConstraint(
-                name: "CK_Plans_BetsPerDraw",
-                table: "Plans",
-                sql: "[BetsPerDraw] BETWEEN 1 AND 100");
-
-            migrationBuilder.AddCheckConstraint(
-                name: "CK_Plans_DisabledJokerCost",
-                table: "Plans",
-                sql: "[EnableJoker] = 1 OR [JokerCostPerBet] = 0");
+            migrationBuilder.Sql(@"
+                IF NOT EXISTS (SELECT 1 FROM sys.check_constraints WHERE [parent_object_id] = OBJECT_ID(N'[Plans]') AND [name] = N'CK_Plans_EffectivePeriod')
+                    ALTER TABLE [Plans] WITH CHECK ADD CONSTRAINT [CK_Plans_EffectivePeriod] CHECK ([EffectiveTo] IS NULL OR [EffectiveFrom] <= [EffectiveTo]);
+                IF NOT EXISTS (SELECT 1 FROM sys.check_constraints WHERE [parent_object_id] = OBJECT_ID(N'[Plans]') AND [name] = N'CK_Plans_Name')
+                    ALTER TABLE [Plans] WITH CHECK ADD CONSTRAINT [CK_Plans_Name] CHECK (LEN(LTRIM(RTRIM([Name]))) > 0);
+                IF NOT EXISTS (SELECT 1 FROM sys.check_constraints WHERE [parent_object_id] = OBJECT_ID(N'[Plans]') AND [name] = N'CK_Plans_NonNegativeValues')
+                    ALTER TABLE [Plans] WITH CHECK ADD CONSTRAINT [CK_Plans_NonNegativeValues] CHECK ([WeeksToTrackDefault] >= 0 AND [CostPerBet] >= 0 AND [JokerCostPerBet] >= 0);
+                IF NOT EXISTS (SELECT 1 FROM sys.check_constraints WHERE [parent_object_id] = OBJECT_ID(N'[Plans]') AND [name] = N'CK_Plans_BetsPerDraw')
+                    ALTER TABLE [Plans] WITH CHECK ADD CONSTRAINT [CK_Plans_BetsPerDraw] CHECK ([BetsPerDraw] BETWEEN 1 AND 100);
+                IF NOT EXISTS (SELECT 1 FROM sys.check_constraints WHERE [parent_object_id] = OBJECT_ID(N'[Plans]') AND [name] = N'CK_Plans_DisabledJokerCost')
+                    ALTER TABLE [Plans] WITH CHECK ADD CONSTRAINT [CK_Plans_DisabledJokerCost] CHECK ([EnableJoker] = 1 OR [JokerCostPerBet] = 0);");
 
             migrationBuilder.Sql(@"
                 CREATE OR ALTER TRIGGER [TR_Plans_PreventOverlap]

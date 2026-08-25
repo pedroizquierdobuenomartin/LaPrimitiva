@@ -37,37 +37,25 @@ namespace LaPrimitiva.Infrastructure.Migrations
                        OR ([Joker] IS NOT NULL AND (DATALENGTH([Joker]) <> 14 OR [Joker] LIKE '%[^0-9]%')))
                     THROW 51002, 'No se pueden activar las restricciones: existen sorteos históricos inválidos.', 1;");
 
-            migrationBuilder.AlterColumn<string>(
-                name: "Joker",
-                table: "WinningDraws",
-                type: "nvarchar(7)",
-                maxLength: 7,
-                nullable: true,
-                oldClrType: typeof(string),
-                oldType: "nvarchar(10)",
-                oldMaxLength: 10,
-                oldNullable: true);
+            migrationBuilder.Sql(@"
+                IF EXISTS (
+                    SELECT 1
+                    FROM sys.columns
+                    WHERE [object_id] = OBJECT_ID(N'[WinningDraws]')
+                      AND [name] = N'Joker'
+                      AND [max_length] <> 14)
+                    ALTER TABLE [WinningDraws] ALTER COLUMN [Joker] nvarchar(7) NULL;
 
-            migrationBuilder.AddCheckConstraint(
-                name: "CK_WinningDraws_MainNumbersRange",
-                table: "WinningDraws",
-                sql: "[Number1] BETWEEN 1 AND 49 AND [Number2] BETWEEN 1 AND 49 AND [Number3] BETWEEN 1 AND 49 AND [Number4] BETWEEN 1 AND 49 AND [Number5] BETWEEN 1 AND 49 AND [Number6] BETWEEN 1 AND 49");
-            migrationBuilder.AddCheckConstraint(
-                name: "CK_WinningDraws_MainNumbersDistinct",
-                table: "WinningDraws",
-                sql: "[Number1] NOT IN ([Number2], [Number3], [Number4], [Number5], [Number6]) AND [Number2] NOT IN ([Number3], [Number4], [Number5], [Number6]) AND [Number3] NOT IN ([Number4], [Number5], [Number6]) AND [Number4] NOT IN ([Number5], [Number6]) AND [Number5] <> [Number6]");
-            migrationBuilder.AddCheckConstraint(
-                name: "CK_WinningDraws_Complementario",
-                table: "WinningDraws",
-                sql: "[Complementario] BETWEEN 1 AND 49 AND [Complementario] NOT IN ([Number1], [Number2], [Number3], [Number4], [Number5], [Number6])");
-            migrationBuilder.AddCheckConstraint(
-                name: "CK_WinningDraws_Reintegro",
-                table: "WinningDraws",
-                sql: "[Reintegro] BETWEEN 0 AND 9");
-            migrationBuilder.AddCheckConstraint(
-                name: "CK_WinningDraws_Joker",
-                table: "WinningDraws",
-                sql: "[Joker] IS NULL OR (DATALENGTH([Joker]) = 14 AND [Joker] NOT LIKE '%[^0-9]%')");
+                IF NOT EXISTS (SELECT 1 FROM sys.check_constraints WHERE [parent_object_id] = OBJECT_ID(N'[WinningDraws]') AND [name] = N'CK_WinningDraws_MainNumbersRange')
+                    ALTER TABLE [WinningDraws] WITH CHECK ADD CONSTRAINT [CK_WinningDraws_MainNumbersRange] CHECK ([Number1] BETWEEN 1 AND 49 AND [Number2] BETWEEN 1 AND 49 AND [Number3] BETWEEN 1 AND 49 AND [Number4] BETWEEN 1 AND 49 AND [Number5] BETWEEN 1 AND 49 AND [Number6] BETWEEN 1 AND 49);
+                IF NOT EXISTS (SELECT 1 FROM sys.check_constraints WHERE [parent_object_id] = OBJECT_ID(N'[WinningDraws]') AND [name] = N'CK_WinningDraws_MainNumbersDistinct')
+                    ALTER TABLE [WinningDraws] WITH CHECK ADD CONSTRAINT [CK_WinningDraws_MainNumbersDistinct] CHECK ([Number1] NOT IN ([Number2], [Number3], [Number4], [Number5], [Number6]) AND [Number2] NOT IN ([Number3], [Number4], [Number5], [Number6]) AND [Number3] NOT IN ([Number4], [Number5], [Number6]) AND [Number4] NOT IN ([Number5], [Number6]) AND [Number5] <> [Number6]);
+                IF NOT EXISTS (SELECT 1 FROM sys.check_constraints WHERE [parent_object_id] = OBJECT_ID(N'[WinningDraws]') AND [name] = N'CK_WinningDraws_Complementario')
+                    ALTER TABLE [WinningDraws] WITH CHECK ADD CONSTRAINT [CK_WinningDraws_Complementario] CHECK ([Complementario] BETWEEN 1 AND 49 AND [Complementario] NOT IN ([Number1], [Number2], [Number3], [Number4], [Number5], [Number6]));
+                IF NOT EXISTS (SELECT 1 FROM sys.check_constraints WHERE [parent_object_id] = OBJECT_ID(N'[WinningDraws]') AND [name] = N'CK_WinningDraws_Reintegro')
+                    ALTER TABLE [WinningDraws] WITH CHECK ADD CONSTRAINT [CK_WinningDraws_Reintegro] CHECK ([Reintegro] BETWEEN 0 AND 9);
+                IF NOT EXISTS (SELECT 1 FROM sys.check_constraints WHERE [parent_object_id] = OBJECT_ID(N'[WinningDraws]') AND [name] = N'CK_WinningDraws_Joker')
+                    ALTER TABLE [WinningDraws] WITH CHECK ADD CONSTRAINT [CK_WinningDraws_Joker] CHECK ([Joker] IS NULL OR (DATALENGTH([Joker]) = 14 AND [Joker] NOT LIKE '%[^0-9]%'));");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)

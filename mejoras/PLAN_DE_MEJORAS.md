@@ -446,7 +446,7 @@
 
 ## Fase 4 — Persistencia y arquitectura
 
-### [ ] M-401 — Sustituir DDL manual por migraciones EF Core
+### [x] M-401 — Sustituir DDL manual por migraciones EF Core
 
 **Problema:** el arranque crea tablas con `IF OBJECT_ID` y no actualiza de forma segura esquemas anteriores.
 
@@ -455,6 +455,13 @@
 - El esquema completo puede crearse desde cero mediante migraciones.
 - Una base anterior puede actualizarse sin perder datos.
 - La aplicación normal no necesita permisos permanentes para crear tablas.
+
+- **Fecha de cierre:** 2026-08-25.
+- **Referencia:** cambios locales de M-401 sobre `d63095a` (sin commit solicitado).
+- **Evidencia previa:** `WinningDrawSeeder.EnsureAllTablesExistAsync()` ejecutaba en cada arranque tres bloques `IF OBJECT_ID ... CREATE TABLE`, además de `ALTER TABLE` y `CREATE OR ALTER TRIGGER`; los dos scripts SQL manuales duplicaban parte del esquema. La consulta de solo lectura a `PrimitivaAuditV2` confirmó las tres tablas y datos existentes (`Plans`: 1, `DrawRecords`: 92, `WinningDraws`: 4178), pero `__EFMigrationsHistory` no contenía ninguna fila, por lo que la cadena original intentaría recrear tablas ya existentes.
+- **Pruebas realizadas:** antes de editar, `dotnet test LaPrimitiva.sln --no-restore` compiló la línea base y ejecutó 116 pruebas: 103 superadas y 13 de integración fallidas porque `localhost\SQLEXPRESS` no estaba accesible (`SQL Network Interfaces, error: 26`); este resultado es previo a los cambios. Después de editar no se compiló, conforme a la restricción del repositorio. Sí se ejecutaron `scripts/Verify-M401EfMigrations.ps1`, análisis sintáctico de los dos scripts PowerShell, `Invoke-M401DatabaseMigration.ps1 -Action Script -WhatIf`, `Invoke-M401DatabaseMigration.ps1 -Action Update -WhatIf` y `git diff --check`, todos correctos. Se añadieron pruebas de integración para creación desde cero y adopción del esquema legado con conservación de filas, pero no se atribuye su ejecución en esta sesión.
+- **Resultado:** el seeder conserva únicamente reparación y carga de datos; ya no contiene DDL. Las cuatro migraciones existentes son compatibles tanto con una base vacía como con el esquema legado sin historial: crean o completan solo objetos ausentes, conservan las filas y registran la cadena mediante EF Core. Se eliminaron los dos scripts DDL manuales obsoletos. `scripts/Invoke-M401DatabaseMigration.ps1` permite aplicar las migraciones con una identidad administrativa o generar el SQL idempotente derivado de EF en `artifacts\database`, mientras el arranque normal no llama a `Migrate`, `EnsureCreated` ni operaciones DDL.
+- **Decisiones:** no se ejecutan migraciones automáticamente desde la aplicación: separar la identidad de migración de la identidad de ejecución evita conceder permisos DDL permanentes al proceso web. La compatibilidad con la base anterior se resuelve dentro de la cadena EF mediante operaciones condicionales, no marcando migraciones a mano ni recreando tablas. Antes de actualizar una base real se mantiene obligatorio el backup verificado de M-101. M-401 no crea certificados; el paquete exportable de M-306 (`.cer` público y `.pfx` protegido, fuera de Git) permanece descargable e instalable en otros equipos locales. No se avanzó a M-402.
 
 ### [ ] M-402 — Usar contextos cortos con `IDbContextFactory`
 

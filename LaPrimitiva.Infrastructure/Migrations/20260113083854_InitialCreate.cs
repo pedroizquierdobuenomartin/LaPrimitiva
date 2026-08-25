@@ -11,72 +11,57 @@ namespace LaPrimitiva.Infrastructure.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.CreateTable(
-                name: "Plans",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    EffectiveFrom = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    EffectiveTo = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    WeeksToTrackDefault = table.Column<int>(type: "int", nullable: false),
-                    CostPerBet = table.Column<decimal>(type: "decimal(10,2)", precision: 10, scale: 2, nullable: false),
-                    BetsPerDraw = table.Column<int>(type: "int", nullable: false),
-                    EnableJoker = table.Column<bool>(type: "bit", nullable: false),
-                    JokerCostPerBet = table.Column<decimal>(type: "decimal(10,2)", precision: 10, scale: 2, nullable: false),
-                    FixedCombinationLabel = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Plans", x => x.Id);
-                });
+            // The application historically created these tables at startup without
+            // recording migration history. Conditional creation lets EF adopt that
+            // legacy schema without dropping or recreating its data.
+            migrationBuilder.Sql(@"
+                IF OBJECT_ID(N'[Plans]', N'U') IS NULL
+                BEGIN
+                    CREATE TABLE [Plans] (
+                        [Id] uniqueidentifier NOT NULL,
+                        [Name] nvarchar(max) NOT NULL,
+                        [EffectiveFrom] datetime2 NOT NULL,
+                        [EffectiveTo] datetime2 NULL,
+                        [WeeksToTrackDefault] int NOT NULL,
+                        [CostPerBet] decimal(10,2) NOT NULL,
+                        [BetsPerDraw] int NOT NULL,
+                        [EnableJoker] bit NOT NULL,
+                        [JokerCostPerBet] decimal(10,2) NOT NULL,
+                        [FixedCombinationLabel] nvarchar(max) NULL,
+                        [CreatedAt] datetime2 NOT NULL,
+                        [UpdatedAt] datetime2 NOT NULL,
+                        CONSTRAINT [PK_Plans] PRIMARY KEY ([Id])
+                    );
+                END;
 
-            migrationBuilder.CreateTable(
-                name: "DrawRecords",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    PlanId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    DrawType = table.Column<byte>(type: "tinyint", nullable: false),
-                    DrawDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    WeekNumber = table.Column<int>(type: "int", nullable: false),
-                    Played = table.Column<bool>(type: "bit", nullable: false),
-                    FixedPrize = table.Column<decimal>(type: "decimal(10,2)", precision: 10, scale: 2, nullable: false),
-                    AutoPrize = table.Column<decimal>(type: "decimal(10,2)", precision: 10, scale: 2, nullable: false),
-                    JokerFixedPrize = table.Column<decimal>(type: "decimal(10,2)", precision: 10, scale: 2, nullable: false),
-                    JokerAutoPrize = table.Column<decimal>(type: "decimal(10,2)", precision: 10, scale: 2, nullable: false),
-                    Notes = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_DrawRecords", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_DrawRecords_Plans_PlanId",
-                        column: x => x.PlanId,
-                        principalTable: "Plans",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
+                IF OBJECT_ID(N'[DrawRecords]', N'U') IS NULL
+                BEGIN
+                    CREATE TABLE [DrawRecords] (
+                        [Id] uniqueidentifier NOT NULL,
+                        [PlanId] uniqueidentifier NOT NULL,
+                        [DrawType] tinyint NOT NULL,
+                        [DrawDate] datetime2 NOT NULL,
+                        [WeekNumber] int NOT NULL,
+                        [Played] bit NOT NULL,
+                        [FixedPrize] decimal(10,2) NOT NULL,
+                        [AutoPrize] decimal(10,2) NOT NULL,
+                        [JokerFixedPrize] decimal(10,2) NOT NULL,
+                        [JokerAutoPrize] decimal(10,2) NOT NULL,
+                        [Notes] nvarchar(max) NULL,
+                        [CreatedAt] datetime2 NOT NULL,
+                        [UpdatedAt] datetime2 NOT NULL,
+                        CONSTRAINT [PK_DrawRecords] PRIMARY KEY ([Id]),
+                        CONSTRAINT [FK_DrawRecords_Plans_PlanId]
+                            FOREIGN KEY ([PlanId]) REFERENCES [Plans] ([Id]) ON DELETE CASCADE
+                    );
+                END;
 
-            migrationBuilder.CreateIndex(
-                name: "IX_DrawRecords_DrawDate",
-                table: "DrawRecords",
-                column: "DrawDate");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_DrawRecords_PlanId_DrawDate_DrawType",
-                table: "DrawRecords",
-                columns: new[] { "PlanId", "DrawDate", "DrawType" },
-                unique: true);
-
-            migrationBuilder.CreateIndex(
-                name: "IX_DrawRecords_WeekNumber",
-                table: "DrawRecords",
-                column: "WeekNumber");
+                IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE [object_id] = OBJECT_ID(N'[DrawRecords]') AND [name] = N'IX_DrawRecords_DrawDate')
+                    CREATE INDEX [IX_DrawRecords_DrawDate] ON [DrawRecords] ([DrawDate]);
+                IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE [object_id] = OBJECT_ID(N'[DrawRecords]') AND [name] = N'IX_DrawRecords_PlanId_DrawDate_DrawType')
+                    CREATE UNIQUE INDEX [IX_DrawRecords_PlanId_DrawDate_DrawType] ON [DrawRecords] ([PlanId], [DrawDate], [DrawType]);
+                IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE [object_id] = OBJECT_ID(N'[DrawRecords]') AND [name] = N'IX_DrawRecords_WeekNumber')
+                    CREATE INDEX [IX_DrawRecords_WeekNumber] ON [DrawRecords] ([WeekNumber]);");
         }
 
         /// <inheritdoc />

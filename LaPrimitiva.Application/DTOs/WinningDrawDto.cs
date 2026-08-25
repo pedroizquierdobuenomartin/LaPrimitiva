@@ -15,10 +15,11 @@ namespace LaPrimitiva.Application.DTOs
         public int Complementario { get; set; }
         public int Reintegro { get; set; }
         public string? Joker { get; set; }
+        public byte[] RowVersion { get; set; } = [];
 
         public WinningDrawDto() { }
 
-        public WinningDrawDto(Guid id, DateTime drawDate, int n1, int n2, int n3, int n4, int n5, int n6, int comp, int rein, string? joker)
+        public WinningDrawDto(Guid id, DateTime drawDate, int n1, int n2, int n3, int n4, int n5, int n6, int comp, int rein, string? joker, byte[]? rowVersion = null)
         {
             Id = id;
             DrawDate = drawDate;
@@ -31,6 +32,7 @@ namespace LaPrimitiva.Application.DTOs
             Complementario = comp;
             Reintegro = rein;
             Joker = joker;
+            RowVersion = rowVersion?.ToArray() ?? [];
         }
     }
 }

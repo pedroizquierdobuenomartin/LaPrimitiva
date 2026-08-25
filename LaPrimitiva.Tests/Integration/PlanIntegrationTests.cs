@@ -202,7 +202,8 @@ namespace LaPrimitiva.Tests.Integration
                 EffectiveFrom = testPlan.EffectiveFrom,
                 EffectiveTo = testPlan.EffectiveTo,
                 CostPerBet = testPlan.CostPerBet,
-                BetsPerDraw = testPlan.BetsPerDraw
+                BetsPerDraw = testPlan.BetsPerDraw,
+                RowVersion = loadedPlanDto.RowVersion.ToArray()
             };
 
             // Act
@@ -277,6 +278,9 @@ namespace LaPrimitiva.Tests.Integration
             };
             await planService.CreatePlanAsync(testPlan);
 
+            var loadedPlanDto = await planService.GetPlanByIdAsync(testPlan.Id);
+            Assert.NotNull(loadedPlanDto);
+
             var disconnectedPlan = new Plan
             {
                 Id = testPlan.Id,
@@ -286,7 +290,8 @@ namespace LaPrimitiva.Tests.Integration
                 CostPerBet = testPlan.CostPerBet,
                 BetsPerDraw = testPlan.BetsPerDraw,
                 CreatedAt = originalCreatedAt.AddYears(10),
-                UpdatedAt = originalUpdatedAt
+                UpdatedAt = originalUpdatedAt,
+                RowVersion = loadedPlanDto.RowVersion.ToArray()
             };
 
             // Act

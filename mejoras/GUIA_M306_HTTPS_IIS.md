@@ -28,7 +28,9 @@ Comprueba antes de continuar:
 5. Tienes permisos de administrador en Windows.
 6. El sitio no define `ASPNETCORE_ENVIRONMENT=Development`; debe usar `Production` —valor predeterminado— para que la aplicación emita HSTS.
 
-Si todavía necesitas generar la publicación, ejecuta `Publish.bat` manualmente desde la raíz. Esta operación compila la aplicación.
+Si todavía necesitas generar la publicación, ejecuta `Publish.bat` manualmente desde la raíz. Esta operación compila la aplicación y crea en `publish` un EF migration bundle autocontenido para Windows x64, su lanzador `ActualizarBaseDatos.bat`, el marcador `ESQUEMA_BD.version` y el manifiesto `MIGRACIONES_BD.txt`.
+
+> **Orden obligatorio en cada despliegue:** detén el sitio o pool IIS, copia la nueva publicación, revisa la conexión de `appsettings.json`, ejecuta `ActualizarBaseDatos.bat` con una identidad administrativa y arranca IIS únicamente si termina correctamente. El BAT debe ejecutarse en **todas** las actualizaciones: el bundle consulta `__EFMigrationsHistory` y decide por sí mismo si existen migraciones pendientes. Si la base ya existe, realiza antes el backup verificado de M-101.
 
 ## 3. Abrir la consola correcta
 

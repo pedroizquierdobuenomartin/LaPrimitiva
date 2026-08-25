@@ -19,7 +19,6 @@ namespace LaPrimitiva.Tests
             var service = new DrawNotificationService(
                 rssClient,
                 new RssParserService(),
-                Mock.Of<ILocalStorageService>(),
                 winningDrawService.Object,
                 new GlobalState());
 

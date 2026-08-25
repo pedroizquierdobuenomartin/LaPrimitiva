@@ -4,6 +4,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using LaPrimitiva.Domain.Entities;
+using LaPrimitiva.Domain.Exceptions;
 using LaPrimitiva.Domain.Repositories;
 using LaPrimitiva.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
@@ -48,8 +49,9 @@ namespace LaPrimitiva.Infrastructure.Repositories
         {
             await using var context = await _contextFactory.CreateDbContextAsync();
             var tracked = await GetTrackedDrawAsync(context, draw.Id);
+            context.Entry(tracked).Property(entity => entity.RowVersion).OriginalValue = draw.RowVersion;
             ApplyEditableValues(tracked, draw);
-            await context.SaveChangesAsync();
+            await SaveChangesAsync(context, draw.Id);
         }
 
         public async Task UpdateRangeAsync(IEnumerable<DrawRecord> draws)
@@ -67,15 +69,16 @@ namespace LaPrimitiva.Infrastructure.Repositories
                 .FirstOrDefault();
             if (missingId.HasValue)
             {
-                throw new InvalidOperationException($"No existe el sorteo con identificador '{missingId}'.");
+                throw new ConcurrencyConflictException(missingId.Value);
             }
 
             foreach (var draw in disconnectedDraws)
             {
+                context.Entry(trackedDraws[draw.Id]).Property(entity => entity.RowVersion).OriginalValue = draw.RowVersion;
                 ApplyEditableValues(trackedDraws[draw.Id], draw);
             }
 
-            await context.SaveChangesAsync();
+            await SaveChangesAsync(context, disconnectedDraws.FirstOrDefault()?.Id ?? Guid.Empty);
         }
 
         public async Task DeleteAsync(Guid id)
@@ -97,7 +100,7 @@ namespace LaPrimitiva.Infrastructure.Repositories
         private static async Task<DrawRecord> GetTrackedDrawAsync(PrimitivaDbContext context, Guid id)
         {
             return await context.DrawRecords.SingleOrDefaultAsync(draw => draw.Id == id)
-                ?? throw new InvalidOperationException($"No existe el sorteo con identificador '{id}'.");
+                ?? throw new ConcurrencyConflictException(id);
         }
 
         private static void ApplyEditableValues(DrawRecord target, DrawRecord source)
@@ -117,6 +120,18 @@ namespace LaPrimitiva.Infrastructure.Repositories
             target.TotalPremios = source.TotalPremios;
             target.Neto = source.Neto;
             target.UpdatedAt = source.UpdatedAt;
+        }
+
+        private static async Task SaveChangesAsync(PrimitivaDbContext context, Guid entityId)
+        {
+            try
+            {
+                await context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException exception)
+            {
+                throw new ConcurrencyConflictException(entityId, exception);
+            }
         }
     }
 }

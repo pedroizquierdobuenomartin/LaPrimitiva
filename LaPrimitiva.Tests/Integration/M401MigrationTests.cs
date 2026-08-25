@@ -18,7 +18,8 @@ public sealed class M401MigrationTests
             await context.Database.MigrateAsync();
 
             var applied = (await context.Database.GetAppliedMigrationsAsync()).ToArray();
-            Assert.Equal(4, applied.Length);
+            var defined = context.Database.GetMigrations().ToArray();
+            Assert.Equal(defined, applied);
             Assert.True(await context.Database.SqlQuery<int>($"SELECT COUNT(*) AS [Value] FROM sys.tables WHERE [name] IN ('Plans', 'DrawRecords', 'WinningDraws')").SingleAsync() == 3);
         }
         finally
@@ -70,7 +71,9 @@ public sealed class M401MigrationTests
             {
                 await migratedContext.Database.MigrateAsync();
 
-                Assert.Equal(4, (await migratedContext.Database.GetAppliedMigrationsAsync()).Count());
+                var defined = migratedContext.Database.GetMigrations().ToArray();
+                var applied = (await migratedContext.Database.GetAppliedMigrationsAsync()).ToArray();
+                Assert.Equal(defined, applied);
                 Assert.Equal("Plan conservado", (await migratedContext.Plans.SingleAsync()).Name);
                 Assert.Equal("0123456", (await migratedContext.WinningDraws.SingleAsync()).Joker);
             }

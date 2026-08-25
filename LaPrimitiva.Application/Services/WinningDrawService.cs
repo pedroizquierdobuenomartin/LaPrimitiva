@@ -119,7 +119,8 @@ namespace LaPrimitiva.Application.Services
             entity.Number6,
             entity.Complementario,
             entity.Reintegro,
-            entity.Joker
+            entity.Joker,
+            entity.RowVersion
         );
 
         private static WinningDraw MapToEntity(WinningDrawDto dto)
@@ -142,7 +143,8 @@ namespace LaPrimitiva.Application.Services
                 Number6 = sortedNumbers[5],
                 Complementario = dto.Complementario,
                 Reintegro = dto.Reintegro,
-                Joker = string.IsNullOrWhiteSpace(dto.Joker) ? null : dto.Joker.Trim()
+                Joker = string.IsNullOrWhiteSpace(dto.Joker) ? null : dto.Joker.Trim(),
+                RowVersion = dto.RowVersion.ToArray()
             };
         }
     }

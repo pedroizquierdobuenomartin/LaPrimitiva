@@ -61,7 +61,8 @@ namespace LaPrimitiva.Tests.Integration
                 DrawDate = draw.DrawDate,
                 Played = true,
                 Notes = "Updated Notes",
-                UpdatedAt = DateTime.UtcNow
+                UpdatedAt = DateTime.UtcNow,
+                RowVersion = draw.RowVersion.ToArray()
             };
 
             var exception = await Record.ExceptionAsync(async () => await repo.UpdateAsync(detachedDraw));

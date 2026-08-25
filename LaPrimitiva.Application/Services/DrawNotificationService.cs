@@ -12,7 +12,6 @@ namespace LaPrimitiva.Application.Services
     public class DrawNotificationService(
         IRssClient rssClient,
         IRssParserService rssParser,
-        ILocalStorageService localStorage,
         IWinningDrawService winningDrawService,
         GlobalState globalState) : IDrawNotificationService
     {

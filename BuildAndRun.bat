@@ -15,6 +15,11 @@ dotnet build "LaPrimitiva.sln" --configuration Debug
 if errorlevel 1 goto :fail
 
 echo.
+echo === Aplicando migraciones pendientes a la base configurada ===
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File ".\scripts\Invoke-M401DatabaseMigration.ps1" -Action Update -NoBuild
+if errorlevel 1 goto :fail
+
+echo.
 echo === Ejecutando LaPrimitiva en http://localhost:5007 ===
 dotnet run --project ".\LaPrimitiva.App\LaPrimitiva.App.csproj" --no-build --launch-profile http
 if errorlevel 1 goto :fail

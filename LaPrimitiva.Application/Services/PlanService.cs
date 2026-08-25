@@ -171,6 +171,7 @@ namespace LaPrimitiva.Application.Services
             JokerCostPerBet = p.JokerCostPerBet,
             FixedCombinationLabel = p.FixedCombinationLabel,
             CreatedAt = p.CreatedAt,
+            RowVersion = p.RowVersion.ToArray(),
             HasDraws = p.Draws != null && p.Draws.Any(),
             TotalDraws = p.Draws?.Count ?? 0,
             ActiveDraws = p.Draws?.Count(d => d.Played) ?? 0,

@@ -39,8 +39,10 @@ public class DisconnectedDrawPersistenceTests(IntegrationTestFixture fixture)
                 {
                     Id = otherPlanId,
                     Name = "Plan que no debe aplicarse",
-                    EffectiveFrom = new DateTime(2026, 1, 1),
-                    EffectiveTo = new DateTime(2026, 12, 31),
+                    // It only supplies a different structural PlanId for the update attempt;
+                    // its validity period must not violate the database overlap invariant.
+                    EffectiveFrom = new DateTime(2027, 1, 1),
+                    EffectiveTo = new DateTime(2027, 12, 31),
                     BetsPerDraw = 1,
                     CostPerBet = 2m
                 });

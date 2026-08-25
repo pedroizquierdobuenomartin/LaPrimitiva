@@ -20,6 +20,7 @@ namespace LaPrimitiva.Infrastructure.Persistence
                 entity.HasKey(e => e.Id);
                 entity.Property(e => e.CostPerBet).HasPrecision(10, 2);
                 entity.Property(e => e.JokerCostPerBet).HasPrecision(10, 2);
+                entity.Property(e => e.RowVersion).IsRowVersion();
                 entity.ToTable(table =>
                 {
                     table.HasTrigger("TR_Plans_PreventOverlap");
@@ -48,6 +49,7 @@ namespace LaPrimitiva.Infrastructure.Persistence
                 entity.Property(e => e.TotalPremios).HasPrecision(10, 2);
                 entity.Property(e => e.Neto).HasPrecision(10, 2);
                 entity.Property(e => e.Acumulado).HasPrecision(12, 2);
+                entity.Property(e => e.RowVersion).IsRowVersion();
 
                 // Constraint: Unique (PlanId, DrawDate, DrawType)
                 entity.HasIndex(e => new { e.PlanId, e.DrawDate, e.DrawType }).IsUnique();
@@ -66,6 +68,7 @@ namespace LaPrimitiva.Infrastructure.Persistence
                 entity.HasKey(e => e.Id);
                 entity.HasIndex(e => e.DrawDate).IsUnique();
                 entity.Property(e => e.Joker).HasMaxLength(WinningDraw.JokerLength);
+                entity.Property(e => e.RowVersion).IsRowVersion();
                 entity.ToTable(table =>
                 {
                     table.HasCheckConstraint("CK_WinningDraws_MainNumbersRange", "[Number1] BETWEEN 1 AND 49 AND [Number2] BETWEEN 1 AND 49 AND [Number3] BETWEEN 1 AND 49 AND [Number4] BETWEEN 1 AND 49 AND [Number5] BETWEEN 1 AND 49 AND [Number6] BETWEEN 1 AND 49");

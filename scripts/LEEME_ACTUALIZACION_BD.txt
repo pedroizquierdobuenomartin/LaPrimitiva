@@ -1,0 +1,39 @@
+LA PRIMITIVA AUDIT - ACTUALIZACIÓN DE BASE DE DATOS
+===================================================
+
+REGLA SIMPLE: después de copiar CADA nueva publicación y antes de iniciar IIS,
+ejecuta ActualizarBaseDatos.bat como una identidad con permisos administrativos
+sobre SQL Server.
+
+No necesitas recordar si esa versión incorpora cambios de base de datos. El
+bundle consulta __EFMigrationsHistory y aplica solamente las migraciones que
+falten. Si no falta ninguna, termina correctamente sin alterar el esquema.
+
+ANTES DE EJECUTAR
+-----------------
+1. Detén el sitio o pool de aplicaciones de IIS.
+2. Si la base ya existe, crea y verifica un backup.
+3. Revisa ConnectionStrings:DefaultConnection en appsettings.json.
+4. Comprueba que la instancia de SQL Server indicada existe en este equipo.
+
+CONEXIÓN ADMINISTRATIVA ALTERNATIVA
+-----------------------------------
+Puedes evitar modificar appsettings.json definiendo temporalmente la variable
+LAPRIMITIVA_MIGRATION_CONNECTION antes de ejecutar el BAT:
+
+  set "LAPRIMITIVA_MIGRATION_CONNECTION=Server=localhost\LOCALSERVER;Database=PrimitivaAuditV2;Trusted_Connection=True;TrustServerCertificate=True;"
+  ActualizarBaseDatos.bat
+
+No guardes contraseñas SQL dentro de este paquete.
+
+CÓMO RECONOCER UN CAMBIO DE ESQUEMA
+-----------------------------------
+- ESQUEMA_BD.version contiene el identificador de la última migración incluida.
+- MIGRACIONES_BD.txt enumera todas las migraciones del paquete.
+- Si ESQUEMA_BD.version cambia entre dos publicaciones, el modelo de base de
+  datos ha cambiado.
+- Aunque no lo compares, ejecutar siempre ActualizarBaseDatos.bat es seguro e
+  idempotente: el propio bundle detecta el estado real de la base de destino.
+
+Si el BAT devuelve un error, NO inicies IIS. Conserva la salida completa para
+diagnosticar permisos, conexión o una migración rechazada.

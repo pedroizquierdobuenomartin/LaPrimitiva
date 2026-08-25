@@ -3,6 +3,7 @@
 @using LaPrimitiva.Application.Interfaces
 @using LaPrimitiva.Application.Services
 @using LaPrimitiva.Domain.Localization
+@using LaPrimitiva.Domain.Exceptions
 @using Microsoft.Extensions.Localization
 @inject IWinningDrawService WinningDrawService
 @inject IStringLocalizer<HistoricalResource> L
@@ -235,7 +236,15 @@
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-rose-500 shrink-0 mt-0.5" viewBox="0 0 20 20" fill="currentColor">
                             <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
                         </svg>
-                        <div class="text-[11px] font-bold text-rose-700">@_errorMessage</div>
+                        <div>
+                            <div class="text-[11px] font-bold text-rose-700">@_errorMessage</div>
+                            @if (_hasConcurrencyConflict)
+                            {
+                                <button type="button" @onclick="ReloadWinningDrawAsync" class="mt-2 text-[10px] font-black uppercase tracking-widest text-rose-700 underline">
+                                    Recargar datos actuales
+                                </button>
+                            }
+                        </div>
                     </div>
                 }
             </div>
@@ -284,6 +293,7 @@
     private bool _isEditing = false;
     private WinningDrawDto _editingDraw = CreateNewDto();
     private string? _errorMessage;
+    private bool _hasConcurrencyConflict;
 
     protected override async Task OnInitializedAsync()
     {
@@ -321,6 +331,7 @@
         _isEditing = false;
         _editingDraw = CreateNewDto();
         _errorMessage = null;
+        _hasConcurrencyConflict = false;
         _showModal = true;
     }
 
@@ -329,6 +340,7 @@
         _isEditing = true;
         _editingDraw = draw with { };
         _errorMessage = null;
+        _hasConcurrencyConflict = false;
         _showModal = true;
     }
 
@@ -350,14 +362,23 @@
         _errorMessage = null;
 
         Result result;
-        if (_isEditing)
+        try
         {
-            result = await WinningDrawService.UpdateAsync(_editingDraw);
+            if (_isEditing)
+            {
+                result = await WinningDrawService.UpdateAsync(_editingDraw);
+            }
+            else
+            {
+                var createResult = await WinningDrawService.CreateAsync(_editingDraw);
+                result = createResult.IsSuccess ? Result.Success() : Result.Failure(createResult.Error!);
+            }
         }
-        else
+        catch (ConcurrencyConflictException exception)
         {
-            var createResult = await WinningDrawService.CreateAsync(_editingDraw);
-            result = createResult.IsSuccess ? Result.Success() : Result.Failure(createResult.Error!);
+            _hasConcurrencyConflict = true;
+            _errorMessage = exception.Message;
+            return;
         }
 
         if (result.IsSuccess)
@@ -369,6 +390,21 @@
         {
             _errorMessage = result.Error;
         }
+    }
+
+    private async Task ReloadWinningDrawAsync()
+    {
+        var current = await WinningDrawService.GetByIdAsync(_editingDraw.Id);
+        if (current == null)
+        {
+            CloseModal();
+            await LoadDraws();
+            return;
+        }
+
+        _editingDraw = current;
+        _hasConcurrencyConflict = false;
+        _errorMessage = null;
     }
 
     private async Task ConfirmDelete()

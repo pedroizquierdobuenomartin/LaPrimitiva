@@ -1,6 +1,7 @@
 @using LaPrimitiva.Domain.Repositories
 @using LaPrimitiva.Domain.Localization
 @using LaPrimitiva.Domain.Entities
+@using LaPrimitiva.Domain.Exceptions
 @using LaPrimitiva.Application.Interfaces
 @using LaPrimitiva.Application.Services
 @using Microsoft.Extensions.Localization
@@ -273,9 +274,15 @@
                                 <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
                             </svg>
                         </div>
-                        <div>
+                        <div class="flex-1">
                             <p class="text-xs font-bold text-rose-900 uppercase tracking-widest">Error Detectado</p>
                             <p class="text-[13px] font-medium text-rose-700/80">@modalErrorMessage</p>
+                            @if (_hasConcurrencyConflict)
+                            {
+                                <button type="button" @onclick="ReloadWeekAfterConflictAsync" class="mt-2 text-[10px] font-black uppercase tracking-widest text-rose-700 underline">
+                                    Recargar datos actuales
+                                </button>
+                            }
                         </div>
                     </div>
                 }
@@ -588,6 +595,7 @@
     private Guid? selectedPlanId;
     private List<DrawRecord> tempModalDraws = new();
     private string? modalErrorMessage;
+    private bool _hasConcurrencyConflict;
     private bool _isLoading;
     
     // Delete Confirmation State
@@ -750,6 +758,7 @@
         selectedPlanId = allPlans?.FirstOrDefault()?.Id;
         tempModalDraws.Clear();
         modalErrorMessage = null;
+        _hasConcurrencyConflict = false;
         showModal = true;
     }
 
@@ -759,6 +768,7 @@
         weekAlreadyExists = true; // Technically it exists if we are editing
         modalWeek = draw.WeekNumber;
         modalErrorMessage = null;
+        _hasConcurrencyConflict = false;
         showModal = true;
         await LoadWeekDataInModal();
     }
@@ -896,6 +906,7 @@
         try 
         {
             modalErrorMessage = null;
+            _hasConcurrencyConflict = false;
             
             // Validate all draws before saving anything
             foreach (var draw in modalDraws)
@@ -942,6 +953,11 @@
             await LoadData();
             StateHasChanged();
         }
+        catch (ConcurrencyConflictException ex)
+        {
+            _hasConcurrencyConflict = true;
+            modalErrorMessage = ex.Message;
+        }
         catch (InvalidOperationException ex)
         {
             modalErrorMessage = ex.Message;
@@ -950,6 +966,13 @@
         {
             modalErrorMessage = "Ha ocurrido un error inesperado al guardar los cambios.";
         }
+    }
+
+    private async Task ReloadWeekAfterConflictAsync()
+    {
+        await LoadWeekDataInModal();
+        _hasConcurrencyConflict = false;
+        modalErrorMessage = null;
     }
 
     private void ConfirmDeleteWeek(int week, int year, Guid planId)

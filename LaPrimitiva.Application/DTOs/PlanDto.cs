@@ -14,6 +14,7 @@ namespace LaPrimitiva.Application.DTOs
         public decimal JokerCostPerBet { get; init; }
         public string? FixedCombinationLabel { get; init; }
         public DateTime CreatedAt { get; init; }
+        public byte[] RowVersion { get; init; } = [];
         public bool HasDraws { get; init; }
         public bool HasOverlap { get; init; }
         public int TotalDraws { get; init; }

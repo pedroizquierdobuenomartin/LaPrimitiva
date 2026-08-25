@@ -32,6 +32,7 @@ namespace LaPrimitiva.Domain.Entities
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
+        public byte[] RowVersion { get; set; } = [];
 
         // Plan-derived helpers are only used to snapshot the configured costs.
         public decimal FixedCost => Played ? Plan.CostPerBet : 0;

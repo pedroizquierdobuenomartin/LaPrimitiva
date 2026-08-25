@@ -4,6 +4,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using LaPrimitiva.Domain.Entities;
+using LaPrimitiva.Domain.Exceptions;
 using LaPrimitiva.Domain.Repositories;
 using LaPrimitiva.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
@@ -75,7 +76,8 @@ namespace LaPrimitiva.Infrastructure.Repositories
             await EnsureNoOverlapAsync(context, plan);
 
             var existing = await context.Plans.SingleOrDefaultAsync(existing => existing.Id == plan.Id)
-                ?? throw new InvalidOperationException("No se ha encontrado el plan que se quiere actualizar.");
+                ?? throw new ConcurrencyConflictException(plan.Id);
+            context.Entry(existing).Property(entity => entity.RowVersion).OriginalValue = plan.RowVersion;
 
             existing.Name = plan.Name;
             existing.EffectiveFrom = plan.EffectiveFrom;
@@ -88,7 +90,14 @@ namespace LaPrimitiva.Infrastructure.Repositories
             existing.FixedCombinationLabel = plan.FixedCombinationLabel;
             existing.UpdatedAt = DateTime.UtcNow;
 
-            await context.SaveChangesAsync();
+            try
+            {
+                await context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException exception)
+            {
+                throw new ConcurrencyConflictException(plan.Id, exception);
+            }
         }
 
         private static async Task EnsureNoOverlapAsync(PrimitivaDbContext context, Plan plan)

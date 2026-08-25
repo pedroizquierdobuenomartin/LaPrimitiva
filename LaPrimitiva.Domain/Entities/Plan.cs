@@ -36,6 +36,7 @@ namespace LaPrimitiva.Domain.Entities
         
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
+        public byte[] RowVersion { get; set; } = [];
 
         // Navigation property
         public ICollection<DrawRecord> Draws { get; set; } = new List<DrawRecord>();

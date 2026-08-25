@@ -4,6 +4,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using LaPrimitiva.Domain.Entities;
+using LaPrimitiva.Domain.Exceptions;
 using LaPrimitiva.Domain.Repositories;
 using LaPrimitiva.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
@@ -63,8 +64,28 @@ namespace LaPrimitiva.Infrastructure.Repositories
         {
             draw.Validate();
             await using var context = await _contextFactory.CreateDbContextAsync();
-            context.WinningDraws.Update(draw);
-            await context.SaveChangesAsync();
+            var existing = await context.WinningDraws.SingleOrDefaultAsync(entity => entity.Id == draw.Id)
+                ?? throw new ConcurrencyConflictException(draw.Id);
+            context.Entry(existing).Property(entity => entity.RowVersion).OriginalValue = draw.RowVersion;
+            existing.DrawDate = draw.DrawDate;
+            existing.Number1 = draw.Number1;
+            existing.Number2 = draw.Number2;
+            existing.Number3 = draw.Number3;
+            existing.Number4 = draw.Number4;
+            existing.Number5 = draw.Number5;
+            existing.Number6 = draw.Number6;
+            existing.Complementario = draw.Complementario;
+            existing.Reintegro = draw.Reintegro;
+            existing.Joker = draw.Joker;
+
+            try
+            {
+                await context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException exception)
+            {
+                throw new ConcurrencyConflictException(draw.Id, exception);
+            }
         }
 
         public async Task DeleteAsync(Guid id)

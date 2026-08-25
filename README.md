@@ -37,6 +37,20 @@ Para entregar el cambio a un administrador de base de datos sin conceder DDL a l
 
 El fichero queda en `artifacts\database\LaPrimitiva.Migrations.sql` (fuera de Git). Tras aplicarlo, la identidad normal de la aplicación solo necesita los permisos de lectura y escritura requeridos por sus casos de uso; no necesita permisos permanentes para crear o alterar tablas. `-NoBuild` solo debe usarse cuando los binarios ya se hayan compilado con exactamente la versión que se va a migrar.
 
+### Publicación portable y actualización en otro equipo
+
+`Publish.bat` genera, además de la aplicación, un **EF migration bundle autocontenido para Windows x64** dentro de `publish`:
+
+- `LaPrimitiva.DatabaseMigration.exe`: ejecutor de migraciones; no necesita el repositorio, el SDK de .NET ni `dotnet ef` en el equipo de destino.
+- `ActualizarBaseDatos.bat`: lanzador interactivo que conserva visible el resultado y devuelve error si la base no queda preparada.
+- `ESQUEMA_BD.version`: identificador de la última migración incluida. Si cambia entre dos publicaciones, el modelo de base de datos ha cambiado.
+- `MIGRACIONES_BD.txt`: manifiesto completo del esquema incluido.
+- `LEEME_ACTUALIZACION_BD.txt`: procedimiento autónomo para el equipo de destino.
+
+La regla operativa evita depender de comparaciones manuales: **después de copiar cada nueva publicación y antes de iniciar IIS, ejecuta `ActualizarBaseDatos.bat`**. El bundle consulta `__EFMigrationsHistory`; aplica únicamente las migraciones pendientes y no altera el esquema si ya está actualizado. Antes hay que detener el sitio o pool, verificar un backup si la base existe y revisar `ConnectionStrings:DefaultConnection` en el `appsettings.json` publicado.
+
+Si la cuenta Windows que ejecuta el BAT no debe usar la conexión publicada, define temporalmente `LAPRIMITIVA_MIGRATION_CONNECTION`. Esta identidad administrativa necesita permisos para crear o alterar el esquema; la identidad normal del pool IIS sigue necesitando únicamente los permisos de aplicación. No almacenes contraseñas SQL en el paquete.
+
 ### Seguridad de acceso exclusivamente local
 
 La aplicación está diseñada para ejecutarse sin autenticación **solo en el equipo local**:

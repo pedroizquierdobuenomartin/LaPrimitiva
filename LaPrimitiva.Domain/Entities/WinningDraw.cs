@@ -24,6 +24,7 @@ namespace LaPrimitiva.Domain.Entities
         public string? Joker { get; set; }
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public byte[] RowVersion { get; set; } = [];
 
         public void Validate()
         {

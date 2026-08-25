@@ -12,11 +12,11 @@ namespace LaPrimitiva.Infrastructure.Persistence.Seed
 {
     public class WinningDrawSeeder
     {
-        private readonly PrimitivaDbContext _context;
+        private readonly IDbContextFactory<PrimitivaDbContext> _contextFactory;
 
-        public WinningDrawSeeder(PrimitivaDbContext context)
+        public WinningDrawSeeder(IDbContextFactory<PrimitivaDbContext> contextFactory)
         {
-            _context = context;
+            _contextFactory = contextFactory;
         }
 
         private int ParseInt(string value)
@@ -27,7 +27,8 @@ namespace LaPrimitiva.Infrastructure.Persistence.Seed
 
         private async Task RepairFinancialTotalsAsync()
         {
-            var inconsistentDraws = await _context.DrawRecords
+            await using var context = await _contextFactory.CreateDbContextAsync();
+            var inconsistentDraws = await context.DrawRecords
                 .Where(draw =>
                     draw.TotalCoste != draw.CosteFija + draw.CosteAuto + draw.CosteJokerFija + draw.CosteJokerAuto ||
                     draw.TotalPremios != draw.FixedPrize + draw.AutoPrize + draw.JokerFixedPrize + draw.JokerAutoPrize ||
@@ -46,7 +47,7 @@ namespace LaPrimitiva.Infrastructure.Persistence.Seed
 
             if (inconsistentDraws.Count > 0)
             {
-                await _context.SaveChangesAsync();
+                await context.SaveChangesAsync();
             }
         }
 
@@ -69,13 +70,6 @@ namespace LaPrimitiva.Infrastructure.Persistence.Seed
 
         public async Task SeedAsync(string csvPath)
         {
-            if (_context.WinningDraws.Any()) 
-            {
-                // Optimization: if we already have data, we might want to skip or just check for new ones.
-                // But since it's a seed of historical data, if there's anything, let's skip for speed 
-                // UNLESS user wants to merge. For now, let's keep it idempotent.
-            }
-            
             if (!File.Exists(csvPath))
             {
                 Console.WriteLine($"CSV file not found: {csvPath}");
@@ -85,7 +79,9 @@ namespace LaPrimitiva.Infrastructure.Persistence.Seed
             var lines = await File.ReadAllLinesAsync(csvPath);
             if (lines.Length <= 1) return;
 
-            var existingDates = await _context.WinningDraws
+            await using var context = await _contextFactory.CreateDbContextAsync();
+            var existingDates = await context.WinningDraws
+                .AsNoTracking()
                 .Select(wd => wd.DrawDate)
                 .ToListAsync();
 
@@ -140,8 +136,8 @@ namespace LaPrimitiva.Infrastructure.Persistence.Seed
 
             if (newDraws.Any())
             {
-                await _context.WinningDraws.AddRangeAsync(newDraws);
-                await _context.SaveChangesAsync();
+                await context.WinningDraws.AddRangeAsync(newDraws);
+                await context.SaveChangesAsync();
                 Console.WriteLine($"Seeded {newDraws.Count} draws from {Path.GetFileName(csvPath)}");
             }
         }

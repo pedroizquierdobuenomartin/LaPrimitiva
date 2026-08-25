@@ -13,47 +13,51 @@ namespace LaPrimitiva.Infrastructure.Repositories
     /// <summary>
     /// Implementación de IDrawRepository utilizando EF Core 10.
     /// </summary>
-    public class DrawRepository(PrimitivaDbContext context) : IDrawRepository
+    public class DrawRepository(IDbContextFactory<PrimitivaDbContext> contextFactory) : IDrawRepository
     {
-        private readonly PrimitivaDbContext _context = context;
+        private readonly IDbContextFactory<PrimitivaDbContext> _contextFactory = contextFactory;
 
         public async Task<List<DrawRecord>> GetListAsync(Expression<Func<DrawRecord, bool>>? predicate = null)
         {
-            var query = _context.DrawRecords.AsNoTracking();
+            await using var context = await _contextFactory.CreateDbContextAsync();
+            var query = context.DrawRecords.AsNoTracking();
             if (predicate != null) query = query.Where(predicate);
             return await query.ToListAsync();
         }
 
         public async Task<bool> AnyAsync(Expression<Func<DrawRecord, bool>> predicate)
         {
-            return await _context.DrawRecords.AnyAsync(predicate);
+            await using var context = await _contextFactory.CreateDbContextAsync();
+            return await context.DrawRecords.AnyAsync(predicate);
         }
 
         public async Task CreateRangeAsync(IEnumerable<DrawRecord> draws)
         {
+            await using var context = await _contextFactory.CreateDbContextAsync();
             var drawList = draws.ToList();
             foreach (var draw in drawList)
             {
                 draw.RecalculateFinancials();
             }
 
-            await _context.DrawRecords.AddRangeAsync(drawList);
-            await _context.SaveChangesAsync();
-            _context.ChangeTracker.Clear();
+            await context.DrawRecords.AddRangeAsync(drawList);
+            await context.SaveChangesAsync();
         }
 
         public async Task UpdateAsync(DrawRecord draw)
         {
-            var tracked = await GetTrackedDrawAsync(draw.Id);
+            await using var context = await _contextFactory.CreateDbContextAsync();
+            var tracked = await GetTrackedDrawAsync(context, draw.Id);
             ApplyEditableValues(tracked, draw);
-            await _context.SaveChangesAsync();
+            await context.SaveChangesAsync();
         }
 
         public async Task UpdateRangeAsync(IEnumerable<DrawRecord> draws)
         {
+            await using var context = await _contextFactory.CreateDbContextAsync();
             var disconnectedDraws = draws.ToList();
             var drawIds = disconnectedDraws.Select(draw => draw.Id).ToList();
-            var trackedDraws = await _context.DrawRecords
+            var trackedDraws = await context.DrawRecords
                 .Where(draw => drawIds.Contains(draw.Id))
                 .ToDictionaryAsync(draw => draw.Id);
 
@@ -71,27 +75,28 @@ namespace LaPrimitiva.Infrastructure.Repositories
                 ApplyEditableValues(trackedDraws[draw.Id], draw);
             }
 
-            await _context.SaveChangesAsync();
-            _context.ChangeTracker.Clear();
+            await context.SaveChangesAsync();
         }
 
         public async Task DeleteAsync(Guid id)
         {
-            await _context.DrawRecords
+            await using var context = await _contextFactory.CreateDbContextAsync();
+            await context.DrawRecords
                 .Where(d => d.Id == id)
                 .ExecuteDeleteAsync();
         }
 
         public async Task DeleteRangeAsync(Expression<Func<DrawRecord, bool>> predicate)
         {
-            await _context.DrawRecords
+            await using var context = await _contextFactory.CreateDbContextAsync();
+            await context.DrawRecords
                 .Where(predicate)
                 .ExecuteDeleteAsync();
         }
 
-        private async Task<DrawRecord> GetTrackedDrawAsync(Guid id)
+        private static async Task<DrawRecord> GetTrackedDrawAsync(PrimitivaDbContext context, Guid id)
         {
-            return await _context.DrawRecords.SingleOrDefaultAsync(draw => draw.Id == id)
+            return await context.DrawRecords.SingleOrDefaultAsync(draw => draw.Id == id)
                 ?? throw new InvalidOperationException($"No existe el sorteo con identificador '{id}'.");
         }
 

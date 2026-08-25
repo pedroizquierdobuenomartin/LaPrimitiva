@@ -25,8 +25,9 @@ builder.Services.AddRazorComponents()
 
 builder.Services.AddLocalization();
 
-// Register DbContext
-builder.Services.AddDbContext<PrimitivaDbContext>(options =>
+// Create a short-lived DbContext for each data operation. A scoped DbContext
+// would otherwise live for the complete interactive Blazor circuit.
+builder.Services.AddDbContextFactory<PrimitivaDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // Register Repositories

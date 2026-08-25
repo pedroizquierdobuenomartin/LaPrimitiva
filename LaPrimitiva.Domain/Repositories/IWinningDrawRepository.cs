@@ -16,6 +16,5 @@ namespace LaPrimitiva.Domain.Repositories
         Task CreateAsync(WinningDraw draw);
         Task UpdateAsync(WinningDraw draw);
         Task DeleteAsync(Guid id);
-        Task SaveChangesAsync();
     }
 }

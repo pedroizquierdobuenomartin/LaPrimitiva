@@ -25,14 +25,15 @@ namespace LaPrimitiva.Tests.Integration
         {
             // Arrange
             using var scope = CreateScope();
-            var context = scope.ServiceProvider.GetRequiredService<PrimitivaDbContext>();
-            var seeder = new WinningDrawSeeder(context);
+            var contextFactory = scope.ServiceProvider.GetRequiredService<IDbContextFactory<PrimitivaDbContext>>();
+            var seeder = new WinningDrawSeeder(contextFactory);
             var csvPath = Path.Combine(_fixture.TestDataDirectory, "winning-draws.csv");
 
             // Act
             await seeder.SeedAsync(csvPath);
 
             // Assert
+            await using var context = await contextFactory.CreateDbContextAsync();
             var count = await context.WinningDraws.CountAsync();
             Assert.True(count > 0);
             Console.WriteLine($"Total draws in DB: {count}");

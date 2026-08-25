@@ -10,20 +10,23 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LaPrimitiva.Infrastructure.Repositories
 {
-    public class WinningDrawRepository(PrimitivaDbContext context) : IWinningDrawRepository
+    public class WinningDrawRepository(IDbContextFactory<PrimitivaDbContext> contextFactory) : IWinningDrawRepository
     {
-        private readonly PrimitivaDbContext _context = context;
+        private readonly IDbContextFactory<PrimitivaDbContext> _contextFactory = contextFactory;
 
         public async Task<List<WinningDraw>> GetListAsync(Expression<Func<WinningDraw, bool>>? predicate = null)
         {
-            var query = _context.WinningDraws.AsNoTracking();
+            await using var context = await _contextFactory.CreateDbContextAsync();
+            var query = context.WinningDraws.AsNoTracking();
             if (predicate != null) query = query.Where(predicate);
             return await query.OrderByDescending(d => d.DrawDate).ToListAsync();
         }
 
         public async Task<List<int>> GetYearsAsync()
         {
-            return await _context.WinningDraws
+            await using var context = await _contextFactory.CreateDbContextAsync();
+            return await context.WinningDraws
+                .AsNoTracking()
                 .Select(d => d.DrawDate.Year)
                 .Distinct()
                 .OrderByDescending(y => y)
@@ -32,49 +35,44 @@ namespace LaPrimitiva.Infrastructure.Repositories
 
         public async Task<DateTime?> GetLatestDateAsync()
         {
-            return await _context.WinningDraws.MaxAsync(d => (DateTime?)d.DrawDate);
+            await using var context = await _contextFactory.CreateDbContextAsync();
+            return await context.WinningDraws.MaxAsync(d => (DateTime?)d.DrawDate);
         }
 
         public async Task<WinningDraw?> GetAsync(Guid id)
         {
-            return await _context.WinningDraws.FindAsync(id);
+            await using var context = await _contextFactory.CreateDbContextAsync();
+            return await context.WinningDraws.AsNoTracking().SingleOrDefaultAsync(draw => draw.Id == id);
         }
 
         public async Task<bool> AnyAsync(Expression<Func<WinningDraw, bool>> predicate)
         {
-            return await _context.WinningDraws.AnyAsync(predicate);
+            await using var context = await _contextFactory.CreateDbContextAsync();
+            return await context.WinningDraws.AnyAsync(predicate);
         }
 
         public async Task CreateAsync(WinningDraw draw)
         {
             draw.Validate();
-            await _context.WinningDraws.AddAsync(draw);
-            await _context.SaveChangesAsync();
+            await using var context = await _contextFactory.CreateDbContextAsync();
+            await context.WinningDraws.AddAsync(draw);
+            await context.SaveChangesAsync();
         }
 
         public async Task UpdateAsync(WinningDraw draw)
         {
             draw.Validate();
-            var tracked = _context.WinningDraws.Local.FirstOrDefault(e => e.Id == draw.Id);
-            if (tracked != null)
-            {
-                _context.Entry(tracked).State = EntityState.Detached;
-            }
-
-            _context.WinningDraws.Update(draw);
-            await _context.SaveChangesAsync();
+            await using var context = await _contextFactory.CreateDbContextAsync();
+            context.WinningDraws.Update(draw);
+            await context.SaveChangesAsync();
         }
 
         public async Task DeleteAsync(Guid id)
         {
-            await _context.WinningDraws
+            await using var context = await _contextFactory.CreateDbContextAsync();
+            await context.WinningDraws
                 .Where(d => d.Id == id)
                 .ExecuteDeleteAsync();
-        }
-
-        public async Task SaveChangesAsync()
-        {
-            await _context.SaveChangesAsync();
         }
     }
 }

@@ -3,7 +3,7 @@
 @using LaPrimitiva.Infrastructure.Persistence
 @using Microsoft.EntityFrameworkCore
 @using System.Text
-@inject PrimitivaDbContext Db
+@inject IDbContextFactory<PrimitivaDbContext> DbContextFactory
 @inject IJSRuntime JS
 
 <PageTitle>Datos - La Primitiva Audit</PageTitle>
@@ -45,7 +45,9 @@
 @code {
     private async Task ExportAll()
     {
-        var draws = await Db.DrawRecords
+        await using var db = await DbContextFactory.CreateDbContextAsync();
+        var draws = await db.DrawRecords
+            .AsNoTracking()
             .Include(d => d.Plan)
             .OrderBy(d => d.DrawDate)
             .ToListAsync();

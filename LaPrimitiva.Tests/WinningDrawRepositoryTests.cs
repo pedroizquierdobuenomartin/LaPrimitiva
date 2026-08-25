@@ -10,21 +10,23 @@ public class WinningDrawRepositoryTests
     [Fact]
     public async Task CreateAsync_WhenDrawIsInvalid_RejectsBeforePersistence()
     {
-        await using var context = CreateContext();
-        var repository = new WinningDrawRepository(context);
+        var factory = CreateFactory();
+        var repository = new WinningDrawRepository(factory);
         var draw = CreateValidDraw();
         draw.Number6 = 50;
 
         await Assert.ThrowsAsync<InvalidOperationException>(() => repository.CreateAsync(draw));
 
+        await using var context = await factory.CreateDbContextAsync();
         Assert.Empty(context.WinningDraws);
     }
 
     [Fact]
     public async Task UpdateAsync_WhenDrawIsInvalid_RejectsBeforePersistence()
     {
-        await using var context = CreateContext();
-        var repository = new WinningDrawRepository(context);
+        var factory = CreateFactory();
+        var repository = new WinningDrawRepository(factory);
+        await using var context = await factory.CreateDbContextAsync();
         var draw = CreateValidDraw();
         context.WinningDraws.Add(draw);
         await context.SaveChangesAsync();
@@ -38,12 +40,21 @@ public class WinningDrawRepositoryTests
         Assert.Equal(0, (await context.WinningDraws.AsNoTracking().SingleAsync()).Reintegro);
     }
 
-    private static PrimitivaDbContext CreateContext()
+    private static IDbContextFactory<PrimitivaDbContext> CreateFactory()
     {
         var options = new DbContextOptionsBuilder<PrimitivaDbContext>()
             .UseInMemoryDatabase(Guid.NewGuid().ToString())
             .Options;
-        return new PrimitivaDbContext(options);
+        return new TestDbContextFactory(options);
+    }
+
+    private sealed class TestDbContextFactory(DbContextOptions<PrimitivaDbContext> options)
+        : IDbContextFactory<PrimitivaDbContext>
+    {
+        public PrimitivaDbContext CreateDbContext() => new(options);
+
+        public Task<PrimitivaDbContext> CreateDbContextAsync(CancellationToken cancellationToken = default) =>
+            Task.FromResult(CreateDbContext());
     }
 
     private static WinningDraw CreateValidDraw() => new()

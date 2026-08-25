@@ -18,12 +18,8 @@ namespace LaPrimitiva.Tests.Integration
         }
 
         [Fact]
-        public async Task UpdateAsync_Should_Fail_When_Entity_Is_Already_Tracked_Without_Fix()
+        public async Task UpdateAsync_UsesIndependentContext_WhenCircuitContextTracksSameEntity()
         {
-            // This test is designed to reproduced the issue. 
-            // Once fixed, we should update the assertion or the test logic to expect success.
-            // But strict TDD says: write a failing test first.
-            
             await ResetDatabaseAsync();
 
             using var scope = CreateScope();
@@ -52,8 +48,7 @@ namespace LaPrimitiva.Tests.Integration
             context.DrawRecords.Add(draw);
             await context.SaveChangesAsync();
 
-            // 2. Simulate the scenario: Entity is loaded into Local cache (tracked)
-            // We use a query that tracks.
+            // Simulate a long-lived circuit context that already tracks the entity.
             var trackedDraw = await context.DrawRecords.FindAsync(draw.Id);
             Assert.NotNull(trackedDraw);
             
@@ -69,22 +64,12 @@ namespace LaPrimitiva.Tests.Integration
                 UpdatedAt = DateTime.UtcNow
             };
 
-            // 4. Attempt to UpdateAsync with the detached entity
-            // This SHOULD FAIL if the repository doesn't handle local detach.
-            // If the fix is NOT implemented, this throws InvalidOperationException.
-            
-            // NOTE: For the TDD step, I expect this to FAIL.
-            // However, since I cannot easily "assert it fails then assert it passes" without modifying the test code twice,
-            // I will write the test expecting SUCCESS, so it fails NOW (Red), and passes LATER (Green).
-
             var exception = await Record.ExceptionAsync(async () => await repo.UpdateAsync(detachedDraw));
-            
-            // If the bug exists, exception will be not null (InvalidOperationException)
-            // So to match "Red State", we assert that it succeeds, which will fail.
-            Assert.Null(exception); 
-            
-            // Verify update happened
-            context.ChangeTracker.Clear(); // Clear tracking to reload fresh
+            Assert.Null(exception);
+            Assert.Same(trackedDraw, context.DrawRecords.Local.Single());
+
+            // The repository's context was independent; reload to observe its committed update.
+            context.ChangeTracker.Clear();
             var reloaded = await context.DrawRecords.FindAsync(draw.Id);
             Assert.Equal("Updated Notes", reloaded?.Notes);
         }

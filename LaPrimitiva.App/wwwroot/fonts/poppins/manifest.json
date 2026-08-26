@@ -1,0 +1,49 @@
+{
+  "package": "@fontsource/poppins",
+  "version": "5.3.0",
+  "license": "OFL-1.1",
+  "source": "https://www.npmjs.com/package/@fontsource/poppins/v/5.3.0",
+  "integrity": "sha512-cms1nM7U6SN8epIV1WMVOV8VsA645aSm3wHfzIQnkk188U341ThbJGSl2Sv54V29gnDbT2arMPfLzvVIIVCceQ==",
+  "files": [
+    {
+      "name": "poppins-latin-300-normal.woff2",
+      "sha256": "78bc3aa78faec288bbb3bf26c9a0fa4eb67b1e69da94a17233c5cab60525efdb"
+    },
+    {
+      "name": "poppins-latin-400-normal.woff2",
+      "sha256": "7d93459d86585bfcdbb7e0376056226adb25821ee54b96236fe2123e9560929f"
+    },
+    {
+      "name": "poppins-latin-500-normal.woff2",
+      "sha256": "cd36de204aca2d5fa263a731f7c20009b5e3d754ba1f1e03c33e93a48f3e7446"
+    },
+    {
+      "name": "poppins-latin-600-normal.woff2",
+      "sha256": "f4e80d9dfd374d02989b87a27b5ed4cb78fbb177c27f1478e9a8b0afb7513149"
+    },
+    {
+      "name": "poppins-latin-700-normal.woff2",
+      "sha256": "9338e65fc077355c7a87ae0d64cc101e23b9bf8ad78ae65f0f319c857311b526"
+    },
+    {
+      "name": "poppins-latin-800-normal.woff2",
+      "sha256": "60bf0aba6526436f3930c58c12047687fbb6bff4dd180cce4613458ed3439ea2"
+    },
+    {
+      "name": "poppins-latin-900-normal.woff2",
+      "sha256": "17ea10196a490a8d3b8da162c7d4af9c301c5229f70af90dad6fa33eb951d83f"
+    },
+    {
+      "name": "poppins-latin-400-italic.woff2",
+      "sha256": "50d0c1742d80ac71f4cde20e8c04d41a24806af342831f479938b527fbff0972"
+    },
+    {
+      "name": "poppins-latin-500-italic.woff2",
+      "sha256": "1ddb074f9963be8f6275c42dbd54d18625da8f91c85803121094ec81649f488b"
+    },
+    {
+      "name": "poppins-latin-900-italic.woff2",
+      "sha256": "ed79248088783dd5be147808b6f904dc55122f18e80cc0780da3d3e6152ea1b1"
+    }
+  ]
+}

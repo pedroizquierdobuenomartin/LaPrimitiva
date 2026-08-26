@@ -2,7 +2,11 @@
 module.exports = {
   content: ["./Components/**/*.{razor,html,cs}"],
   theme: {
-    extend: {}
+    extend: {
+      fontFamily: {
+        sans: ["Poppins", "system-ui", "sans-serif"]
+      }
+    }
   },
   plugins: []
 };

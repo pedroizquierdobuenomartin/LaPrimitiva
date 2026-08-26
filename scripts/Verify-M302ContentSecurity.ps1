@@ -58,8 +58,8 @@ if ((Get-Item $chartPath).Length -lt 100000) {
     throw 'The vendored Chart.js bundle is unexpectedly small.'
 }
 
-if ((Get-FileHash $tailwindPath -Algorithm SHA256).Hash -ne 'E4FC0C970741447541FF6A85695DCAC69EA6878C7EB4B2A648EA68BFED0FD6DC') {
-    throw 'The compiled Tailwind asset does not match the reviewed M-302 output.'
+if ((Get-FileHash $tailwindPath -Algorithm SHA256).Hash -ne '1858836721B81C5C72F25EEB1D5DE24CCCC7457D03FF817BEF3F2293F67EE99F') {
+    throw 'The compiled Tailwind asset does not match the reviewed M-307 typography output.'
 }
 
 if ((Get-FileHash $chartPath -Algorithm SHA256).Hash -ne '48444A82D4EDCB5BEC0F1965FAACDDE18D9C17DB3063D042ABADA2F705C9F54A') {

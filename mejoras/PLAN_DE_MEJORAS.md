@@ -442,6 +442,37 @@
 - **Evidencia operativa:** el usuario repitió `Create` y aportó una captura donde el script confirma `HTTPS configurado para 127.0.0.1:443:laprimitiva.local`, junto con las rutas de la CA pública y la PFX protegida. Tras activar en Firefox la confianza en la CA instalada y retirar la excepción temporal, aportó una segunda captura donde la aplicación carga con el indicador seguro y sin `No seguro`. La guía explica que los dos `.cer` son públicos, que la PFX contiene el certificado público más la clave privada y que en el primer equipo no debe ejecutarse ninguna importación manual porque `Create` ya instaló certificados y binding.
 - **Incidencia Firefox resuelta:** la primera apertura requirió una excepción manual y mostró `No seguro`, por lo que no se aceptó como cierre. Se habilitó la confianza de CA de terceros del almacén Windows, se retiró la excepción y se reinició Firefox; la comprobación posterior quedó limpia. La guía conserva ambos procedimientos: `security.enterprise_roots.enabled` como opción recomendada e importación exclusiva de `LaPrimitiva-Local-Root-CA.cer` en Autoridades como alternativa.
 
+### [x] M-307 — Autoalojar Poppins y unificar la tipografía base
+
+**Problema:** la aplicación había definido Poppins como tipografía de marca, pero M-302 retiró su importación desde Google Fonts y eligió temporalmente la pila del sistema para no incorporar otra descarga externa. Además, `MainLayout` conserva el token Tailwind `font-sans`, que sin configuración propia resuelve a `ui-sans-serif, system-ui, ...`, y las opciones de Chart.js fijaban `system-ui`. Como resultado, la interfaz publicada no respetaba la tipografía aprobada y algunas excepciones explícitas de Poppins dependían de una fuente que ya no estaba disponible.
+
+**Pasos:**
+
+1. Incorporar Poppins como activos WOFF2 autoalojados, con versión, procedencia, licencia y hashes verificables.
+2. Declarar mediante `@font-face` los pesos y estilos realmente utilizados, con `font-display: swap` y fallbacks locales.
+3. Configurar el token Tailwind `font-sans` para que represente la tipografía oficial en vez de la pila predeterminada del framework.
+4. Eliminar las sobrescrituras tipográficas de Chart.js y establecer Poppins como su valor predeterminado.
+5. Verificar que M-302 mantiene `font-src 'self'`, que no reaparecen orígenes externos y que los verificadores tipográficos anteriores siguen siendo válidos.
+
+**Criterios de aceptación:**
+
+- Los activos Poppins se sirven exclusivamente desde `wwwroot/fonts`, sin `@import`, Google Fonts ni solicitudes tipográficas externas.
+- Se conservan la licencia OFL 1.1, la versión exacta del paquete de origen, su integridad y un hash SHA-256 por archivo publicado.
+- La fuente base global y el token `font-sans` priorizan Poppins con `system-ui, sans-serif` como fallback.
+- Los pesos normales 300–900 y las cursivas 400, 500 y 900 utilizados por la interfaz disponen de archivos reales; el navegador no necesita sintetizarlos.
+- Chart.js hereda Poppins mediante una configuración global y no conserva familias `system-ui` locales.
+- La CSP continúa limitando las fuentes a `'self'` y las verificaciones M-302, M-307 y M-702 resultan correctas.
+
+**Dependencias:** M-302 completado para la política de activos y CSP; coordina con la auditoría tipográfica incluida en M-702, sin modificar la lógica funcional del generador.
+
+**Cierre (2026-08-26):**
+
+- **Referencia:** commit de cierre de esta publicación, sobre `95814c0`; release `v1.12.0`.
+- **Evidencia previa:** repositorio inicialmente limpio en `main`, sincronizado con `origin/main` en `95814c0`; M-302 resultaba correcto, pero M-702 fallaba porque no encontraba los pesos Poppins, `app.css` declaraba `system-ui`, `MainLayout` aplicaba el `font-sans` predeterminado, Home fijaba `system-ui` en Chart.js y no existía ningún archivo de fuente local. El primer verificador M-307 falló por la ausencia de la licencia y los activos; tras cubrir inicialmente solo 300–700 normales, una auditoría de las clases reales detectó `font-extrabold`, `font-black` y cursivas, y el verificador ampliado volvió a fallar por la ausencia del peso 800.
+- **Pruebas realizadas:** `scripts/Verify-M307SelfHostedPoppins.ps1`, `scripts/Verify-M302ContentSecurity.ps1` y `scripts/Verify-M702UniformGenerator.ps1` correctos; manifiesto JSON válido; diez archivos con firma WOFF2 y hashes SHA-256 coincidentes; `node --check` correcto para `app-interop.js`; análisis sintáctico correcto del verificador PowerShell; paquete `@fontsource/poppins` 5.3.0 instalado con licencia `OFL-1.1` y auditoría npm sin vulnerabilidades; búsqueda sin importaciones ni orígenes externos de fuentes; `git diff --check` correcto. El agente no compiló. El usuario probó la aplicación actualizada en distintas páginas y confirmó que todas muestran correctamente Poppins como fuente base; aportó capturas de Dashboard, del canvas de evolución y de Histórico donde Firefox calcula `Poppins, system-ui, sans-serif` sobre títulos, contenido, números y gráfico.
+- **Resultado:** Poppins es la tipografía base efectiva de HTML, del layout Tailwind, del modal de reconexión y de Chart.js. Los activos latinos normales 300–900 y cursivos 400, 500 y 900 se sirven localmente con `font-display: swap`; `manifest.json` conserva procedencia, versión, integridad y hashes, y la licencia OFL acompaña a la distribución. La pila `system-ui, sans-serif` permanece únicamente como fallback de disponibilidad, no como fuente principal. La navegación y la revisión visual aportadas por el usuario confirman una aplicación tipográficamente coherente en las páginas comprobadas.
+- **Decisiones:** se mantiene Poppins para preservar la identidad visual ya aprobada en vez de introducir una alternativa parecida. Se fija `@fontsource/poppins` 5.3.0 como dependencia de desarrollo reproducible y se publican únicamente WOFF2 latinos; este subconjunto cubre español e inglés y evita descargar glifos devanagari o latinos extendidos que la aplicación no utiliza. Se conservan archivos separados por peso y estilo para que el navegador solicite solo las variantes necesarias. `font-sans` se mantiene como token semántico, pero Tailwind lo resuelve a `Poppins, system-ui, sans-serif`; Chart.js define la misma familia globalmente y las configuraciones de Home dejan de sobrescribirla. La CSP `font-src 'self'` no se relaja y no se reintroduce ninguna dependencia de Google Fonts en tiempo de ejecución. No se avanzó a M-405 ni a ningún otro hito pendiente.
+
 ---
 
 ## Fase 4 — Persistencia y arquitectura
@@ -1074,6 +1105,7 @@ Estos descartes describen el código auditado y deben revisarse si cambian las f
 | M-304 | 2026-08-24 | Commit de cierre sobre `191c8d5`; release `v1.6.0` | Completado | Descarga incremental limitada a 512 KiB, parser acotado a 100 elementos, timeout global de 15 segundos, cancelación y exclusión mutua; verificadores M-204/M-304 correctos y seis casos xUnit añadidos sin ejecutar por la prohibición de compilar. |
 | M-305 | 2026-08-24 | Commit de cierre sobre `1534ad2`; release `v1.7.0` | Completado | Fórmulas CSV neutralizadas; 92/92 filas del artefacto real validadas con 17 columnas e importes invariantes; seis casos CSV correctos sobre binarios compilados por el usuario y verificador estático correcto. |
 | M-306 | 2026-08-24 | Commit de cierre sobre `067349e`; release `v1.8.0` | Completado | HTTPS confiable en `127.0.0.1:443:laprimitiva.local` con SNI, SAN/EKU/vigencia correctos, `200` y HSTS; HTTP deshabilitado; Firefox validado sin advertencias por el usuario; paquete CER/PFX trasladable, guía completa y verificadores M-301/M-302/M-306 correctos. |
+| M-307 | 2026-08-26 | Commit de cierre de esta publicación, sobre `95814c0`; release `v1.12.0` | Completado | Poppins 5.3.0 autoalojada con diez WOFF2 latinos, licencia OFL, manifiesto e integridad verificables; HTML, Tailwind y Chart.js comparten la fuente base; CSP limitada a `'self'`; verificadores M-302/M-307/M-702 correctos y validación visual en distintas páginas aportada por el usuario. |
 | M-402 | 2026-08-25 | Commit de cierre sobre `96aab2c`; release `v1.9.0` | Completado | `IDbContextFactory` y contextos efímeros por operación en repositorios, seeder y exportación; lecturas sin tracking; aislamiento simultáneo cubierto por pruebas focalizadas; verificador correcto y build/funcionamiento aparente comunicados por el usuario. |
 | M-403 | 2026-08-25 | Release `v1.10.0`, sobre `eefe391` | Completado | `rowversion` en planes, registros y sorteos ganadores; instancia de integración corregida a `LOCALSERVER`; build y publish correctos aportados por el usuario; suite completa 125/125 y bundle de migraciones portable verificado. |
 | M-404 | 2026-08-26 | Commit de cierre de esta publicación, sobre `d0d9d1c`; release `v1.11.0` | Completado | Application depende solo de Domain; componentes sin `DbContext` ni repositorios; casos de uso y métricas financieras centralizados; build, run y guardados correctos aportados por el usuario; suite completa 138/138 y verificadores M-403/M-404 correctos. |

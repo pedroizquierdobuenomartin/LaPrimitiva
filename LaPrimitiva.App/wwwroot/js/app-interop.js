@@ -7,6 +7,8 @@ window.downloadFile = (fileName, base64Data) => {
     document.body.removeChild(link);
 };
 
+Chart.defaults.font.family = "Poppins, system-ui, sans-serif";
+
 window.renderChart = (canvasId, config) => {
     const canvas = document.getElementById(canvasId);
     const existingChart = Chart.getChart(canvasId);

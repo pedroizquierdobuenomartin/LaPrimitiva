@@ -139,3 +139,5 @@ dotnet test
 ```
 
 La preparación de SQL Server, la base exclusiva de integración, la matriz de flujos críticos y el resultado inicial verificable están documentados en [`mejoras/LINEA_BASE_M000.md`](mejoras/LINEA_BASE_M000.md).
+
+La separación entre suite rápida, integración SQL, cobertura mínima y reglas de atribución de resultados está documentada en [`mejoras/ESTRATEGIA_PRUEBAS_M501.md`](mejoras/ESTRATEGIA_PRUEBAS_M501.md).

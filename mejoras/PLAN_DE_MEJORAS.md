@@ -621,7 +621,7 @@ la actualización inmediata del formulario delega en el caso de uso que invoca l
 
 ## Fase 5 — Calidad, observabilidad y mantenimiento
 
-### [ ] M-501 — Completar la estrategia de pruebas
+### [x] M-501 — Completar la estrategia de pruebas
 
 **Cobertura mínima:**
 
@@ -632,6 +632,16 @@ la actualización inmediata del formulario delega en el caso de uso que invoca l
 - Parser RSS y límites.
 - Exportación CSV segura.
 - Migraciones desde cero y desde una versión anterior.
+
+**Cierre:**
+
+- **Fecha:** 2026-08-26.
+- **Commit o referencia:** commit de cierre de esta publicación, sobre `93eb3e3`; estrategia en `mejoras/ESTRATEGIA_PRUEBAS_M501.md`, verificador en `scripts/Verify-M501TestStrategy.ps1` y cobertura adicional en `LaPrimitiva.Tests/Integration/M401MigrationTests.cs`.
+- **Evidencia previa:** las siete áreas tenían casos repartidos entre pruebas rápidas e integración, pero no existía una estrategia vigente que las relacionase, separase sus requisitos de ejecución ni impidiese atribuir como posterior una prueba sobre binarios antiguos. La ruta de migración cubría una instalación vacía y la adopción del esquema histórico creado mediante `EnsureCreated`, pero no una actualización real desde una migración de una versión publicada. La primera ejecución TDD del verificador M-501 falló porque no existía `mejoras/ESTRATEGIA_PRUEBAS_M501.md`.
+- **Pruebas realizadas:** antes de editar se inventariaron **145** casos mediante `dotnet test LaPrimitiva.Tests/LaPrimitiva.Tests.csproj --no-build --no-restore --nologo --list-tests`. La suite precompilada previa ejecutó 145 casos: **129 correctos y 16 de integración fallidos** porque SQL Server informó que exige cifrado no admitido por el entorno; esta es una línea base previa, no una validación del cambio. Después de editar no se compiló. Pasaron `scripts/Verify-M501TestStrategy.ps1`, `scripts/Verify-M401EfMigrations.ps1`, `scripts/Verify-M403Concurrency.ps1`, el análisis sintáctico PowerShell del nuevo verificador y `git diff --check`. El nuevo caso xUnit de actualización desde una versión anterior queda añadido pero no se atribuye como ejecutado porque requiere compilar las fuentes actuales y un SQL Server compatible.
+- **Resultado:** la estrategia documenta niveles, comandos independientes, matriz trazable de las siete coberturas mínimas, aislamiento de la base `_IntegrationTests` y criterio de cierre. El verificador falla si desaparecen el documento, sus instrucciones o los casos focalizados. La prueba de migración nueva lleva una base segura hasta `20260824150000_ValidateWinningDraws`, inserta una fila con el esquema de esa versión, aplica todas las migraciones pendientes y comprueba conservación de datos, `RowVersion` y paridad entre migraciones definidas y aplicadas.
+- **Decisiones:** se mantienen SQL Server real para persistencia, triggers y migraciones, y pruebas rápidas sin SQL para feedback inmediato; EF InMemory no sustituye la semántica del proveedor. Se distingue explícitamente verificación estática, binarios precompilados y ejecución posterior compilada. M-501 no crea certificados: `TrustServerCertificate=True` evita convertir una PKI local en dependencia de la suite, pero no oculta una incompatibilidad TLS; si una instalación exige certificados propios, deben entregarse como artefactos instalables y transferibles fuera de Git, nunca mediante una excepción del navegador o un secreto versionado. No se avanzó a M-502.
+- **Corrección de compatibilidad y validación final (2026-08-26):** se confirmó que `LOCALSERVER` no fuerza cifrado y tiene TCP/IP y Named Pipes desactivados. `Microsoft.Data.SqlClient 6` activaba cifrado por defecto y fallaba al negociar TLS sobre el transporte local; la conexión de integración declara ahora `Encrypt=False`. La primera repetición dentro del aislamiento sustituyó el error TLS por el bloqueo de credenciales `No se puede generar contexto SSPI`, demostrando que el cifrado ya no era el impedimento. La suite completa se ejecutó después fuera del aislamiento, con autenticación integrada y la misma base efímera protegida: **146/146 pruebas superadas, 0 fallidas y 0 omitidas** en 4 segundos. No se creó ningún certificado; `Encrypt=False` queda limitado a esta instancia estrictamente local y no debe reutilizarse en conexiones remotas.
 
 ### [ ] M-502 — Añadir observabilidad segura
 
@@ -1117,4 +1127,5 @@ Estos descartes describen el código auditado y deben revisarse si cambian las f
 | M-403 | 2026-08-25 | Release `v1.10.0`, sobre `eefe391` | Completado | `rowversion` en planes, registros y sorteos ganadores; instancia de integración corregida a `LOCALSERVER`; build y publish correctos aportados por el usuario; suite completa 125/125 y bundle de migraciones portable verificado. |
 | M-404 | 2026-08-26 | Commit de cierre de esta publicación, sobre `d0d9d1c`; release `v1.11.0` | Completado | Application depende solo de Domain; componentes sin `DbContext` ni repositorios; casos de uso y métricas financieras centralizados; build, run y guardados correctos aportados por el usuario; suite completa 138/138 y verificadores M-403/M-404 correctos. |
 | M-405 | 2026-08-26 | Commit de cierre de esta publicación, sobre `5bc67f0`; release `v1.13.0` | Completado | Eliminados los cuatro `async void`; tareas con excepciones observadas y logging; guardas tras disposición; `_feedbackTimer` y todas las suscripciones liberadas; prueba fuente y verificador focalizados añadidos sin ejecutar mediante build; verificadores M-403/M-404/M-405 y `git diff --check` correctos. |
+| M-501 | 2026-08-26 | Commit de cierre de esta publicación, sobre `93eb3e3` | Completado | Estrategia trazable para las siete áreas mínimas, separación rápida/integración, verificador M-501 y migración desde versión anterior; compatibilidad local corregida con `Encrypt=False` y suite final **146/146**, sin fallos ni omisiones. |
 | M-702 | 2026-08-24 | `e2402f6`, `19defe6`, release `373561a`, tag `v1.1.0` | Completado | Generación uniforme y rediseño validados; títulos de Histórico y Combinación automática unificados con `PageTitle`; footer enlazado a la versión del ensamblado y release `1.1.0` publicada. Verificación estática correcta y validación visual del usuario; casos xUnit nuevos no ejecutados por la prohibición de compilar. |

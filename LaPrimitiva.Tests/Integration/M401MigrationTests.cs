@@ -1,11 +1,15 @@
 using LaPrimitiva.Domain.Entities;
 using LaPrimitiva.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace LaPrimitiva.Tests.Integration;
 
 public sealed class M401MigrationTests
 {
+    private const string PreviousReleaseMigration = "20260824150000_ValidateWinningDraws";
+
     [Fact]
     public async Task Migrations_CreateTheCompleteSchema_FromScratch()
     {
@@ -76,6 +80,53 @@ public sealed class M401MigrationTests
                 Assert.Equal(defined, applied);
                 Assert.Equal("Plan conservado", (await migratedContext.Plans.SingleAsync()).Name);
                 Assert.Equal("0123456", (await migratedContext.WinningDraws.SingleAsync()).Joker);
+            }
+        }
+        finally
+        {
+            await DeleteDatabaseAsync(connectionString);
+        }
+    }
+
+    [Fact]
+    public async Task Migrations_UpgradeFromPreviousVersion_WithoutLosingData()
+    {
+        var connectionString = CreateConnectionString();
+        var planId = Guid.NewGuid();
+        var createdAt = new DateTime(2026, 8, 24, 12, 0, 0, DateTimeKind.Utc);
+
+        try
+        {
+            await using (var previousVersionContext = CreateContext(connectionString))
+            {
+                var migrator = previousVersionContext.GetService<IMigrator>();
+                await migrator.MigrateAsync(PreviousReleaseMigration);
+
+                await previousVersionContext.Database.ExecuteSqlInterpolatedAsync($@"
+                    INSERT INTO [Plans] (
+                        [Id], [Name], [EffectiveFrom], [EffectiveTo],
+                        [WeeksToTrackDefault], [CostPerBet], [BetsPerDraw],
+                        [EnableJoker], [JokerCostPerBet], [FixedCombinationLabel],
+                        [CreatedAt], [UpdatedAt])
+                    VALUES (
+                        {planId}, {"Plan de versión anterior"}, {new DateTime(2026, 1, 1)}, NULL,
+                        {52}, {1m}, {1},
+                        {false}, {0m}, NULL,
+                        {createdAt}, {createdAt});");
+            }
+
+            await using (var currentVersionContext = CreateContext(connectionString))
+            {
+                await currentVersionContext.Database.MigrateAsync();
+
+                var plan = await currentVersionContext.Plans.SingleAsync(candidate => candidate.Id == planId);
+                Assert.Equal("Plan de versión anterior", plan.Name);
+                Assert.Equal(createdAt, plan.CreatedAt);
+                Assert.NotEmpty(plan.RowVersion);
+
+                var defined = currentVersionContext.Database.GetMigrations().ToArray();
+                var applied = (await currentVersionContext.Database.GetAppliedMigrationsAsync()).ToArray();
+                Assert.Equal(defined, applied);
             }
         }
         finally

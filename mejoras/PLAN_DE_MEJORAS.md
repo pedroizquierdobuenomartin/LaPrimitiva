@@ -19,7 +19,7 @@
 | 1 | Integridad de datos y backups | Completada |
 | 2 | Errores funcionales | Completada |
 | 3 | Seguridad local robusta | Completada |
-| 4 | Persistencia y arquitectura | Pendiente |
+| 4 | Persistencia y arquitectura | Completada |
 | 5 | Calidad, observabilidad y mantenimiento | Pendiente |
 | 6 | Verificación final | Pendiente |
 

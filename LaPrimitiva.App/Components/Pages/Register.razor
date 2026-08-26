@@ -915,8 +915,9 @@
         {
             modalErrorMessage = ex.Message;
         }
-        catch (Exception)
+        catch (Exception ex)
         {
+            Logger.LogError(ex, "Falló la operación {Operation}.", "SaveDraw");
             modalErrorMessage = "Ha ocurrido un error inesperado al guardar los cambios.";
         }
     }

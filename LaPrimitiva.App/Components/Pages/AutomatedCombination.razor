@@ -5,6 +5,7 @@
 @using LaPrimitiva.Application.DTOs
 @inject IStringLocalizer<CombinationResource> L
 @inject IAutomatedCombinationService CombinationService
+@inject ILogger<AutomatedCombination> Logger
 
 <PageTitle>@L["Combination"] @L["Automated"] - La Primitiva Audit</PageTitle>
 
@@ -240,8 +241,9 @@
         {
             _backtest = await CombinationService.BacktestAsync();
         }
-        catch (Exception)
+        catch (Exception ex)
         {
+            Logger.LogError(ex, "Falló la operación {Operation}.", "AutomatedCombinationBacktest");
             _backtestError = L["BacktestError"];
         }
         finally

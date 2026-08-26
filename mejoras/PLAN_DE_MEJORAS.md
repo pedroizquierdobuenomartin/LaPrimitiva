@@ -643,7 +643,7 @@ la actualización inmediata del formulario delega en el caso de uso que invoca l
 - **Decisiones:** se mantienen SQL Server real para persistencia, triggers y migraciones, y pruebas rápidas sin SQL para feedback inmediato; EF InMemory no sustituye la semántica del proveedor. Se distingue explícitamente verificación estática, binarios precompilados y ejecución posterior compilada. M-501 no crea certificados: `TrustServerCertificate=True` evita convertir una PKI local en dependencia de la suite, pero no oculta una incompatibilidad TLS; si una instalación exige certificados propios, deben entregarse como artefactos instalables y transferibles fuera de Git, nunca mediante una excepción del navegador o un secreto versionado. No se avanzó a M-502.
 - **Corrección de compatibilidad y validación final (2026-08-26):** se confirmó que `LOCALSERVER` no fuerza cifrado y tiene TCP/IP y Named Pipes desactivados. `Microsoft.Data.SqlClient 6` activaba cifrado por defecto y fallaba al negociar TLS sobre el transporte local; la conexión de integración declara ahora `Encrypt=False`. La primera repetición dentro del aislamiento sustituyó el error TLS por el bloqueo de credenciales `No se puede generar contexto SSPI`, demostrando que el cifrado ya no era el impedimento. La suite completa se ejecutó después fuera del aislamiento, con autenticación integrada y la misma base efímera protegida: **146/146 pruebas superadas, 0 fallidas y 0 omitidas** en 4 segundos. No se creó ningún certificado; `Encrypt=False` queda limitado a esta instancia estrictamente local y no debe reutilizarse en conexiones remotas.
 
-### [ ] M-502 — Añadir observabilidad segura
+### [x] M-502 — Añadir observabilidad segura
 
 **Criterios de aceptación:**
 
@@ -651,6 +651,16 @@ la actualización inmediata del formulario delega en el caso de uso que invoca l
 - Mensajes de usuario comprensibles sin detalles internos sensibles.
 - Logs para importación RSS, migraciones y backups.
 - Health check básico de aplicación y base de datos.
+
+**Cierre:**
+
+- **Fecha:** 2026-08-26.
+- **Commit o referencia:** commit de cierre de esta publicación, sobre `c8ed271`; release `v1.14.0`; implementación en `LaPrimitiva.App/Observability`, pruebas focalizadas en `LaPrimitiva.Tests/M502ObservabilityTests.cs` y verificador en `scripts/Verify-M502SecureObservability.ps1`.
+- **Evidencia previa:** `Program.cs` conservaba únicamente la configuración básica de niveles y no registraba health checks, correlación ni un proveedor persistente estructurado; solo existía un `LogWarning` explícito en `LocalOnlyMiddleware`. `RssClient` descargaba el feed sin eventos operativos y `DrawNotificationService` mostraba directamente `Exception.Message`; varios límites de UI devolvían mensajes genéricos pero silenciaban el detalle técnico. Los scripts de migración y backup solo escribían texto de consola y no producían eventos JSON correlacionados. `/Error` seguía siendo la plantilla inglesa. Las búsquedas previas no encontraron `AddHealthChecks`, `MapHealthChecks`, `AddJsonConsole`, `ActivitySource`, `Meter`, OpenTelemetry ni Serilog.
+- **Pruebas realizadas:** antes de editar, `dotnet test LaPrimitiva.sln --no-build --nologo --verbosity minimal` ejecutó los binarios precompilados: **129/146 pruebas superadas y 17 integraciones fallidas** por `No se puede generar contexto SSPI` dentro del aislamiento; es una línea base previa y no valida M-502. Después de editar no se compiló. Pasaron `scripts/Verify-M502SecureObservability.ps1` —incluida la escritura y lectura funcional de un evento JSONL con correlación y excepción—, `scripts/Verify-M101Backup.ps1`, `scripts/Verify-M401EfMigrations.ps1`, `scripts/Verify-M404LayerBoundaries.ps1`, el análisis sintáctico de todos los scripts PowerShell, `Invoke-M401DatabaseMigration.ps1 -Action Script -WhatIf` y `git diff --check`. Se añadieron pruebas xUnit para cabecera de correlación, respuesta de salud sin detalles, separación entre logs técnicos y mensajes de UI y escritura JSON estructurada; no se atribuye su ejecución porque requiere compilar las fuentes actuales.
+- **Resultado:** la aplicación emite JSON estructurado por consola y en ficheros locales de 5 MiB con retención máxima de diez, incluye el `TraceIdentifier` generado por el servidor en el scope y en `X-Correlation-ID`, registra excepciones completas en límites técnicos y muestra a la persona usuaria mensajes seguros junto con una referencia. RSS registra inicio, resultado y fallo correlacionado sin mostrar `Exception.Message`; migraciones y backups escriben JSONL operativo en `artifacts/logs` sin registrar la cadena de conexión. `/health/live` comprueba el proceso y `/health/ready` usa un `DbContext` corto de factory para SQL Server; ambos quedan detrás de la política loopback y responden solo estado agregado y correlación.
+- **Decisiones:** se eligió un proveedor JSON local, pequeño y acotado, además de `AddJsonConsole`, para que IIS no dependa de un colector remoto ni de incorporar paquetes cuya revisión corresponde a M-503. El proveedor conserva propiedades, scopes y excepción completa, rota por tamaño, limita retención y nunca interrumpe la aplicación si el destino no es escribible; el runbook exige permiso `Modificar` solo sobre `logs/` y prohíbe datos sensibles. Se mantienen separados el health check de vida y el de disponibilidad; no se expone `HealthReport.Entries`. M-502 no necesita ni crea certificados: el paquete descargable/transferible de M-306 en `artifacts/local-https` sigue siendo la única entrega HTTPS, con PFX cifrada y secretos fuera de Git. No se avanzó a M-503.
+- **Validación final posterior (2026-08-26):** el usuario compiló las fuentes actuales y confirmó que la aplicación arranca y funciona correctamente. Sobre esos binarios frescos, el agente ejecutó `dotnet test LaPrimitiva.sln --no-build --no-restore --nologo --verbosity minimal`: dentro del aislamiento pasaron **133/150** y las 17 integraciones fallaron únicamente porque la autenticación integrada de SQL Server no pudo generar el contexto SSPI. La repetición autorizada fuera del aislamiento, con los mismos binarios y sin recompilar, terminó con **150/150 pruebas superadas, 0 fallidas y 0 omitidas** en 4 segundos. Esta ejecución valida también las cuatro pruebas nuevas de M-502.
 
 ### [ ] M-503 — Revisar dependencias
 
@@ -1082,6 +1092,34 @@ Esta es una fase viva para registrar problemas y oportunidades confirmados duran
 
 **Dependencias:** M-710 para componer paginación y filtros sobre una única consulta; coordinación con M-705 para integrar los controles en las vistas de escritorio y móvil. Puede implementarse antes de esos hitos si se conserva el contrato de integración.
 
+### [ ] M-712 — Mostrar el estado operativo en una página y en el footer
+
+**Problema:** M-502 proporciona los endpoints técnicos `/health/live` y `/health/ready`, pero una persona usuaria debe abrir y comparar manualmente dos respuestas JSON para conocer el estado de la aplicación y de SQL Server. El footer no comunica el último estado conocido ni ofrece una navegación hacia una vista explicativa.
+
+**Evidencia (2026-08-26):** después de validar M-502 con 150/150 pruebas, el usuario comprobó en ejecución que ambos endpoints responden `Healthy` y aportó capturas de sus respuestas con identificadores de correlación independientes. La revisión de `MainLayout.razor` confirmó que el footer solo muestra copyright, versión y enlaces de ayuda, privacidad y términos. La oportunidad se detectó durante uso real y no formaba parte de los criterios originales de M-502.
+
+**Principio de diseño:** la interfaz presentará el último estado conocido de forma comprensible y accesible, pero no se describirá como monitor externo. Si el proceso o el circuito Blazor caen por completo, la propia página y su indicador tampoco pueden actualizarse; esa pérdida de conexión seguirá correspondiendo al mecanismo de reconexión y, si se requiere vigilancia independiente, a una herramienta externa.
+
+**Comportamiento esperado:**
+
+- Existe una página local `/estado` con estado general y dos comprobaciones diferenciadas: aplicación web y base de datos.
+- Cada comprobación muestra estado seguro, instante y duración de la última ejecución, además de una acción manual `Comprobar ahora`; no expone excepciones, SQL, servidor ni cadena de conexión.
+- El footer incluye un enlace compacto a `/estado` con indicador y texto: verde para operativo, ámbar cuando la aplicación responde pero la base de datos no está disponible, gris para comprobando/desconocido u obsoleto y rojo para un fallo inesperado de la comprobación mientras el circuito continúa activo.
+- El estado no depende solo del color: ofrece texto, `aria-label`, tooltip y foco de teclado visibles.
+- La comprobación inicial se realiza al cargar y el refresco automático usa un intervalo moderado —inicialmente 60 segundos—, con cancelación y liberación completas al disponer el componente.
+- Los endpoints JSON existentes permanecen como interfaz técnica para scripts o monitores; la UI reutiliza los checks registrados mediante `HealthCheckService` y no hace HTTP contra su propio servidor.
+
+**Criterios de aceptación:**
+
+- La página y el indicador comparten un servicio de estado en la capa App y no duplican la consulta SQL ni la lógica de `DatabaseHealthCheck`.
+- `HealthIndicator` es un componente autocontenido; `MainLayout` solo lo compone y no incorpora otra tarea periódica ni reglas de salud.
+- El indicador agregado representa correctamente los estados saludable, degradado, desconocido/obsoleto y error de comprobación, sin prometer detectar una caída total desde la propia aplicación.
+- Una respuesta no saludable conserva HTTP `503` en `/health/ready`, mientras la página presenta un mensaje seguro y una acción de reintento.
+- Existen pruebas unitarias del mapeo de estados, pruebas de componente para página/footer y accesibilidad, y cobertura de cancelación/disposición que impide callbacks tardíos.
+- La verificación manual confirma escritorio y móvil, navegación desde el footer, refresco manual, transición ante base disponible/no disponible y ausencia de detalles sensibles.
+
+**Dependencias:** M-405 para el ciclo de vida seguro del refresco; M-502 para logging, correlación y health checks; coordinación con el `ReconnectModal` existente para no confundir readiness con conectividad del circuito.
+
 **Criterio de cierre del plan:** todas las fases y todos los hitos emergentes aplicables están completados, verificados y asociados a evidencia reproducible.
 
 ---
@@ -1128,4 +1166,5 @@ Estos descartes describen el código auditado y deben revisarse si cambian las f
 | M-404 | 2026-08-26 | Commit de cierre de esta publicación, sobre `d0d9d1c`; release `v1.11.0` | Completado | Application depende solo de Domain; componentes sin `DbContext` ni repositorios; casos de uso y métricas financieras centralizados; build, run y guardados correctos aportados por el usuario; suite completa 138/138 y verificadores M-403/M-404 correctos. |
 | M-405 | 2026-08-26 | Commit de cierre de esta publicación, sobre `5bc67f0`; release `v1.13.0` | Completado | Eliminados los cuatro `async void`; tareas con excepciones observadas y logging; guardas tras disposición; `_feedbackTimer` y todas las suscripciones liberadas; prueba fuente y verificador focalizados añadidos sin ejecutar mediante build; verificadores M-403/M-404/M-405 y `git diff --check` correctos. |
 | M-501 | 2026-08-26 | Commit de cierre de esta publicación, sobre `93eb3e3` | Completado | Estrategia trazable para las siete áreas mínimas, separación rápida/integración, verificador M-501 y migración desde versión anterior; compatibilidad local corregida con `Encrypt=False` y suite final **146/146**, sin fallos ni omisiones. |
+| M-502 | 2026-08-26 | Commit de cierre de esta publicación, sobre `c8ed271`; release `v1.14.0` | Completado | Logs JSON estructurados y rotados, correlación, mensajes seguros, eventos RSS/migración/backup y health checks `live`/`ready`; build y funcionamiento aportados por el usuario, suite final **150/150** y verificadores M-101/M-401/M-404/M-502 correctos. |
 | M-702 | 2026-08-24 | `e2402f6`, `19defe6`, release `373561a`, tag `v1.1.0` | Completado | Generación uniforme y rediseño validados; títulos de Histórico y Combinación automática unificados con `PageTitle`; footer enlazado a la versión del ensamblado y release `1.1.0` publicada. Verificación estática correcta y validación visual del usuario; casos xUnit nuevos no ejecutados por la prohibición de compilar. |

@@ -492,8 +492,9 @@
         {
             errorMessage = ex.Message;
         }
-        catch (Exception)
+        catch (Exception ex)
         {
+            Logger.LogError(ex, "Falló la operación {Operation}.", "SavePlan");
             errorMessage = L["SavePlanError"];
         }
     }
@@ -557,8 +558,9 @@
             _deleteErrorMessage = ex.Message;
             _hasLinkedDraws = true; // Refresh state if backend rejected it
         }
-        catch (Exception)
+        catch (Exception ex)
         {
+            Logger.LogError(ex, "Falló la operación {Operation}.", "DeletePlan");
             _deleteErrorMessage = L["UnexpectedDeleteError"];
         }
     }

@@ -6,10 +6,11 @@ using System.Threading;
 using System.Threading.Tasks;
 using LaPrimitiva.Domain.Interfaces;
 using LaPrimitiva.Domain.Models;
+using Microsoft.Extensions.Logging;
 
 namespace LaPrimitiva.Infrastructure.Services
 {
-    public class RssClient(HttpClient httpClient) : IRssClient
+    public class RssClient(HttpClient httpClient, ILogger<RssClient> logger) : IRssClient
     {
         private const string RssUrl = "https://www.loteriasyapuestas.es/es/la-primitiva/resultados/.formatoRSS";
 
@@ -17,6 +18,7 @@ namespace LaPrimitiva.Infrastructure.Services
         {
             try
             {
+                logger.LogInformation("Iniciando descarga del feed RSS oficial. {Operation}", "RssImport");
                 using var request = new HttpRequestMessage(HttpMethod.Get, RssUrl);
                 
                 request.Headers.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:134.0) Gecko/20100101 Firefox/134.0");
@@ -78,7 +80,13 @@ namespace LaPrimitiva.Infrastructure.Services
                     content,
                     ResolveEncoding(response.Content.Headers.ContentType?.CharSet),
                     detectEncodingFromByteOrderMarks: true);
-                return await reader.ReadToEndAsync(cancellationToken);
+                var xml = await reader.ReadToEndAsync(cancellationToken);
+                logger.LogInformation(
+                    "Feed RSS descargado correctamente. {Operation} {ByteCount} {StatusCode}",
+                    "RssImport",
+                    content.Length,
+                    (int)response.StatusCode);
+                return xml;
             }
             catch (OperationCanceledException)
             {
@@ -86,6 +94,7 @@ namespace LaPrimitiva.Infrastructure.Services
             }
             catch (InvalidDataException)
             {
+                logger.LogWarning("El feed RSS fue rechazado por los límites de seguridad. {Operation}", "RssImport");
                 throw;
             }
             catch (Exception ex)

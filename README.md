@@ -111,6 +111,21 @@ No usar `Todos sin asignar`, una IP LAN ni un binding comodín. La aplicación r
 
 Esta política local no sustituye autenticación ni autorización. Si en el futuro se habilita acceso LAN, debe implementarse ese modelo de seguridad antes de retirar estas restricciones.
 
+### Observabilidad local segura
+
+La aplicación emite cada evento en JSON estructurado por consola y conserva una copia local en `logs/application-AAAAMMDD.jsonl`. Los ficheros rotan al alcanzar 5 MiB y se retienen como máximo diez; `logs/` está fuera de Git. En IIS, la identidad del pool debe tener permiso **Modificar** únicamente sobre esa carpeta. No habilites `EnableSensitiveDataLogging`, no añadas cadenas de conexión, apuestas, certificados, claves ni contraseñas como propiedades de log.
+
+Cada petición recibe un identificador generado por el servidor en la cabecera `X-Correlation-ID`; el mismo valor se incluye en el scope del log y en la página global de error como referencia comunicable. La UI muestra mensajes seguros y comprensibles, mientras la excepción completa queda solo en los logs locales.
+
+Los endpoints de salud también están protegidos por la política loopback de M-301 y no publican excepciones ni detalles de la conexión:
+
+- `GET /health/live`: confirma que el proceso web responde.
+- `GET /health/ready`: comprueba además la conexión a SQL Server mediante un `DbContext` corto creado por factory.
+
+Los scripts administrativos de migración y backup escriben eventos JSONL correlacionados en `artifacts/logs/operations-AAAAMMDD.jsonl`. Puede elegirse otra ubicación con `-LogPath`; ni la cadena de conexión ni las credenciales se incluyen como propiedades. Los artefactos están fuera de Git y deben custodiarse con permisos locales mínimos.
+
+M-502 no crea certificados. El certificado HTTPS transferible sigue siendo el paquete descargable de M-306 en `artifacts/local-https`, con PFX cifrada y certificados públicos; no se duplica ni se incorpora a los logs.
+
 ## 🛠️ Funcionalidades Implementadas
 
 - **Dashboard**: Vista clara de KPIs (Gasto, Ganado, Neto, ROI) y desglose por tipo de apuesta.

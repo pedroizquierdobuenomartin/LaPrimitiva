@@ -29,6 +29,7 @@ x86/
 bld/
 log/
 errorlog/
+logs/
 
 # Roslyn cache directories
 *.ide/

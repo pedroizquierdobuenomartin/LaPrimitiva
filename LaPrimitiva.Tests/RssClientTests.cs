@@ -4,6 +4,7 @@ using System.Net.Http;
 using System.Threading;
 using LaPrimitiva.Domain.Models;
 using LaPrimitiva.Infrastructure.Services;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace LaPrimitiva.Tests
 {
@@ -17,7 +18,7 @@ namespace LaPrimitiva.Tests
                 {
                     Content = new ByteArrayContent(new byte[RssFeedLimits.MaxBytes + 1])
                 })));
-            var client = new RssClient(httpClient);
+            var client = CreateClient(httpClient);
 
             await Assert.ThrowsAsync<InvalidDataException>(() => client.GetRssXmlAsync());
         }
@@ -30,7 +31,7 @@ namespace LaPrimitiva.Tests
                 {
                     Content = new StreamContent(new MemoryStream(new byte[RssFeedLimits.MaxBytes + 1]))
                 })));
-            var client = new RssClient(httpClient);
+            var client = CreateClient(httpClient);
 
             await Assert.ThrowsAsync<InvalidDataException>(() => client.GetRssXmlAsync());
         }
@@ -43,7 +44,7 @@ namespace LaPrimitiva.Tests
                 await Task.Delay(Timeout.InfiniteTimeSpan, cancellationToken);
                 return new HttpResponseMessage(HttpStatusCode.OK);
             }));
-            var client = new RssClient(httpClient);
+            var client = CreateClient(httpClient);
             using var cancellationSource = new CancellationTokenSource();
             cancellationSource.CancelAfter(TimeSpan.FromMilliseconds(50));
 
@@ -58,5 +59,8 @@ namespace LaPrimitiva.Tests
                 HttpRequestMessage request,
                 CancellationToken cancellationToken) => sendAsync(cancellationToken);
         }
+
+        private static RssClient CreateClient(HttpClient httpClient) =>
+            new(httpClient, NullLogger<RssClient>.Instance);
     }
 }

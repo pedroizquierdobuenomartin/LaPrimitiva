@@ -22,7 +22,10 @@ param(
 
     [Parameter()]
     [ValidateNotNullOrEmpty()]
-    [string]$SqlCmdExecutable = "sqlcmd"
+    [string]$SqlCmdExecutable = "sqlcmd",
+
+    [Parameter()]
+    [string]$LogPath
 )
 
 $ErrorActionPreference = "Stop"
@@ -30,6 +33,12 @@ Set-StrictMode -Version Latest
 
 $backupMarker = "LaPrimitiva"
 $timestamp = Get-Date -Format "yyyyMMdd_HHmmss"
+$repositoryRoot = Split-Path -Parent $PSScriptRoot
+. (Join-Path $PSScriptRoot 'OperationalLog.ps1')
+if ([string]::IsNullOrWhiteSpace($LogPath)) {
+    $LogPath = Join-Path $repositoryRoot ("artifacts\logs\operations-{0}.jsonl" -f (Get-Date -Format 'yyyyMMdd'))
+}
+$correlationId = [Guid]::NewGuid().ToString('N')
 
 function Get-SafeFileComponent {
     param(
@@ -46,6 +55,7 @@ function Get-SafeFileComponent {
 }
 
 try {
+    Write-OperationalLog -Path $LogPath -Operation 'DatabaseBackup' -Status started -CorrelationId $correlationId -Message 'Iniciando backup de bases de datos.' -Properties @{ databaseCount = $DatabaseNames.Count }
     if (-not (Test-Path -LiteralPath $LocalBackupDir -PathType Container)) {
         New-Item -ItemType Directory -Path $LocalBackupDir -ErrorAction Stop | Out-Null
     }
@@ -98,6 +108,7 @@ try {
 
         Write-Host "  [OK] Backup verificado en '$localFile'." -ForegroundColor Green
         Write-Host "  [OK] SHA-256: $($hash.Hash.ToLowerInvariant())" -ForegroundColor Green
+        Write-OperationalLog -Path $LogPath -Operation 'DatabaseBackup' -Status succeeded -CorrelationId $correlationId -Message 'Backup creado y verificado.' -Properties @{ database = $databaseName; backupFile = $fileName; sha256 = $hash.Hash.ToLowerInvariant() }
 
         if ($copyToDrive) {
             $driveFile = Join-Path $DriveBackupDir $fileName
@@ -128,6 +139,7 @@ try {
     Write-Host "Proceso finalizado correctamente." -ForegroundColor Cyan
 }
 catch {
+    Write-OperationalLog -Path $LogPath -Operation 'DatabaseBackup' -Status failed -Level Error -CorrelationId $correlationId -Message 'El proceso de backup ha fallado.' -Exception $_.Exception
     Write-Error "El proceso de backup ha fallado: $($_.Exception.Message)"
     exit 1
 }

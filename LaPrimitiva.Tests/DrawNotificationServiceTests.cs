@@ -20,7 +20,8 @@ namespace LaPrimitiva.Tests
                 rssClient,
                 new RssParserService(),
                 winningDrawService.Object,
-                new GlobalState());
+                new GlobalState(),
+                Mock.Of<IApplicationErrorReporter>());
 
             var firstUpdate = service.CheckForNewDrawsAsync();
             await rssClient.Started.Task.WaitAsync(TimeSpan.FromSeconds(1));

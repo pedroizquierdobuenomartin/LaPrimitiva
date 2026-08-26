@@ -13,7 +13,8 @@ namespace LaPrimitiva.Application.Services
         IRssClient rssClient,
         IRssParserService rssParser,
         IWinningDrawService winningDrawService,
-        GlobalState globalState) : IDrawNotificationService
+        GlobalState globalState,
+        IApplicationErrorReporter errorReporter) : IDrawNotificationService
     {
         private const string LastCheckedDateKey = "LastCheckedDrawDate";
         private static readonly SemaphoreSlim UpdateLock = new(1, 1);
@@ -68,7 +69,8 @@ namespace LaPrimitiva.Application.Services
             }
             catch (Exception ex)
             {
-                globalState.LastError = $"Error al sincronizar sorteos: {ex.Message}";
+                errorReporter.Report(ex, "RssImport");
+                globalState.LastError = "No se pudieron sincronizar los sorteos. Inténtalo de nuevo más tarde.";
             }
             finally
             {

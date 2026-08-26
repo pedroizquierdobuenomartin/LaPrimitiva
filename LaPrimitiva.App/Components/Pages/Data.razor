@@ -1,9 +1,8 @@
 @page "/datos"
 @using LaPrimitiva.App.Exporting
-@using LaPrimitiva.Infrastructure.Persistence
-@using Microsoft.EntityFrameworkCore
+@using LaPrimitiva.Application.Interfaces
 @using System.Text
-@inject IDbContextFactory<PrimitivaDbContext> DbContextFactory
+@inject IDataExportService DataExportService
 @inject IJSRuntime JS
 
 <PageTitle>Datos - La Primitiva Audit</PageTitle>
@@ -45,12 +44,7 @@
 @code {
     private async Task ExportAll()
     {
-        await using var db = await DbContextFactory.CreateDbContextAsync();
-        var draws = await db.DrawRecords
-            .AsNoTracking()
-            .Include(d => d.Plan)
-            .OrderBy(d => d.DrawDate)
-            .ToListAsync();
+        var draws = await DataExportService.GetAllDrawsAsync();
 
         var csv = CsvExportBuilder.Build(draws);
 

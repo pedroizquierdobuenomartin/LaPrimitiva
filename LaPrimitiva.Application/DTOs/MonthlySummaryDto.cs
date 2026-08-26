@@ -1,4 +1,6 @@
 
+using LaPrimitiva.Domain.Services;
+
 namespace LaPrimitiva.Application.DTOs
 {
     public class MonthlySummaryDto
@@ -8,6 +10,6 @@ namespace LaPrimitiva.Application.DTOs
         public int Month { get; set; }
         public decimal Spent { get; set; }
         public decimal Won { get; set; }
-        public decimal Net => Won - Spent;
+        public decimal Net => FinancialMetrics.CalculateNet(Spent, Won);
     }
 }

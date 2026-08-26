@@ -1,12 +1,9 @@
-@using LaPrimitiva.Domain.Repositories
 @using LaPrimitiva.Domain.Localization
 @using LaPrimitiva.Domain.Entities
 @using LaPrimitiva.Domain.Exceptions
 @using LaPrimitiva.Application.Interfaces
 @using LaPrimitiva.Application.Services
 @using Microsoft.Extensions.Localization
-@inject IPlanRepository PlanRepository
-@inject IDrawRepository DrawRepository
 @inject GlobalState GlobalState
 @inject IDrawService DrawService
 @inject IStringLocalizer<RegistrationResource> L
@@ -613,22 +610,9 @@
         GlobalState.OnDataRefreshRequired += HandleDataChange;
         
         // Try to identify current week if possible
-        modalWeek = GetCurrentWeekNumber();
+        modalWeek = DrawService.GetCurrentWeekNumber(GlobalState.SelectedYear, DateTime.Now);
         
         await LoadData();
-    }
-
-    private int GetCurrentWeekNumber()
-    {
-        var year = GlobalState.SelectedYear;
-        var now = DateTime.Now;
-        var referenceDate = now.Year == year ? now : new DateTime(year, 1, 1);
-        
-        var start = new DateTime(year, 1, 1);
-        while (start.DayOfWeek != DayOfWeek.Monday) start = start.AddDays(1);
-        
-        if (referenceDate < start) return 1;
-        return ((referenceDate - start).Days / 7) + 1;
     }
 
     private void HandleUIStateChange()
@@ -655,17 +639,7 @@
             var year = GlobalState.SelectedYear;
             
             // Ensure allPlans is loaded for the year
-            var planDtos = await PlanRepository.GetByYearAsync(year);
-            allPlans = planDtos.Select(p => new Plan 
-            {
-                Id = p.Id,
-                Name = p.Name,
-                BetsPerDraw = p.BetsPerDraw,
-                CostPerBet = p.CostPerBet,
-                EnableJoker = p.EnableJoker,
-                JokerCostPerBet = p.JokerCostPerBet,
-                EffectiveFrom = p.EffectiveFrom
-            }).ToList();
+            allPlans = (await DrawService.GetPlansByYearAsync(year)).ToList();
 
             if (allPlans.Any())
             {
@@ -680,12 +654,7 @@
                 GlobalState.SelectedPlanId = null;
             }
 
-            var query = await DrawRepository.GetListAsync(d => d.DrawDate.Year == year);
-            
-            if (GlobalState.SelectedPlanId != null)
-            {
-                query = query.Where(d => d.PlanId == GlobalState.SelectedPlanId).ToList();
-            }
+            var query = await DrawService.GetDrawsByYearAsync(year, GlobalState.SelectedPlanId);
 
             var rawDraws = query.OrderBy(d => d.DrawDate).ToList();
 
@@ -732,16 +701,14 @@
 
     private async Task SaveDraw(DrawRecord draw)
     {
-        RecalculateDraw(draw);
-        draw.UpdatedAt = DateTime.UtcNow;
-        await DrawRepository.UpdateAsync(draw);
+        await DrawService.SaveDrawAsync(draw);
         await LoadData();
         StateHasChanged();
     }
 
     private void RecalculateDraw(DrawRecord draw, bool forceDefaults = false)
     {
-        draw.RecalculateFinancials(forceDefaults);
+        DrawService.RecalculateFinancials(draw, forceDefaults);
     }
 
     private static bool IsJokerVisible(DrawRecord draw) =>
@@ -753,7 +720,7 @@
     {
         isNewRegistration = true;
         weekAlreadyExists = false;
-        modalWeek = GetCurrentWeekNumber();
+        modalWeek = DrawService.GetCurrentWeekNumber(GlobalState.SelectedYear, DateTime.Now);
         modalDraws = null;
         selectedPlanId = allPlans?.FirstOrDefault()?.Id;
         tempModalDraws.Clear();
@@ -782,8 +749,7 @@
         StateHasChanged();
 
         var year = GlobalState.SelectedYear;
-        var existing = await DrawRepository.GetListAsync(d => 
-            d.DrawDate.Year == year && d.WeekNumber == modalWeek);
+        var existing = (await DrawService.GetDrawsForWeekAsync(year, modalWeek)).ToList();
 
         if (existing.Any())
         {
@@ -796,17 +762,13 @@
             }
             else 
             {
-                foreach (var draw in existing)
-                {
-                    draw.Plan = allPlans?.FirstOrDefault(plan => plan.Id == draw.PlanId) ?? null!;
-                }
                 modalDraws = existing;
             }
             
             // Still need modalPlan for the header info
             if (existing.Any())
             {
-                var plan = await PlanRepository.GetAsync(existing.First().PlanId);
+                var plan = await DrawService.GetPlanAsync(existing.First().PlanId);
                 modalPlan = plan;
             }
         }
@@ -845,53 +807,17 @@
         if (plan == null) return;
 
         var year = GlobalState.SelectedYear;
-        var date = GetDateForWeekAndDay(year, modalWeek, day);
+        var draw = DrawService.CreateDrawTemplate(plan, year, modalWeek, day);
         
-        if (tempModalDraws.Any(d => d.DrawDate.Date == date.Date))
+        if (tempModalDraws.Any(d => d.DrawDate.Date == draw.DrawDate.Date))
         {
-            modalErrorMessage = $"Ya has añadido un sorteo para el {date:dd/MM/yyyy}.";
+            modalErrorMessage = $"Ya has añadido un sorteo para el {draw.DrawDate:dd/MM/yyyy}.";
             return;
         }
 
         modalErrorMessage = null;
-        var draw = new DrawRecord
-        {
-            Id = Guid.Empty, // Explicitly set to empty for new draws
-            WeekNumber = modalWeek,
-            DrawDate = date,
-            DrawType = GetDrawType(date),
-            PlanId = plan.Id,
-            Plan = plan,
-            CreatedAt = DateTime.UtcNow,
-            UpdatedAt = DateTime.UtcNow
-        };
         RecalculateDraw(draw);
         tempModalDraws.Add(draw);
-    }
-
-    private DateTime GetDateForWeekAndDay(int year, int week, DayOfWeek day)
-    {
-        var startOfYear = new DateTime(year, 1, 1);
-        var firstMonday = startOfYear;
-        while (firstMonday.DayOfWeek != DayOfWeek.Monday) firstMonday = firstMonday.AddDays(1);
-        
-        var targetDate = firstMonday.AddDays((week - 1) * 7);
-        // If the target day is earlier in the week than Monday (not possible in .NET as Monday=1), 
-        // but let's be safe and adjust to the correct day of that week.
-        while (targetDate.DayOfWeek != day) targetDate = targetDate.AddDays(1);
-        
-        return targetDate;
-    }
-
-    private DrawType GetDrawType(DateTime date)
-    {
-        return date.DayOfWeek switch
-        {
-            DayOfWeek.Monday => DrawType.Lunes,
-            DayOfWeek.Thursday => DrawType.Jueves,
-            DayOfWeek.Saturday => DrawType.Sabado,
-            _ => (DrawType)1 // Default to Lunes if weird
-        };
     }
 
     private void CloseModal()
@@ -908,46 +834,7 @@
             modalErrorMessage = null;
             _hasConcurrencyConflict = false;
             
-            // Validate all draws before saving anything
-            foreach (var draw in modalDraws)
-            {
-                await DrawService.ValidateDrawAsync(draw.PlanId, draw.DrawDate, draw.Id != Guid.Empty ? draw.Id : null);
-            }
-
-            // Separate new and existing
-            var newDraws = new List<DrawRecord>();
-            var existingDraws = new List<DrawRecord>();
-
-            foreach (var draw in modalDraws)
-            {
-                RecalculateDraw(draw);
-                draw.UpdatedAt = DateTime.UtcNow;
-                
-                // Decouple related Plan to avoid "Plan instance already tracked" error 
-                var planRef = draw.Plan;
-                draw.Plan = null!; 
-
-                if (draw.Id == Guid.Empty)
-                {
-                    newDraws.Add(draw);
-                }
-                else
-                {
-                    existingDraws.Add(draw);
-                }
-            }
-
-            // Batch insert new
-            if (newDraws.Any())
-            {
-                await DrawRepository.CreateRangeAsync(newDraws);
-            }
-
-            // Batch update existing
-            if (existingDraws.Any())
-            {
-                await DrawRepository.UpdateRangeAsync(existingDraws);
-            }
+            await DrawService.SaveDrawsAsync(modalDraws);
 
             showModal = false;
             await LoadData();

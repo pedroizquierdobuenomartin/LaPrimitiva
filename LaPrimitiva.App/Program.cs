@@ -39,6 +39,8 @@ builder.Services.AddScoped<IWinningDrawRepository, WinningDrawRepository>();
 builder.Services.AddScoped<PlanService>();
 builder.Services.AddScoped<DrawGenerationService>();
 builder.Services.AddScoped<SummaryService>();
+builder.Services.AddScoped<IDashboardService, DashboardService>();
+builder.Services.AddScoped<IDataExportService, DataExportService>();
 builder.Services.AddScoped<GlobalState>();
 builder.Services.AddScoped<IDrawService, DrawService>();
 builder.Services.AddScoped<IWinningDrawService, WinningDrawService>();

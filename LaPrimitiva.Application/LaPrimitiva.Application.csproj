@@ -2,11 +2,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\LaPrimitiva.Domain\LaPrimitiva.Domain.csproj" />
-    <ProjectReference Include="..\LaPrimitiva.Infrastructure\LaPrimitiva.Infrastructure.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.1" />
   </ItemGroup>
 
   <PropertyGroup>

@@ -508,7 +508,7 @@
 
 **Decisiones:** se eligió `rowversion` nativo de SQL Server frente a marcas temporales de aplicación porque es atómico y cambia en cada escritura. La política es **rechazar la escritura obsoleta y recargar** —no fusionar ni aplicar “último guardado gana”— para no inventar una resolución de datos. La excepción común vive en Domain y no expone detalles de EF Core a la UI; Infrastructure traduce `DbUpdateConcurrencyException`. La recarga descarta los valores obsoletos deliberadamente y trae la fila vigente antes de permitir un nuevo intento. Para evitar que el lanzador local vuelva a arrancar un binario contra un esquema atrasado, `BuildAndRun.bat` invoca explícitamente el script administrativo de migración después de una compilación correcta y antes de ejecutar la aplicación; conserva así la decisión M-401 de no ejecutar DDL desde `Program.cs`, pero automatiza el paso en la herramienta local de desarrollo. No se modificaron los límites entre capas ni se avanzó a M-404.
 
-### [ ] M-404 — Reforzar límites entre capas
+### [x] M-404 — Reforzar límites entre capas
 
 **Objetivo:** UI → casos de uso de Application → puertos/repositorios → Infrastructure.
 
@@ -523,6 +523,53 @@
 
 - El dominio y Application no dependen de EF Core ni del proyecto Infrastructure.
 - La misma regla de negocio no está duplicada en varias páginas.
+
+**Cierre (2026-08-26):** completado para la release `v1.11.0`; commit de cierre de esta publicación,
+sobre `d0d9d1c`. Referencias
+`scripts/Verify-M404LayerBoundaries.ps1`, `LaPrimitiva.Tests/M404LayerBoundaryTests.cs` y
+`LaPrimitiva.Tests/M404ApplicationServiceTests.cs`. No se creó commit ni se publicó porque no fueron
+solicitados.
+
+**Problema confirmado antes del cambio:** `LaPrimitiva.Application.csproj` referenciaba directamente
+`LaPrimitiva.Infrastructure` y el paquete `Microsoft.EntityFrameworkCore`, aunque su código fuente no
+necesitaba ninguno. `Data.razor` inyectaba `IDbContextFactory<PrimitivaDbContext>` y componía una consulta
+EF Core; `Home.razor` inyectaba `IDrawRepository`; `Register.razor` inyectaba `IPlanRepository` e
+`IDrawRepository` y coordinaba consultas, validación, recálculo y escrituras. La UI también repetía los
+cálculos de neto por tipo y Joker, mientras `SummaryDto`, `MonthlySummaryDto`, `PlanDto`, `DrawRecord` y
+`PlanService` mantenían fórmulas financieras relacionadas en puntos distintos.
+
+**Pruebas realizadas:** antes de modificar código se ejecutó la suite precompilada con `dotnet test
+LaPrimitiva.Tests/LaPrimitiva.Tests.csproj --no-build --no-restore --nologo`: pasaron **109/125** y las
+16 integraciones restantes no pudieron abrir SQL Server porque el entorno informó que la instancia exige
+cifrado no admitido; no se atribuye ese bloqueo a M-404. Después de los cambios, sin compilar por la regla
+operativa del repositorio, `scripts/Verify-M404LayerBoundaries.ps1` pasó y confirmó dependencias interiores,
+componentes, casos de uso, reglas financieras y pruebas focalizadas; `scripts/Verify-M403Concurrency.ps1`
+también pasó como regresión estática. El XML de `LaPrimitiva.Application.csproj`, la sintaxis PowerShell del
+verificador, las búsquedas negativas de acoplamientos y `git diff --check` resultaron correctos. El usuario
+realizó posteriormente build y run correctos y comprobó guardados reales. El ensamblado generado contenía los
+cinco tests iniciales de M-404 y la suite completa pasó **130/130** fuera del sandbox contra `LOCALSERVER`.
+Una auditoría TDD posterior detectó que faltaban pruebas de comportamiento propias para dashboard, exportación
+y varias rutas nuevas de `DrawService`; se añadieron ocho casos focalizados. Tras el segundo build correcto
+aportado por el usuario, se confirmó que los ocho estaban compilados y `dotnet test
+LaPrimitiva.Tests/LaPrimitiva.Tests.csproj --no-build --no-restore --nologo` pasó finalmente **138/138**, sin
+errores ni tests omitidos, incluidas las integraciones SQL Server.
+
+**Resultado:** Application depende únicamente de Domain y ya no referencia EF Core ni Infrastructure. Los
+componentes no acceden al `DbContext` ni a repositorios: exportación, dashboard y registro entran por
+`IDataExportService`, `IDashboardService` e `IDrawService`; estos casos de uso consumen los puertos de
+repositorio y las implementaciones continúan en Infrastructure. Costes, premios y neto permanecen en
+`DrawRecord`; neto, ROI, porcentajes y recuento de apuestas premiadas comparten `FinancialMetrics`; la
+validación de planes permanece en `Plan`/`PlanService`, y la validación y persistencia coordinada de registros
+se trasladó desde la página a `DrawService`.
+
+**Decisiones:** `LaPrimitiva.App` conserva la referencia a Infrastructure exclusivamente como raíz de
+composición para registrar EF Core, repositorios y proveedores; no se ocultó la configuración del host tras
+un localizador de servicios. Los puertos de persistencia existentes permanecen en Domain para evitar una
+reubicación masiva sin valor funcional, mientras Application los consume y la UI solo ve interfaces de casos
+de uso. Se eligieron servicios específicos para dashboard y exportación en vez de un servicio genérico de
+datos. Las reglas financieras puras se centralizaron sin convertir DTO ni componentes en entidades ricas, y
+la actualización inmediata del formulario delega en el caso de uso que invoca la entidad. No se abordaron
+`async void`, temporizadores ni liberación de recursos y no se avanzó a M-405.
 
 ### [ ] M-405 — Reemplazar eventos `async void` y liberar recursos
 
@@ -1029,4 +1076,5 @@ Estos descartes describen el código auditado y deben revisarse si cambian las f
 | M-306 | 2026-08-24 | Commit de cierre sobre `067349e`; release `v1.8.0` | Completado | HTTPS confiable en `127.0.0.1:443:laprimitiva.local` con SNI, SAN/EKU/vigencia correctos, `200` y HSTS; HTTP deshabilitado; Firefox validado sin advertencias por el usuario; paquete CER/PFX trasladable, guía completa y verificadores M-301/M-302/M-306 correctos. |
 | M-402 | 2026-08-25 | Commit de cierre sobre `96aab2c`; release `v1.9.0` | Completado | `IDbContextFactory` y contextos efímeros por operación en repositorios, seeder y exportación; lecturas sin tracking; aislamiento simultáneo cubierto por pruebas focalizadas; verificador correcto y build/funcionamiento aparente comunicados por el usuario. |
 | M-403 | 2026-08-25 | Release `v1.10.0`, sobre `eefe391` | Completado | `rowversion` en planes, registros y sorteos ganadores; instancia de integración corregida a `LOCALSERVER`; build y publish correctos aportados por el usuario; suite completa 125/125 y bundle de migraciones portable verificado. |
+| M-404 | 2026-08-26 | Commit de cierre de esta publicación, sobre `d0d9d1c`; release `v1.11.0` | Completado | Application depende solo de Domain; componentes sin `DbContext` ni repositorios; casos de uso y métricas financieras centralizados; build, run y guardados correctos aportados por el usuario; suite completa 138/138 y verificadores M-403/M-404 correctos. |
 | M-702 | 2026-08-24 | `e2402f6`, `19defe6`, release `373561a`, tag `v1.1.0` | Completado | Generación uniforme y rediseño validados; títulos de Histórico y Combinación automática unificados con `PageTitle`; footer enlazado a la versión del ensamblado y release `1.1.0` publicada. Verificación estática correcta y validación visual del usuario; casos xUnit nuevos no ejecutados por la prohibición de compilar. |

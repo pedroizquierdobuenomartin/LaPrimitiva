@@ -1,4 +1,5 @@
 using System;
+using LaPrimitiva.Domain.Services;
 
 namespace LaPrimitiva.Domain.Entities
 {
@@ -48,7 +49,7 @@ namespace LaPrimitiva.Domain.Entities
         /// </summary>
         public decimal CalculatedTotalCost => CosteFija + CosteAuto + CosteJokerFija + CosteJokerAuto;
         public decimal CalculatedTotalPrize => FixedPrize + AutoPrize + JokerFixedPrize + JokerAutoPrize;
-        public decimal CalculatedNetResult => CalculatedTotalPrize - CalculatedTotalCost;
+        public decimal CalculatedNetResult => FinancialMetrics.CalculateNet(CalculatedTotalCost, CalculatedTotalPrize);
 
         public void RecalculateFinancials(bool refreshCostsFromPlan = false)
         {

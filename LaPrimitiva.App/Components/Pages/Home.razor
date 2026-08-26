@@ -1,12 +1,11 @@
 ﻿@page "/"
 @using LaPrimitiva.Application.Services
+@using LaPrimitiva.Application.Interfaces
 @using LaPrimitiva.Application.DTOs
-@using LaPrimitiva.Domain.Repositories
 @using LaPrimitiva.Domain.Localization
 @using LaPrimitiva.App.Components.Shared
 @using Microsoft.Extensions.Localization
-@inject IDrawRepository DrawRepository
-@inject SummaryService SummaryService
+@inject IDashboardService DashboardService
 @inject GlobalState GlobalState
 @inject IStringLocalizer<DashboardResource> L
 @inject IStringLocalizer<GlobalResource> LG
@@ -79,8 +78,8 @@
                     <div class="group px-1">
                         <div class="flex justify-between text-sm mb-4">
                             <span class="font-bold text-[var(--brand-text-primary)] group-hover:text-[var(--brand-primary)] transition-colors">@L["FixedCombination"]</span>
-                            <span class="@(summary.FixedWon - summary.FixedSpent >= 0 ? "text-[var(--brand-positive)]" : "text-[var(--brand-negativo)]") font-bold text-lg">
-                                @((summary.FixedWon - summary.FixedSpent).ToString("N2"))€
+                            <span class="@(summary.FixedNet >= 0 ? "text-[var(--brand-positive)]" : "text-[var(--brand-negativo)]") font-bold text-lg">
+                                @(summary.FixedNet.ToString("N2"))€
                             </span>
                         </div>
                         <BreakdownBar Spent="@summary.FixedSpent" Won="@summary.FixedWon" AriaLabel="@L["FixedCombination"]" />
@@ -93,8 +92,8 @@
                     <div class="group px-1">
                         <div class="flex justify-between text-sm mb-4">
                             <span class="font-bold text-[var(--brand-text-primary)] group-hover:text-[var(--brand-primary)] transition-colors">@L["AutoCombination"]</span>
-                            <span class="@(summary.AutoWon - summary.AutoSpent >= 0 ? "text-[var(--brand-positive)]" : "text-[var(--brand-negativo)]") font-bold text-lg">
-                                @((summary.AutoWon - summary.AutoSpent).ToString("N2"))€
+                            <span class="@(summary.AutoNet >= 0 ? "text-[var(--brand-positive)]" : "text-[var(--brand-negativo)]") font-bold text-lg">
+                                @(summary.AutoNet.ToString("N2"))€
                             </span>
                         </div>
                         <BreakdownBar Spent="@summary.AutoSpent" Won="@summary.AutoWon" AriaLabel="@L["AutoCombination"]" />
@@ -107,16 +106,16 @@
                     <div class="group px-1">
                         <div class="flex justify-between text-sm mb-4">
                             <span class="font-bold text-[var(--brand-text-primary)] group-hover:text-[var(--brand-primary)] transition-colors">Joker (Total)</span>
-                            <span class="@((summary.JokerFixedWon + summary.JokerAutoWon) - (summary.JokerFixedSpent + summary.JokerAutoSpent) >= 0 ? "text-[var(--brand-positive)]" : "text-[var(--brand-negativo)]") font-bold text-lg">
-                                @(((summary.JokerFixedWon + summary.JokerAutoWon) - (summary.JokerFixedSpent + summary.JokerAutoSpent)).ToString("N2"))€
+                            <span class="@(summary.JokerNet >= 0 ? "text-[var(--brand-positive)]" : "text-[var(--brand-negativo)]") font-bold text-lg">
+                                @(summary.JokerNet.ToString("N2"))€
                             </span>
                         </div>
-                        <BreakdownBar Spent="@(summary.JokerFixedSpent + summary.JokerAutoSpent)"
-                                      Won="@(summary.JokerFixedWon + summary.JokerAutoWon)"
+                        <BreakdownBar Spent="@summary.JokerSpent"
+                                      Won="@summary.JokerWon"
                                       AriaLabel="Joker (Total)" />
                         <div class="flex justify-between text-xs font-bold text-[var(--brand-text-secondary)] mt-3">
-                            <span>@L["Expense"]: @((summary.JokerFixedSpent + summary.JokerAutoSpent).ToString("N2"))€</span>
-                            <span>@L["Prize"]: @((summary.JokerFixedWon + summary.JokerAutoWon).ToString("N2"))€</span>
+                            <span>@L["Expense"]: @(summary.JokerSpent.ToString("N2"))€</span>
+                            <span>@L["Prize"]: @(summary.JokerWon.ToString("N2"))€</span>
                         </div>
                     </div>
                 </div>
@@ -163,26 +162,14 @@
 
     private async Task LoadData()
     {
-        IEnumerable<LaPrimitiva.Domain.Entities.DrawRecord> draws;
-        
-        if (GlobalState.IsHistoricalView)
-        {
-            draws = await DrawRepository.GetListAsync(_ => true);
-        }
-        else
-        {
-            var year = GlobalState.SelectedYear;
-            draws = await DrawRepository.GetListAsync(d => d.DrawDate.Year == year);
-        }
-            
-        summary = SummaryService.GetSummary(draws);
-        PrepareChartConfig(draws);
+        var dashboard = await DashboardService.GetDashboardAsync(
+            GlobalState.IsHistoricalView ? null : GlobalState.SelectedYear);
+        summary = dashboard.Summary;
+        PrepareChartConfig(dashboard.MonthlySummaries);
     }
 
-    private void PrepareChartConfig(IEnumerable<LaPrimitiva.Domain.Entities.DrawRecord> draws)
+    private void PrepareChartConfig(IEnumerable<MonthlySummaryDto> monthlySummaries)
     {
-        var monthlySummaries = SummaryService.GetMonthlySummaries(draws);
-        
         // Calculate cumulative net
         decimal cumulativeNet = 0;
         var labels = new List<string>();

@@ -3,8 +3,6 @@
 @using LaPrimitiva.Application.DTOs
 @using LaPrimitiva.Domain.Entities
 @using LaPrimitiva.Domain.Exceptions
-@using LaPrimitiva.Infrastructure.Persistence
-@using Microsoft.EntityFrameworkCore
 @using Microsoft.Extensions.Localization
 @using LaPrimitiva.Domain.Localization
 @inject IStringLocalizer<PlansResource> L
@@ -440,7 +438,6 @@
         {
             errorMessage = null;
             _hasConcurrencyConflict = false;
-            newPlan.Validate();
             if (isEditing)
             {
                 await PlanService.UpdatePlanAsync(newPlan);

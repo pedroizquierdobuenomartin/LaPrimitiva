@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using LaPrimitiva.Domain.Entities;
 using LaPrimitiva.Domain.Repositories;
 using LaPrimitiva.Application.DTOs;
+using LaPrimitiva.Domain.Services;
 
 namespace LaPrimitiva.Application.Services
 {
@@ -178,11 +179,7 @@ namespace LaPrimitiva.Application.Services
             InactiveDraws = p.Draws?.Count(d => !d.Played) ?? 0,
             TotalInvested = p.Draws?.Where(d => d.Played).Sum(d => d.TotalCoste) ?? 0,
             TotalPrizesAmount = p.Draws?.Where(d => d.Played).Sum(d => d.TotalPremios) ?? 0,
-            WinningBetsCount = p.Draws?.Where(d => d.Played).Sum(d => 
-                (d.FixedPrize > 0 ? 1 : 0) + 
-                (d.AutoPrize > 0 ? 1 : 0) + 
-                (d.JokerFixedPrize > 0 ? 1 : 0) + 
-                (d.JokerAutoPrize > 0 ? 1 : 0)) ?? 0
+            WinningBetsCount = p.Draws?.Where(d => d.Played).Sum(FinancialMetrics.CountWinningBets) ?? 0
         };
     }
 }

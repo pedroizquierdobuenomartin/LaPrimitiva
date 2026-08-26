@@ -2,6 +2,7 @@
 @using LaPrimitiva.Domain.Localization
 @inject NavigationManager NavigationManager
 @inject IStringLocalizer<GlobalResource> L
+@implements IDisposable
 
 <nav class="flex" aria-label="Breadcrumb">
     <ol class="inline-flex items-center space-x-1 md:space-x-3 text-xs font-medium uppercase tracking-wider">
@@ -35,12 +36,23 @@
     protected override void OnInitialized()
     {
         UpdatePath();
-        NavigationManager.LocationChanged += (s, e) => { UpdatePath(); StateHasChanged(); };
+        NavigationManager.LocationChanged += HandleLocationChanged;
+    }
+
+    private void HandleLocationChanged(object? sender, LocationChangedEventArgs e)
+    {
+        UpdatePath();
+        StateHasChanged();
     }
 
     private void UpdatePath()
     {
         _currentPath = NavigationManager.ToBaseRelativePath(NavigationManager.Uri);
         _segments = _currentPath.Split('/', StringSplitOptions.RemoveEmptyEntries);
+    }
+
+    public void Dispose()
+    {
+        NavigationManager.LocationChanged -= HandleLocationChanged;
     }
 }

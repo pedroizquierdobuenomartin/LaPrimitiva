@@ -12,6 +12,7 @@
 @inject NavigationManager NavigationManager
 @inject IDrawNotificationService NotificationService
 @inject ILocalStorageService LocalStorageService
+@inject ILogger<MainLayout> Logger
 @implements IDisposable
 
 <div class="h-screen flex bg-[var(--brand-bg)] overflow-hidden font-sans relative">
@@ -498,6 +499,7 @@
     private bool _isPlansPage = false;
     private bool _showNotifications = false;
     private List<int>? _availableYears;
+    private bool _disposed;
     
     // Feedback state
     private string? _feedbackMessage;
@@ -613,20 +615,52 @@
         }
     }
 
-    private async void HandleStateChange()
+    private void HandleStateChange()
     {
-        await InvokeAsync(async () => 
+        if (_disposed)
         {
-            await LoadYears();
-            StateHasChanged();
-        });
+            return;
+        }
+
+        _ = HandleStateChangeAsync();
+    }
+
+    private async Task HandleStateChangeAsync()
+    {
+        try
+        {
+            await InvokeAsync(async () =>
+            {
+                if (_disposed)
+                {
+                    return;
+                }
+
+                await LoadYears();
+                if (!_disposed)
+                {
+                    StateHasChanged();
+                }
+            });
+        }
+        catch (Exception ex)
+        {
+            if (!_disposed)
+            {
+                Logger.LogError(ex, "Error al actualizar el layout tras un cambio de estado global.");
+            }
+        }
     }
 
     private async Task LoadYears()
     {
         using var scope = ScopeFactory.CreateScope();
         var planService = scope.ServiceProvider.GetRequiredService<PlanService>();
-        _availableYears = await planService.GetAvailableYearsAsync();
+        var availableYears = await planService.GetAvailableYearsAsync();
+        if (!_disposed)
+        {
+            _availableYears = availableYears;
+        }
     }
 
     private void ToggleSidebar()
@@ -686,25 +720,58 @@
 
     private void ShowFeedback(string message, bool isError)
     {
+        if (_disposed)
+        {
+            return;
+        }
+
         _feedbackMessage = message;
         _isFeedbackError = isError;
         StateHasChanged();
 
         _feedbackTimer?.Dispose();
-        _feedbackTimer = new System.Threading.Timer(_ => 
+        _feedbackTimer = new System.Threading.Timer(_ => HandleFeedbackTimer(), null, 5000, System.Threading.Timeout.Infinite);
+    }
+
+    private void HandleFeedbackTimer()
+    {
+        if (_disposed)
         {
-            InvokeAsync(() => 
+            return;
+        }
+
+        _ = ClearFeedbackAsync();
+    }
+
+    private async Task ClearFeedbackAsync()
+    {
+        try
+        {
+            await InvokeAsync(() =>
             {
-                _feedbackMessage = null;
-                StateHasChanged();
+                if (!_disposed)
+                {
+                    _feedbackMessage = null;
+                    StateHasChanged();
+                }
             });
-        }, null, 5000, System.Threading.Timeout.Infinite);
+        }
+        catch (Exception ex)
+        {
+            if (!_disposed)
+            {
+                Logger.LogError(ex, "Error al ocultar el mensaje temporal del layout.");
+            }
+        }
     }
 
 
     public void Dispose()
     {
+        _disposed = true;
         GlobalState.OnChange -= HandleStateChange;
         NavigationManager.LocationChanged -= HandleLocationChanged;
+        _feedbackTimer?.Dispose();
+        _feedbackTimer = null;
     }
 }

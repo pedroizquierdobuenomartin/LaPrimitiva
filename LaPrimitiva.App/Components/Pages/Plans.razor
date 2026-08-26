@@ -12,6 +12,7 @@
 @inject DrawGenerationService DrawGenService
 @inject NavigationManager Nav
 @inject IJSRuntime JS
+@inject ILogger<Plans> Logger
 @implements IDisposable
 
 <PageTitle>@L["Plans"] - La Primitiva Audit</PageTitle>
@@ -346,6 +347,7 @@
     private string? _deleteErrorMessage;
     private bool _hasLinkedDraws;
     private bool _isLoading;
+    private bool _disposed;
     private string PlanPageDescription => GlobalState.ShowAllPlans
         ? L["ConfigureAllPlanRules"].Value
         : string.Format("{0} {1}.", L["ConfigurePlanRules"].Value, GlobalState.SelectedYear);
@@ -362,13 +364,41 @@
         await LoadData();
     }
 
-    private async void HandleStateChange()
+    private void HandleStateChange()
     {
-        await InvokeAsync(async () => 
+        if (_disposed)
         {
-            await LoadData();
-            StateHasChanged();
-        });
+            return;
+        }
+
+        _ = HandleStateChangeAsync();
+    }
+
+    private async Task HandleStateChangeAsync()
+    {
+        try
+        {
+            await InvokeAsync(async () =>
+            {
+                if (_disposed)
+                {
+                    return;
+                }
+
+                await LoadData();
+                if (!_disposed)
+                {
+                    StateHasChanged();
+                }
+            });
+        }
+        catch (Exception ex)
+        {
+            if (!_disposed)
+            {
+                Logger.LogError(ex, "Error al recargar los planes tras un cambio de estado global.");
+            }
+        }
     }
 
     private async Task LoadData()
@@ -377,9 +407,13 @@
         _isLoading = true;
         try 
         {
-            plans = GlobalState.ShowAllPlans
+            var loadedPlans = GlobalState.ShowAllPlans
                 ? await PlanService.GetPlansAsync()
                 : await PlanService.GetPlansByYearAsync(GlobalState.SelectedYear);
+            if (!_disposed)
+            {
+                plans = loadedPlans;
+            }
         }
         finally 
         {
@@ -550,6 +584,7 @@
 
     public void Dispose()
     {
+        _disposed = true;
         GlobalState.OnChange -= HandleStateChange;
     }
 }

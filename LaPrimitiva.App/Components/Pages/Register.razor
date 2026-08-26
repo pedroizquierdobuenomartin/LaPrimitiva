@@ -8,6 +8,7 @@
 @inject IDrawService DrawService
 @inject IStringLocalizer<RegistrationResource> L
 @inject IStringLocalizer<GlobalResource> LG
+@inject ILogger<Register> Logger
 @implements IDisposable
 @attribute [Microsoft.AspNetCore.Components.RouteAttribute(AppRoutes.Registration)]
 
@@ -594,6 +595,7 @@
     private string? modalErrorMessage;
     private bool _hasConcurrencyConflict;
     private bool _isLoading;
+    private bool _disposed;
     
     // Delete Confirmation State
     private (int WeekNumber, int Year, Guid PlanId)? showDeleteArgs;
@@ -617,16 +619,70 @@
 
     private void HandleUIStateChange()
     {
-        InvokeAsync(StateHasChanged);
+        if (_disposed)
+        {
+            return;
+        }
+
+        _ = RefreshUiAsync();
     }
 
-    private async void HandleDataChange()
+    private async Task RefreshUiAsync()
     {
-        await InvokeAsync(async () => 
+        try
         {
-            await LoadData();
-            StateHasChanged();
-        });
+            await InvokeAsync(() =>
+            {
+                if (!_disposed)
+                {
+                    StateHasChanged();
+                }
+            });
+        }
+        catch (Exception ex)
+        {
+            if (!_disposed)
+            {
+                Logger.LogError(ex, "Error al actualizar la interfaz del registro.");
+            }
+        }
+    }
+
+    private void HandleDataChange()
+    {
+        if (_disposed)
+        {
+            return;
+        }
+
+        _ = HandleDataChangeAsync();
+    }
+
+    private async Task HandleDataChangeAsync()
+    {
+        try
+        {
+            await InvokeAsync(async () =>
+            {
+                if (_disposed)
+                {
+                    return;
+                }
+
+                await LoadData();
+                if (!_disposed)
+                {
+                    StateHasChanged();
+                }
+            });
+        }
+        catch (Exception ex)
+        {
+            if (!_disposed)
+            {
+                Logger.LogError(ex, "Error al recargar los datos del registro.");
+            }
+        }
     }
 
     private async Task LoadData()
@@ -639,7 +695,13 @@
             var year = GlobalState.SelectedYear;
             
             // Ensure allPlans is loaded for the year
-            allPlans = (await DrawService.GetPlansByYearAsync(year)).ToList();
+            var loadedPlans = (await DrawService.GetPlansByYearAsync(year)).ToList();
+            if (_disposed)
+            {
+                return;
+            }
+
+            allPlans = loadedPlans;
 
             if (allPlans.Any())
             {
@@ -655,6 +717,10 @@
             }
 
             var query = await DrawService.GetDrawsByYearAsync(year, GlobalState.SelectedPlanId);
+            if (_disposed)
+            {
+                return;
+            }
 
             var rawDraws = query.OrderBy(d => d.DrawDate).ToList();
 
@@ -888,6 +954,7 @@
 
     public void Dispose()
     {
+        _disposed = true;
         GlobalState.OnChange -= HandleUIStateChange;
         GlobalState.OnDataRefreshRequired -= HandleDataChange;
     }

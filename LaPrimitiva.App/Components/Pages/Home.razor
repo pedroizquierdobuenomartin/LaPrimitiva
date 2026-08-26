@@ -9,6 +9,7 @@
 @inject GlobalState GlobalState
 @inject IStringLocalizer<DashboardResource> L
 @inject IStringLocalizer<GlobalResource> LG
+@inject ILogger<Home> Logger
 @implements IDisposable
 
 <PageTitle>@L["Dashboard"] - La Primitiva Audit</PageTitle>
@@ -128,6 +129,7 @@
     private SummaryDto? summary;
     private ChartComponent? chartComponent;
     private object chartConfig = new { };
+    private bool _disposed;
 
     protected override async Task OnInitializedAsync()
     {
@@ -138,34 +140,86 @@
 
     private void HandleUIStateChange()
     {
-        InvokeAsync(StateHasChanged);
+        if (_disposed)
+        {
+            return;
+        }
+
+        _ = RefreshUiAsync();
     }
 
-    private async void HandleDataChange()
+    private async Task RefreshUiAsync()
     {
-        await InvokeAsync(async () => 
+        try
         {
-            try 
+            await InvokeAsync(() =>
             {
+                if (!_disposed)
+                {
+                    StateHasChanged();
+                }
+            });
+        }
+        catch (Exception ex)
+        {
+            if (!_disposed)
+            {
+                Logger.LogError(ex, "Error al actualizar la interfaz del dashboard.");
+            }
+        }
+    }
+
+    private void HandleDataChange()
+    {
+        if (_disposed)
+        {
+            return;
+        }
+
+        _ = HandleDataChangeAsync();
+    }
+
+    private async Task HandleDataChangeAsync()
+    {
+        try
+        {
+            await InvokeAsync(async () =>
+            {
+                if (_disposed)
+                {
+                    return;
+                }
+
                 await LoadData();
-                if (chartComponent != null)
+                if (!_disposed && chartComponent != null)
                 {
                     await chartComponent.UpdateChartAsync(chartConfig);
                 }
-            }
-            finally 
+
+                if (!_disposed)
+                {
+                    StateHasChanged();
+                }
+            });
+        }
+        catch (Exception ex)
+        {
+            if (!_disposed)
             {
-                StateHasChanged();
+                Logger.LogError(ex, "Error al recargar los datos del dashboard.");
             }
-        });
+        }
     }
 
     private async Task LoadData()
     {
         var dashboard = await DashboardService.GetDashboardAsync(
             GlobalState.IsHistoricalView ? null : GlobalState.SelectedYear);
-        summary = dashboard.Summary;
-        PrepareChartConfig(dashboard.MonthlySummaries);
+        if (!_disposed)
+        {
+            summary = dashboard.Summary;
+            PrepareChartConfig(dashboard.MonthlySummaries);
+        }
     }
 
     private void PrepareChartConfig(IEnumerable<MonthlySummaryDto> monthlySummaries)
@@ -246,6 +300,7 @@
 
     public void Dispose()
     {
+        _disposed = true;
         GlobalState.OnChange -= HandleUIStateChange;
         GlobalState.OnDataRefreshRequired -= HandleDataChange;
     }

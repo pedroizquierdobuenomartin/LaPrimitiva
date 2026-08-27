@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using LaPrimitiva.Domain.Repositories;
 using LaPrimitiva.Application.Interfaces;
 using LaPrimitiva.Domain.Entities;
+using LaPrimitiva.Domain.Errors;
 
 namespace LaPrimitiva.Application.Services
 {
@@ -135,14 +136,17 @@ namespace LaPrimitiva.Application.Services
             
             if (duplicate)
             {
-                throw new InvalidOperationException($"Ya existe un sorteo registrado para la fecha {drawDate:dd/MM/yyyy}.");
+                throw new DataIntegrityException(
+                    "draw.date.duplicate",
+                    $"Ya existe un sorteo registrado para la fecha {drawDate:dd/MM/yyyy}.",
+                    new Dictionary<string, object?> { ["DrawDate"] = drawDate.Date });
             }
 
             // 2. Validar que la fecha esté dentro del rango del plan
             var plan = await _planRepository.GetAsync(planId);
             if (plan == null)
             {
-                throw new InvalidOperationException("El plan seleccionado no existe.");
+                throw new EntityNotFoundException("Plan", planId);
             }
 
             if (drawDate.Date < plan.EffectiveFrom.Date || (plan.EffectiveTo.HasValue && drawDate.Date > plan.EffectiveTo.Value.Date))
@@ -151,7 +155,14 @@ namespace LaPrimitiva.Application.Services
                     ? $"{plan.EffectiveFrom:dd/MM/yyyy} - {plan.EffectiveTo:dd/MM/yyyy}"
                     : $"desde {plan.EffectiveFrom:dd/MM/yyyy}";
                 
-                throw new InvalidOperationException($"La fecha {drawDate:dd/MM/yyyy} está fuera del periodo del plan ({periodStr}).");
+                throw new BusinessRuleException(
+                    "draw.date.outside-plan-period",
+                    $"La fecha {drawDate:dd/MM/yyyy} está fuera del periodo del plan ({periodStr}).",
+                    new Dictionary<string, object?>
+                    {
+                        ["DrawDate"] = drawDate.Date,
+                        ["PlanId"] = planId
+                    });
             }
         }
 
@@ -171,7 +182,10 @@ namespace LaPrimitiva.Application.Services
             DayOfWeek.Monday => DrawType.Lunes,
             DayOfWeek.Thursday => DrawType.Jueves,
             DayOfWeek.Saturday => DrawType.Sabado,
-            _ => throw new InvalidOperationException("El día seleccionado no corresponde a un sorteo de La Primitiva.")
+            _ => throw new ArgumentOutOfRangeException(
+                nameof(day),
+                day,
+                "El día seleccionado no corresponde a un sorteo de La Primitiva.")
         };
     }
 }

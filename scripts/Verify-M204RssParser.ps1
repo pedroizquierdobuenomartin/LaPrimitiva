@@ -23,11 +23,11 @@ Assert-Contains $parser 'XElement\.LoadAsync\(subtree, LoadOptions\.None, cancel
     'Los elementos RSS no se materializan de forma controlada dentro del bloque de captura de errores.'
 Assert-Contains $tests 'ParseRss_WithAllowedSeparatorSpacing_ReturnsCorrectNumbers' `
     'Faltan pruebas de separadores válidos con espacios variables.'
-Assert-Contains $tests 'ParseRss_WithIncompleteItem_SkipsItem' `
+Assert-Contains $tests 'ParseRss_WithIncompleteItem_ReportsInvalidExternalFormat' `
     'Falta la prueba de entrada incompleta.'
-Assert-Contains $tests 'ParseRss_WithMalformedDraw_SkipsItemWithoutThrowingDuringMaterialization' `
+Assert-Contains $tests 'ParseRss_WithMalformedDraw_ReportsInvalidExternalFormat' `
     'Falta la prueba de sorteo malformado y materialización segura.'
-Assert-Contains $tests 'ParseRss_WithMalformedXml_ReturnsEmptyList' `
+Assert-Contains $tests 'ParseRss_WithMalformedXml_ReportsInvalidExternalFormat' `
     'Falta la prueba de XML malformado.'
 
-Write-Host 'M-204 verificado estáticamente: separadores flexibles, materialización protegida y casos válidos, incompletos y malformados presentes.' -ForegroundColor Green
+Write-Host 'M-204 verificado estáticamente: separadores flexibles, materialización protegida y errores externos tipados presentes.' -ForegroundColor Green

@@ -6,6 +6,7 @@ using LaPrimitiva.Domain.Entities;
 using LaPrimitiva.Domain.Repositories;
 using LaPrimitiva.Application.DTOs;
 using LaPrimitiva.Domain.Services;
+using LaPrimitiva.Domain.Errors;
 
 namespace LaPrimitiva.Application.Services
 {
@@ -76,7 +77,9 @@ namespace LaPrimitiva.Application.Services
 
             if (overlap)
             {
-                throw new InvalidOperationException("Ya existe un plan que se solapa con este periodo de fechas.");
+                throw new DataIntegrityException(
+                    "plan.period.overlap",
+                    "Ya existe un plan que se solapa con este periodo de fechas.");
             }
 
             await _planRepository.CreateAsync(plan);
@@ -96,7 +99,9 @@ namespace LaPrimitiva.Application.Services
 
             if (overlap)
             {
-                throw new InvalidOperationException("Las nuevas fechas se solapan con otro plan existente.");
+                throw new DataIntegrityException(
+                    "plan.period.overlap",
+                    "Las nuevas fechas se solapan con otro plan existente.");
             }
 
             await _planRepository.UpdateAsync(plan);
@@ -110,7 +115,9 @@ namespace LaPrimitiva.Application.Services
             var hasDraws = await _drawRepository.AnyAsync(d => d.PlanId == id);
             if (hasDraws)
             {
-                throw new InvalidOperationException("No se puede borrar un plan que ya tiene sorteos asociados.");
+                throw new DataIntegrityException(
+                    "plan.draws.exist",
+                    "No se puede borrar un plan que ya tiene sorteos asociados.");
             }
 
             await _planRepository.DeleteAsync(id);

@@ -78,9 +78,17 @@ public sealed class SecureJsonFileLoggerProvider : ILoggerProvider, ISupportExte
                 RetainNewestFiles();
             }
         }
-        catch
+        catch (IOException)
         {
-            // Logging must never terminate the application. JSON console remains as fallback.
+            // The JSON console provider remains available if the file sink is temporarily unavailable.
+        }
+        catch (UnauthorizedAccessException)
+        {
+            // The JSON console provider remains available if the log directory cannot be written.
+        }
+        catch (JsonException)
+        {
+            // A serialization failure in this optional sink must not terminate the application.
         }
     }
 

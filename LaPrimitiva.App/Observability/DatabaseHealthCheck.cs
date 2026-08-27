@@ -31,7 +31,12 @@ public sealed class DatabaseHealthCheck(
         }
         catch (Exception exception)
         {
-            logger.LogError(exception, "Falló el health check de base de datos.");
+            logger.LogError(
+                exception,
+                "Falló {Operation} con {ErrorCode} y categoría {ErrorCategory}.",
+                "DatabaseHealthCheck",
+                "persistence.unavailable",
+                "PersistenceUnavailable");
             return HealthCheckResult.Unhealthy("La base de datos no está disponible.");
         }
     }

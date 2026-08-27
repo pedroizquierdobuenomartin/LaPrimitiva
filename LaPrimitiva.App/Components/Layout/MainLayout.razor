@@ -13,6 +13,7 @@
 @inject IDrawNotificationService NotificationService
 @inject ILocalStorageService LocalStorageService
 @inject ILogger<MainLayout> Logger
+@inject IApplicationErrorReporter ErrorReporter
 @implements IDisposable
 
 <div class="h-screen flex bg-[var(--brand-bg)] overflow-hidden font-sans relative">
@@ -647,7 +648,7 @@
         {
             if (!_disposed)
             {
-                Logger.LogError(ex, "Error al actualizar el layout tras un cambio de estado global.");
+                ErrorReporter.Report(ex, "MainLayout.RefreshFromGlobalState");
             }
         }
     }
@@ -714,7 +715,7 @@
         }
         else
         {
-            ShowFeedback(result.Error ?? "Error al guardar el sorteo.", true);
+            ShowFeedback(result.Error?.Message ?? "Error al guardar el sorteo.", true);
         }
     }
 
@@ -760,7 +761,7 @@
         {
             if (!_disposed)
             {
-                Logger.LogError(ex, "Error al ocultar el mensaje temporal del layout.");
+                ErrorReporter.Report(ex, "MainLayout.ClearFeedback");
             }
         }
     }

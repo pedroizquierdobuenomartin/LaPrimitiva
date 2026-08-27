@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using LaPrimitiva.Domain.Errors;
 
 namespace LaPrimitiva.Domain.Entities
 {
@@ -45,38 +46,41 @@ namespace LaPrimitiva.Domain.Entities
         {
             if (string.IsNullOrWhiteSpace(Name))
             {
-                throw new InvalidOperationException("El nombre del plan no puede estar vacío.");
+                throw new BusinessRuleException("plan.name.required", "El nombre del plan no puede estar vacío.");
             }
 
             if (EffectiveTo.HasValue && EffectiveFrom > EffectiveTo.Value)
             {
-                throw new InvalidOperationException("La fecha final no puede ser anterior a la fecha inicial.");
+                throw new BusinessRuleException("plan.period.invalid", "La fecha final no puede ser anterior a la fecha inicial.");
             }
 
             if (WeeksToTrackDefault < 0)
             {
-                throw new InvalidOperationException("El número de semanas a controlar no puede ser negativo.");
+                throw new BusinessRuleException("plan.weeks.negative", "El número de semanas a controlar no puede ser negativo.");
             }
 
             if (CostPerBet < 0)
             {
-                throw new InvalidOperationException("El coste por apuesta no puede ser negativo.");
+                throw new BusinessRuleException("plan.bet-cost.negative", "El coste por apuesta no puede ser negativo.");
             }
 
             if (BetsPerDraw is < MinBetsPerDraw or > MaxBetsPerDraw)
             {
-                throw new InvalidOperationException(
+                throw new BusinessRuleException(
+                    "plan.bets-per-draw.range",
                     $"Las apuestas por sorteo deben estar entre {MinBetsPerDraw} y {MaxBetsPerDraw}.");
             }
 
             if (JokerCostPerBet < 0)
             {
-                throw new InvalidOperationException("El coste de Joker no puede ser negativo.");
+                throw new BusinessRuleException("plan.joker-cost.negative", "El coste de Joker no puede ser negativo.");
             }
 
             if (!EnableJoker && JokerCostPerBet != 0)
             {
-                throw new InvalidOperationException("Un plan con Joker desactivado debe tener coste de Joker cero.");
+                throw new BusinessRuleException(
+                    "plan.joker.disabled-cost",
+                    "Un plan con Joker desactivado debe tener coste de Joker cero.");
             }
         }
     }

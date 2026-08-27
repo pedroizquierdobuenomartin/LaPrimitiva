@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using LaPrimitiva.Domain.Entities;
+using LaPrimitiva.Domain.Errors;
 using LaPrimitiva.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 
@@ -128,9 +129,9 @@ namespace LaPrimitiva.Infrastructure.Persistence.Seed
                     draw.Validate();
                     newDraws.Add(draw);
                 }
-                catch (Exception ex)
+                catch (BusinessRuleException exception)
                 {
-                    Console.WriteLine($"Error parsing line: {line}. {ex.Message}");
+                    Console.WriteLine($"Historical draw rejected by rule {exception.RuleCode}.");
                 }
             }
 

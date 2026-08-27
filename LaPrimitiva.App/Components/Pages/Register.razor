@@ -1,6 +1,7 @@
 @using LaPrimitiva.Domain.Localization
 @using LaPrimitiva.Domain.Entities
 @using LaPrimitiva.Domain.Exceptions
+@using LaPrimitiva.Domain.Errors
 @using LaPrimitiva.Application.Interfaces
 @using LaPrimitiva.Application.Services
 @using Microsoft.Extensions.Localization
@@ -9,6 +10,7 @@
 @inject IStringLocalizer<RegistrationResource> L
 @inject IStringLocalizer<GlobalResource> LG
 @inject ILogger<Register> Logger
+@inject IApplicationErrorReporter ErrorReporter
 @implements IDisposable
 @attribute [Microsoft.AspNetCore.Components.RouteAttribute(AppRoutes.Registration)]
 
@@ -643,7 +645,7 @@
         {
             if (!_disposed)
             {
-                Logger.LogError(ex, "Error al actualizar la interfaz del registro.");
+                ErrorReporter.Report(ex, "Register.RefreshUi");
             }
         }
     }
@@ -680,7 +682,7 @@
         {
             if (!_disposed)
             {
-                Logger.LogError(ex, "Error al recargar los datos del registro.");
+                ErrorReporter.Report(ex, "Register.RefreshData");
             }
         }
     }
@@ -908,17 +910,19 @@
         }
         catch (ConcurrencyConflictException ex)
         {
+            ErrorReporter.Report(ex, "SaveDraw");
             _hasConcurrencyConflict = true;
-            modalErrorMessage = ex.Message;
+            modalErrorMessage = ApplicationError.FromException(ex).Message;
         }
-        catch (InvalidOperationException ex)
+        catch (Exception ex) when (ex is IErrorException)
         {
-            modalErrorMessage = ex.Message;
+            ErrorReporter.Report(ex, "SaveDraw");
+            modalErrorMessage = ApplicationError.FromException(ex).Message;
         }
         catch (Exception ex)
         {
-            Logger.LogError(ex, "Falló la operación {Operation}.", "SaveDraw");
-            modalErrorMessage = "Ha ocurrido un error inesperado al guardar los cambios.";
+            var reference = ErrorReporter.Report(ex, "SaveDraw");
+            modalErrorMessage = $"Ha ocurrido un error inesperado al guardar los cambios. Referencia: {reference}.";
         }
     }
 

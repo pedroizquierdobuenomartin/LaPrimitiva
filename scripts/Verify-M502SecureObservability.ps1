@@ -35,7 +35,6 @@ if ($program -match 'report\.Entries') {
 
 $plan = Read-RepoFile 'mejoras/PLAN_DE_MEJORAS.md'
 Require-Match $plan '### \[x\] M-502 — Añadir observabilidad segura' 'El plan no marca M-502 como completado.'
-Require-Match $plan '### \[ \] M-503 — Revisar dependencias' 'Se avanzó indebidamente al hito M-503.'
 
 $correlation = Read-RepoFile 'LaPrimitiva.App/Observability/CorrelationIdMiddleware.cs'
 Require-Match $correlation 'context\.TraceIdentifier' 'La correlación no parte de un identificador generado por el servidor.'
@@ -48,7 +47,7 @@ Require-Match $fileLogger 'exception\?\.ToString\(\)' 'El log local no conserva 
 
 $databaseHealth = Read-RepoFile 'LaPrimitiva.App/Observability/DatabaseHealthCheck.cs'
 Require-Match $databaseHealth 'CreateDbContextAsync' 'El health check no usa un DbContext corto creado por factory.'
-Require-Match $databaseHealth 'LogError\(exception' 'El fallo técnico del health check no queda registrado con excepción completa.'
+Require-Match $databaseHealth 'LogError\(\s*exception' 'El fallo técnico del health check no queda registrado con excepción completa.'
 
 $rssClient = Read-RepoFile 'LaPrimitiva.Infrastructure/Services/RssClient.cs'
 Require-Match $rssClient 'LogInformation\(' 'La importación RSS no registra sus eventos operativos.'
@@ -66,7 +65,7 @@ foreach ($component in @(
     'LaPrimitiva.App/Components/Pages/Register.razor'
 )) {
     $source = Read-RepoFile $component
-    Require-Match $source 'Logger\.LogError\(ex' "$component no registra los errores inesperados con excepción completa."
+    Require-Match $source 'ErrorReporter\.Report\(ex' "$component no usa la frontera transversal para registrar errores inesperados."
 }
 
 $errorPage = Read-RepoFile 'LaPrimitiva.App/Components/Pages/Error.razor'

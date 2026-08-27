@@ -45,7 +45,7 @@ foreach ($relativePath in @(
     'LaPrimitiva.App/Components/Pages/Register.razor'
 )) {
     $content = Read-RepoFile $relativePath
-    foreach ($required in @('private bool _disposed;', 'if (_disposed)', '_disposed = true;', 'Logger.LogError')) {
+    foreach ($required in @('private bool _disposed;', 'if (_disposed)', '_disposed = true;', 'ErrorReporter.Report')) {
         if (-not $content.Contains($required)) {
             $failures.Add("$relativePath no protege o registra correctamente callbacks asíncronos: $required")
         }

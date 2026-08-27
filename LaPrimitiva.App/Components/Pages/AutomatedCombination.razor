@@ -3,9 +3,11 @@
 @using Microsoft.Extensions.Localization
 @using LaPrimitiva.Application.Interfaces
 @using LaPrimitiva.Application.DTOs
+@using LaPrimitiva.Application.Services
 @inject IStringLocalizer<CombinationResource> L
 @inject IAutomatedCombinationService CombinationService
 @inject ILogger<AutomatedCombination> Logger
+@inject IApplicationErrorReporter ErrorReporter
 
 <PageTitle>@L["Combination"] @L["Automated"] - La Primitiva Audit</PageTitle>
 
@@ -248,8 +250,8 @@
         }
         catch (Exception ex)
         {
-            Logger.LogError(ex, "Falló la operación {Operation}.", "AutomatedCombinationBacktest");
-            _backtestError = L["BacktestError"];
+            var reference = ErrorReporter.Report(ex, "AutomatedCombinationBacktest");
+            _backtestError = $"{L["BacktestError"]} Referencia: {reference}.";
         }
         finally
         {

@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using LaPrimitiva.Domain.Errors;
 
 namespace LaPrimitiva.Domain.Entities
 {
@@ -31,33 +32,45 @@ namespace LaPrimitiva.Domain.Entities
             var mainNumbers = GetMainNumbers();
             if (mainNumbers.Any(number => number is < MinimumNumber or > MaximumNumber))
             {
-                throw new InvalidOperationException($"Los números principales deben estar entre {MinimumNumber} y {MaximumNumber}.");
+                throw new BusinessRuleException(
+                    "winning-draw.main-numbers.range",
+                    $"Los números principales deben estar entre {MinimumNumber} y {MaximumNumber}.");
             }
 
             if (mainNumbers.Distinct().Count() != mainNumbers.Length)
             {
-                throw new InvalidOperationException("Los números principales no se pueden repetir.");
+                throw new BusinessRuleException(
+                    "winning-draw.main-numbers.unique",
+                    "Los números principales no se pueden repetir.");
             }
 
             if (Complementario is < MinimumNumber or > MaximumNumber)
             {
-                throw new InvalidOperationException($"El complementario debe estar entre {MinimumNumber} y {MaximumNumber}.");
+                throw new BusinessRuleException(
+                    "winning-draw.complementary.range",
+                    $"El complementario debe estar entre {MinimumNumber} y {MaximumNumber}.");
             }
 
             if (mainNumbers.Contains(Complementario))
             {
-                throw new InvalidOperationException("El complementario no puede repetir un número principal.");
+                throw new BusinessRuleException(
+                    "winning-draw.complementary.unique",
+                    "El complementario no puede repetir un número principal.");
             }
 
             if (Reintegro is < MinimumReintegro or > MaximumReintegro)
             {
-                throw new InvalidOperationException($"El reintegro debe estar entre {MinimumReintegro} y {MaximumReintegro}.");
+                throw new BusinessRuleException(
+                    "winning-draw.refund.range",
+                    $"El reintegro debe estar entre {MinimumReintegro} y {MaximumReintegro}.");
             }
 
             if (Joker is not null &&
                 (Joker.Length != JokerLength || Joker.Any(character => !char.IsAsciiDigit(character))))
             {
-                throw new InvalidOperationException($"El Joker debe contener exactamente {JokerLength} dígitos.");
+                throw new BusinessRuleException(
+                    "winning-draw.joker.format",
+                    $"El Joker debe contener exactamente {JokerLength} dígitos.");
             }
         }
 
@@ -68,7 +81,7 @@ namespace LaPrimitiva.Domain.Entities
                 Validate();
                 return true;
             }
-            catch (InvalidOperationException)
+            catch (BusinessRuleException)
             {
                 return false;
             }

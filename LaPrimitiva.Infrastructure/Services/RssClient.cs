@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using LaPrimitiva.Domain.Interfaces;
+using LaPrimitiva.Domain.Errors;
 using LaPrimitiva.Domain.Models;
 using Microsoft.Extensions.Logging;
 
@@ -88,19 +89,22 @@ namespace LaPrimitiva.Infrastructure.Services
                     (int)response.StatusCode);
                 return xml;
             }
+            catch (OperationCanceledException exception) when (!cancellationToken.IsCancellationRequested)
+            {
+                throw new ExternalServiceTimeoutException("SELAE", httpClient.Timeout, exception);
+            }
             catch (OperationCanceledException)
             {
                 throw;
             }
-            catch (InvalidDataException)
+            catch (InvalidDataException exception)
             {
                 logger.LogWarning("El feed RSS fue rechazado por los límites de seguridad. {Operation}", "RssImport");
-                throw;
+                throw new ExternalDataFormatException("SELAE", "rss.size-limit", exception);
             }
-            catch (Exception ex)
+            catch (HttpRequestException exception)
             {
-                // Rethrow the exception to be caught by DrawNotificationService
-                throw new Exception($"Error de red: {ex.Message}", ex);
+                throw new ExternalServiceUnavailableException("SELAE", exception);
             }
         }
 

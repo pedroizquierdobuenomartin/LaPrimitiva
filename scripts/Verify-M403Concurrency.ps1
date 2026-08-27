@@ -43,9 +43,12 @@ $repositories = @(
 foreach ($path in $repositories) {
     $content = Read-RepoFile $path
     Require-Match $content 'Property\(entity => entity\.RowVersion\)\.OriginalValue' "$path no compara el token recibido con el persistido."
-    Require-Match $content 'DbUpdateConcurrencyException' "$path no traduce el conflicto de EF Core."
+    Require-Match $content 'PersistenceExceptionTranslator\.ExecuteAsync' "$path no delega la traducción transversal de persistencia."
     Require-Match $content 'ConcurrencyConflictException' "$path no expone un conflicto comprensible a la UI."
 }
+$persistenceTranslator = Read-RepoFile 'LaPrimitiva.Infrastructure/Persistence/PersistenceExceptionTranslator.cs'
+Require-Match $persistenceTranslator 'DbUpdateConcurrencyException' 'La traducción transversal no reconoce el conflicto de EF Core.'
+Require-Match $persistenceTranslator 'ConcurrencyConflictException' 'La traducción transversal no conserva el contrato M-403.'
 
 $pages = @(
     'LaPrimitiva.App/Components/Pages/Plans.razor',

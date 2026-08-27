@@ -6,6 +6,7 @@ using LaPrimitiva.Domain.Interfaces;
 using LaPrimitiva.Application.Services;
 using LaPrimitiva.Application.Interfaces;
 using LaPrimitiva.Domain.Models;
+using LaPrimitiva.Domain.Errors;
 
 namespace LaPrimitiva.Application.Services
 {
@@ -34,16 +35,14 @@ namespace LaPrimitiva.Application.Services
                 var xml = await rssClient.GetRssXmlAsync(timeoutSource.Token);
                 if (string.IsNullOrEmpty(xml))
                 {
-                    globalState.LastError = "Error: El servidor de Loterías y Apuestas (SELAE) bloqueó la solicitud (403 Forbidden).";
-                    return;
+                    throw new ExternalDataFormatException("SELAE", "rss.empty");
                 }
 
                 var parsedDraws = await rssParser.ParseRssAsync(xml, timeoutSource.Token);
                 var rssDraws = parsedDraws.OrderByDescending(d => d.Date).ToList();
                 if (!rssDraws.Any())
                 {
-                    globalState.LastError = "Error: No se pudieron encontrar sorteos en el feed de SELAE.";
-                    return;
+                    throw new ExternalDataFormatException("SELAE", "rss.no-valid-items");
                 }
 
                 // Filter draws by the latest historical date in database
@@ -58,19 +57,25 @@ namespace LaPrimitiva.Application.Services
                 globalState.RecentDraws = rssDraws.Take(10).ToList();
                 globalState.NewDrawsCount = globalState.RecentDraws.Count;
             }
-            catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested)
+            catch (OperationCanceledException exception) when (!cancellationToken.IsCancellationRequested)
             {
-                globalState.LastError =
-                    $"Error: La sincronización RSS superó el límite de {RssFeedLimits.Timeout.TotalSeconds:0} segundos.";
+                var timeout = new ExternalServiceTimeoutException("SELAE", RssFeedLimits.Timeout, exception);
+                errorReporter.Report(timeout, "RssImport");
+                globalState.LastError = ApplicationError.FromException(timeout).Message;
             }
             catch (OperationCanceledException)
             {
                 throw;
             }
-            catch (Exception ex)
+            catch (Exception ex) when (ex is IErrorException)
             {
                 errorReporter.Report(ex, "RssImport");
-                globalState.LastError = "No se pudieron sincronizar los sorteos. Inténtalo de nuevo más tarde.";
+                globalState.LastError = ApplicationError.FromException(ex).Message;
+            }
+            catch (Exception ex)
+            {
+                var reference = errorReporter.Report(ex, "RssImport");
+                globalState.LastError = $"{ApplicationError.FromException(ex).Message} Referencia: {reference}.";
             }
             finally
             {

@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using LaPrimitiva.Application.Services;
 using LaPrimitiva.Domain.Models;
+using LaPrimitiva.Domain.Errors;
 using Xunit;
 
 namespace LaPrimitiva.Tests
@@ -39,13 +40,11 @@ namespace LaPrimitiva.Tests
         }
 
         [Fact]
-        public async Task ParseRss_WithEmptyXml_ReturnsEmptyList()
+        public async Task ParseRss_WithEmptyXml_ReportsInvalidExternalFormat()
         {
-            var results = await _service.ParseRssAsync(
+            await Assert.ThrowsAsync<ExternalDataFormatException>(() => _service.ParseRssAsync(
                 @"<rss version=""2.0""><channel></channel></rss>",
-                TestContext.Current.CancellationToken);
-
-            Assert.Empty(results);
+                TestContext.Current.CancellationToken));
         }
 
         [Theory]
@@ -62,38 +61,31 @@ namespace LaPrimitiva.Tests
         }
 
         [Fact]
-        public async Task ParseRss_WithIncompleteItem_SkipsItem()
+        public async Task ParseRss_WithIncompleteItem_ReportsInvalidExternalFormat()
         {
             var xmlContent = BuildXml(
                 "<b>04 - 05 - 13 - 29 - 30 - 36</b> Complementario: <b>C(09)</b>");
 
-            var results = await _service.ParseRssAsync(xmlContent, TestContext.Current.CancellationToken);
-
-            Assert.Empty(results);
+            await Assert.ThrowsAsync<ExternalDataFormatException>(
+                () => _service.ParseRssAsync(xmlContent, TestContext.Current.CancellationToken));
         }
 
         [Fact]
-        public async Task ParseRss_WithMalformedDraw_SkipsItemWithoutThrowingDuringMaterialization()
+        public async Task ParseRss_WithMalformedDraw_ReportsInvalidExternalFormat()
         {
             var xmlContent = BuildXml(
                 "<b>04-XX-13-29-30-36</b> Complementario: <b>C(09)</b> Reintegro: <b>R(4)</b>");
 
-            IReadOnlyList<RssDraw>? results = null;
-            var exception = await Record.ExceptionAsync(
-                async () => results = await _service.ParseRssAsync(xmlContent, TestContext.Current.CancellationToken));
-
-            Assert.Null(exception);
-            Assert.Empty(results!);
+            await Assert.ThrowsAsync<ExternalDataFormatException>(
+                () => _service.ParseRssAsync(xmlContent, TestContext.Current.CancellationToken));
         }
 
         [Fact]
-        public async Task ParseRss_WithMalformedXml_ReturnsEmptyList()
+        public async Task ParseRss_WithMalformedXml_ReportsInvalidExternalFormat()
         {
-            var results = await _service.ParseRssAsync(
+            await Assert.ThrowsAsync<ExternalDataFormatException>(() => _service.ParseRssAsync(
                 "<rss><channel><item>",
-                TestContext.Current.CancellationToken);
-
-            Assert.Empty(results);
+                TestContext.Current.CancellationToken));
         }
 
         [Fact]

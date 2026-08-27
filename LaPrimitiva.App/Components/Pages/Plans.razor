@@ -3,6 +3,8 @@
 @using LaPrimitiva.Application.DTOs
 @using LaPrimitiva.Domain.Entities
 @using LaPrimitiva.Domain.Exceptions
+@using LaPrimitiva.Domain.Errors
+@using LaPrimitiva.Application.Interfaces
 @using Microsoft.Extensions.Localization
 @using LaPrimitiva.Domain.Localization
 @inject IStringLocalizer<PlansResource> L
@@ -12,6 +14,7 @@
 @inject NavigationManager Nav
 @inject IJSRuntime JS
 @inject ILogger<Plans> Logger
+@inject IApplicationErrorReporter ErrorReporter
 @implements IDisposable
 
 <PageTitle>@L["Plans"] - La Primitiva Audit</PageTitle>
@@ -395,7 +398,7 @@
         {
             if (!_disposed)
             {
-                Logger.LogError(ex, "Error al recargar los planes tras un cambio de estado global.");
+                ErrorReporter.Report(ex, "Plans.RefreshFromGlobalState");
             }
         }
     }
@@ -484,17 +487,19 @@
         }
         catch (ConcurrencyConflictException ex)
         {
+            ErrorReporter.Report(ex, "SavePlan");
             _hasConcurrencyConflict = true;
-            errorMessage = ex.Message;
+            errorMessage = ApplicationError.FromException(ex).Message;
         }
-        catch (InvalidOperationException ex)
+        catch (Exception ex) when (ex is IErrorException)
         {
-            errorMessage = ex.Message;
+            ErrorReporter.Report(ex, "SavePlan");
+            errorMessage = ApplicationError.FromException(ex).Message;
         }
         catch (Exception ex)
         {
-            Logger.LogError(ex, "Falló la operación {Operation}.", "SavePlan");
-            errorMessage = L["SavePlanError"];
+            var reference = ErrorReporter.Report(ex, "SavePlan");
+            errorMessage = $"{L["SavePlanError"]} Referencia: {reference}.";
         }
     }
 
@@ -552,15 +557,16 @@
             _hasLinkedDraws = false;
             await LoadData();
         }
-        catch (InvalidOperationException ex)
+        catch (Exception ex) when (ex is IErrorException)
         {
-            _deleteErrorMessage = ex.Message;
+            ErrorReporter.Report(ex, "DeletePlan");
+            _deleteErrorMessage = ApplicationError.FromException(ex).Message;
             _hasLinkedDraws = true; // Refresh state if backend rejected it
         }
         catch (Exception ex)
         {
-            Logger.LogError(ex, "Falló la operación {Operation}.", "DeletePlan");
-            _deleteErrorMessage = L["UnexpectedDeleteError"];
+            var reference = ErrorReporter.Report(ex, "DeletePlan");
+            _deleteErrorMessage = $"{L["UnexpectedDeleteError"]} Referencia: {reference}.";
         }
     }
 

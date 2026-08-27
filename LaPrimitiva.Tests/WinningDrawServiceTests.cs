@@ -54,7 +54,7 @@ namespace LaPrimitiva.Tests
 
             // Assert
             Assert.False(result.IsSuccess);
-            Assert.Equal("Ya existe un sorteo para la fecha especificada.", result.Error);
+            Assert.Equal("Ya existe un sorteo para la fecha especificada.", result.Error?.Message);
         }
 
         [Fact]
@@ -98,7 +98,7 @@ namespace LaPrimitiva.Tests
 
             // Assert
             Assert.False(result.IsSuccess);
-            Assert.Contains("no se pueden repetir", result.Error);
+            Assert.Contains("no se pueden repetir", result.Error?.Message);
         }
 
         [Fact]
@@ -167,7 +167,7 @@ namespace LaPrimitiva.Tests
 
             // Assert
             Assert.False(result.IsSuccess);
-            Assert.Equal("Ya existe un sorteo para la fecha especificada.", result.Error);
+            Assert.Equal("Ya existe un sorteo para la fecha especificada.", result.Error?.Message);
         }
 
         [Theory]

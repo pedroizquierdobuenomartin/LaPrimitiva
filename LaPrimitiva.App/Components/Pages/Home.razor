@@ -10,6 +10,7 @@
 @inject IStringLocalizer<DashboardResource> L
 @inject IStringLocalizer<GlobalResource> LG
 @inject ILogger<Home> Logger
+@inject IApplicationErrorReporter ErrorReporter
 @implements IDisposable
 
 <PageTitle>@L["Dashboard"] - La Primitiva Audit</PageTitle>
@@ -164,7 +165,7 @@
         {
             if (!_disposed)
             {
-                Logger.LogError(ex, "Error al actualizar la interfaz del dashboard.");
+                ErrorReporter.Report(ex, "Dashboard.RefreshUi");
             }
         }
     }
@@ -206,7 +207,7 @@
         {
             if (!_disposed)
             {
-                Logger.LogError(ex, "Error al recargar los datos del dashboard.");
+                ErrorReporter.Report(ex, "Dashboard.RefreshData");
             }
         }
     }

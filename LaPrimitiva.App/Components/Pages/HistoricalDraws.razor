@@ -4,10 +4,12 @@
 @using LaPrimitiva.Application.Services
 @using LaPrimitiva.Domain.Localization
 @using LaPrimitiva.Domain.Exceptions
+@using LaPrimitiva.Domain.Errors
 @using Microsoft.Extensions.Localization
 @inject IWinningDrawService WinningDrawService
 @inject IStringLocalizer<HistoricalResource> L
 @inject IStringLocalizer<GlobalResource> LG
+@inject IApplicationErrorReporter ErrorReporter
 
 <PageTitle>@L["Historical"] - La Primitiva Audit</PageTitle>
 
@@ -376,8 +378,21 @@
         }
         catch (ConcurrencyConflictException exception)
         {
+            ErrorReporter.Report(exception, "SaveWinningDraw");
             _hasConcurrencyConflict = true;
-            _errorMessage = exception.Message;
+            _errorMessage = ApplicationError.FromException(exception).Message;
+            return;
+        }
+        catch (Exception exception) when (exception is IErrorException)
+        {
+            ErrorReporter.Report(exception, "SaveWinningDraw");
+            _errorMessage = ApplicationError.FromException(exception).Message;
+            return;
+        }
+        catch (Exception exception)
+        {
+            var reference = ErrorReporter.Report(exception, "SaveWinningDraw");
+            _errorMessage = $"Ha ocurrido un error inesperado al guardar el sorteo. Referencia: {reference}.";
             return;
         }
 
@@ -388,7 +403,7 @@
         }
         else
         {
-            _errorMessage = result.Error;
+            _errorMessage = result.Error?.Message;
         }
     }
 

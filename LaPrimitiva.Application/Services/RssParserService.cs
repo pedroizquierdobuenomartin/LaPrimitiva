@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Linq;
 using LaPrimitiva.Domain.Interfaces;
+using LaPrimitiva.Domain.Errors;
 using LaPrimitiva.Domain.Models;
 
 namespace LaPrimitiva.Application.Services
@@ -20,7 +21,7 @@ namespace LaPrimitiva.Application.Services
             CancellationToken cancellationToken = default)
         {
             if (string.IsNullOrWhiteSpace(xmlContent))
-                return Array.Empty<RssDraw>();
+                throw new ExternalDataFormatException("SELAE", "rss.empty");
 
             try
             {
@@ -54,15 +55,32 @@ namespace LaPrimitiva.Application.Services
                         draws.Add(draw);
                 }
 
+                if (draws.Count == 0)
+                {
+                    throw new ExternalDataFormatException("SELAE", "rss.no-valid-items");
+                }
+
                 return draws;
             }
             catch (OperationCanceledException)
             {
                 throw;
             }
-            catch
+            catch (ExternalDataFormatException)
             {
-                return Array.Empty<RssDraw>();
+                throw;
+            }
+            catch (XmlException exception)
+            {
+                throw new ExternalDataFormatException("SELAE", "rss.invalid-xml", exception);
+            }
+            catch (FormatException exception)
+            {
+                throw new ExternalDataFormatException("SELAE", "rss.invalid-value", exception);
+            }
+            catch (OverflowException exception)
+            {
+                throw new ExternalDataFormatException("SELAE", "rss.value-out-of-range", exception);
             }
         }
 

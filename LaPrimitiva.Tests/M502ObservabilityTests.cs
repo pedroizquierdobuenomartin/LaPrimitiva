@@ -76,7 +76,7 @@ public class M502ObservabilityTests
         })
         {
             var source = ReadRepoFile(relativePath);
-            Assert.Contains("Logger.LogError(ex", source);
+            Assert.Contains("ErrorReporter.Report(ex", source);
         }
 
         var errorPage = ReadRepoFile("LaPrimitiva.App/Components/Pages/Error.razor");

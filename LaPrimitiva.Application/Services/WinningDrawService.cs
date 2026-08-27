@@ -7,6 +7,7 @@ using LaPrimitiva.Application.Interfaces;
 using LaPrimitiva.Domain.Entities;
 using LaPrimitiva.Domain.Repositories;
 using LaPrimitiva.Domain.Models;
+using LaPrimitiva.Domain.Errors;
 
 namespace LaPrimitiva.Application.Services
 {
@@ -45,7 +46,10 @@ namespace LaPrimitiva.Application.Services
             var exists = await _repository.AnyAsync(d => d.DrawDate.Date == dto.DrawDate.Date);
             if (exists)
             {
-                return Result<WinningDrawDto>.Failure("Ya existe un sorteo para la fecha especificada.");
+                return Result<WinningDrawDto>.Failure(ApplicationError.FromException(
+                    new DataIntegrityException(
+                        "winning-draw.date.duplicate",
+                        "Ya existe un sorteo para la fecha especificada.")));
             }
 
             await _repository.CreateAsync(entity);
@@ -62,7 +66,10 @@ namespace LaPrimitiva.Application.Services
             var exists = await _repository.AnyAsync(d => d.DrawDate.Date == dto.DrawDate.Date && d.Id != dto.Id);
             if (exists)
             {
-                return Result.Failure("Ya existe otro sorteo para la fecha especificada.");
+                return Result.Failure(ApplicationError.FromException(
+                    new DataIntegrityException(
+                        "winning-draw.date.duplicate",
+                        "Ya existe otro sorteo para la fecha especificada.")));
             }
 
             await _repository.UpdateAsync(entity);
@@ -77,9 +84,9 @@ namespace LaPrimitiva.Application.Services
                 draw.Validate();
                 return Result.Success();
             }
-            catch (InvalidOperationException exception)
+            catch (BusinessRuleException exception)
             {
-                return Result.Failure(exception.Message);
+                return Result.Failure(ApplicationError.FromException(exception));
             }
         }
 

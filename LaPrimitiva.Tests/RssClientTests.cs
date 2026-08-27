@@ -2,6 +2,7 @@ using System.IO;
 using System.Net;
 using System.Net.Http;
 using System.Threading;
+using LaPrimitiva.Domain.Errors;
 using LaPrimitiva.Domain.Models;
 using LaPrimitiva.Infrastructure.Services;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -20,7 +21,7 @@ namespace LaPrimitiva.Tests
                 })));
             var client = CreateClient(httpClient);
 
-            await Assert.ThrowsAsync<InvalidDataException>(
+            await Assert.ThrowsAsync<ExternalDataFormatException>(
                 () => client.GetRssXmlAsync(TestContext.Current.CancellationToken));
         }
 
@@ -34,7 +35,7 @@ namespace LaPrimitiva.Tests
                 })));
             var client = CreateClient(httpClient);
 
-            await Assert.ThrowsAsync<InvalidDataException>(
+            await Assert.ThrowsAsync<ExternalDataFormatException>(
                 () => client.GetRssXmlAsync(TestContext.Current.CancellationToken));
         }
 

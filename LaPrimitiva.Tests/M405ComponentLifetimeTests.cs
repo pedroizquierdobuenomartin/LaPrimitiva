@@ -51,7 +51,7 @@ public class M405ComponentLifetimeTests
         Assert.Contains("private bool _disposed;", source);
         Assert.Contains("if (_disposed)", source);
         Assert.Contains("_disposed = true;", source);
-        Assert.Contains("Logger.LogError", source);
+        Assert.Contains("ErrorReporter.Report", source);
     }
 
     private static string ReadRepoFile(string relativePath) =>

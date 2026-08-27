@@ -23,13 +23,17 @@ namespace LaPrimitiva.Infrastructure.Repositories
             await using var context = await _contextFactory.CreateDbContextAsync();
             var query = context.DrawRecords.AsNoTracking();
             if (predicate != null) query = query.Where(predicate);
-            return await query.ToListAsync();
+            return await PersistenceExceptionTranslator.ExecuteAsync(
+                () => query.ToListAsync(),
+                "Draw.List");
         }
 
         public async Task<bool> AnyAsync(Expression<Func<DrawRecord, bool>> predicate)
         {
             await using var context = await _contextFactory.CreateDbContextAsync();
-            return await context.DrawRecords.AnyAsync(predicate);
+            return await PersistenceExceptionTranslator.ExecuteAsync(
+                () => context.DrawRecords.AnyAsync(predicate),
+                "Draw.Exists");
         }
 
         public async Task CreateRangeAsync(IEnumerable<DrawRecord> draws)
@@ -42,7 +46,9 @@ namespace LaPrimitiva.Infrastructure.Repositories
             }
 
             await context.DrawRecords.AddRangeAsync(drawList);
-            await context.SaveChangesAsync();
+            await PersistenceExceptionTranslator.ExecuteAsync(
+                () => context.SaveChangesAsync(),
+                "Draw.CreateRange");
         }
 
         public async Task UpdateAsync(DrawRecord draw)
@@ -59,9 +65,11 @@ namespace LaPrimitiva.Infrastructure.Repositories
             await using var context = await _contextFactory.CreateDbContextAsync();
             var disconnectedDraws = draws.ToList();
             var drawIds = disconnectedDraws.Select(draw => draw.Id).ToList();
-            var trackedDraws = await context.DrawRecords
-                .Where(draw => drawIds.Contains(draw.Id))
-                .ToDictionaryAsync(draw => draw.Id);
+            var trackedDraws = await PersistenceExceptionTranslator.ExecuteAsync(
+                () => context.DrawRecords
+                    .Where(draw => drawIds.Contains(draw.Id))
+                    .ToDictionaryAsync(draw => draw.Id),
+                "Draw.GetRangeForUpdate");
 
             var missingId = drawIds
                 .Where(id => !trackedDraws.ContainsKey(id))
@@ -84,22 +92,30 @@ namespace LaPrimitiva.Infrastructure.Repositories
         public async Task DeleteAsync(Guid id)
         {
             await using var context = await _contextFactory.CreateDbContextAsync();
-            await context.DrawRecords
-                .Where(d => d.Id == id)
-                .ExecuteDeleteAsync();
+            await PersistenceExceptionTranslator.ExecuteAsync(
+                () => context.DrawRecords
+                    .Where(d => d.Id == id)
+                    .ExecuteDeleteAsync(),
+                "Draw.Delete",
+                id);
         }
 
         public async Task DeleteRangeAsync(Expression<Func<DrawRecord, bool>> predicate)
         {
             await using var context = await _contextFactory.CreateDbContextAsync();
-            await context.DrawRecords
-                .Where(predicate)
-                .ExecuteDeleteAsync();
+            await PersistenceExceptionTranslator.ExecuteAsync(
+                () => context.DrawRecords
+                    .Where(predicate)
+                    .ExecuteDeleteAsync(),
+                "Draw.DeleteRange");
         }
 
         private static async Task<DrawRecord> GetTrackedDrawAsync(PrimitivaDbContext context, Guid id)
         {
-            return await context.DrawRecords.SingleOrDefaultAsync(draw => draw.Id == id)
+            return await PersistenceExceptionTranslator.ExecuteAsync(
+                () => context.DrawRecords.SingleOrDefaultAsync(draw => draw.Id == id),
+                "Draw.GetForUpdate",
+                id)
                 ?? throw new ConcurrencyConflictException(id);
         }
 
@@ -124,14 +140,10 @@ namespace LaPrimitiva.Infrastructure.Repositories
 
         private static async Task SaveChangesAsync(PrimitivaDbContext context, Guid entityId)
         {
-            try
-            {
-                await context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException exception)
-            {
-                throw new ConcurrencyConflictException(entityId, exception);
-            }
+            await PersistenceExceptionTranslator.ExecuteAsync(
+                () => context.SaveChangesAsync(),
+                "Draw.Update",
+                entityId);
         }
     }
 }

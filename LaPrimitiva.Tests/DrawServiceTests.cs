@@ -179,7 +179,7 @@ namespace LaPrimitiva.Tests
         {
             var plan = new Plan { Id = Guid.NewGuid(), Name = "Plan 2026" };
 
-            Assert.Throws<InvalidOperationException>(() =>
+            Assert.Throws<ArgumentOutOfRangeException>(() =>
                 _service.CreateDrawTemplate(plan, 2026, 1, DayOfWeek.Tuesday));
         }
 

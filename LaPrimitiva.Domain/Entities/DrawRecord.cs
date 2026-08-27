@@ -1,4 +1,5 @@
 using System;
+using LaPrimitiva.Domain.Errors;
 using LaPrimitiva.Domain.Services;
 
 namespace LaPrimitiva.Domain.Entities
@@ -68,7 +69,9 @@ namespace LaPrimitiva.Domain.Entities
             {
                 if (Plan is null)
                 {
-                    throw new InvalidOperationException("No se pueden actualizar los costes sin un plan asociado.");
+                    throw new BusinessRuleException(
+                        "draw.plan.required-for-cost-refresh",
+                        "No se pueden actualizar los costes sin un plan asociado.");
                 }
 
                 Plan.Validate();

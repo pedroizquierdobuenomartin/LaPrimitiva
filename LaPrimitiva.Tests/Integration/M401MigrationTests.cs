@@ -19,12 +19,14 @@ public sealed class M401MigrationTests
         {
             await using var context = CreateContext(connectionString);
 
-            await context.Database.MigrateAsync();
+            await context.Database.MigrateAsync(TestContext.Current.CancellationToken);
 
-            var applied = (await context.Database.GetAppliedMigrationsAsync()).ToArray();
+            var applied = (await context.Database.GetAppliedMigrationsAsync(TestContext.Current.CancellationToken)).ToArray();
             var defined = context.Database.GetMigrations().ToArray();
             Assert.Equal(defined, applied);
-            Assert.True(await context.Database.SqlQuery<int>($"SELECT COUNT(*) AS [Value] FROM sys.tables WHERE [name] IN ('Plans', 'DrawRecords', 'WinningDraws')").SingleAsync() == 3);
+            Assert.True(await context.Database
+                .SqlQuery<int>($"SELECT COUNT(*) AS [Value] FROM sys.tables WHERE [name] IN ('Plans', 'DrawRecords', 'WinningDraws')")
+                .SingleAsync(TestContext.Current.CancellationToken) == 3);
         }
         finally
         {
@@ -66,20 +68,20 @@ public sealed class M401MigrationTests
             {
                 // EnsureCreated reproduces the former startup-created schema: current
                 // tables exist, contain data and have no __EFMigrationsHistory rows.
-                await legacyContext.Database.EnsureCreatedAsync();
+                await legacyContext.Database.EnsureCreatedAsync(TestContext.Current.CancellationToken);
                 legacyContext.AddRange(plan, winningDraw);
-                await legacyContext.SaveChangesAsync();
+                await legacyContext.SaveChangesAsync(TestContext.Current.CancellationToken);
             }
 
             await using (var migratedContext = CreateContext(connectionString))
             {
-                await migratedContext.Database.MigrateAsync();
+                await migratedContext.Database.MigrateAsync(TestContext.Current.CancellationToken);
 
                 var defined = migratedContext.Database.GetMigrations().ToArray();
-                var applied = (await migratedContext.Database.GetAppliedMigrationsAsync()).ToArray();
+                var applied = (await migratedContext.Database.GetAppliedMigrationsAsync(TestContext.Current.CancellationToken)).ToArray();
                 Assert.Equal(defined, applied);
-                Assert.Equal("Plan conservado", (await migratedContext.Plans.SingleAsync()).Name);
-                Assert.Equal("0123456", (await migratedContext.WinningDraws.SingleAsync()).Joker);
+                Assert.Equal("Plan conservado", (await migratedContext.Plans.SingleAsync(TestContext.Current.CancellationToken)).Name);
+                Assert.Equal("0123456", (await migratedContext.WinningDraws.SingleAsync(TestContext.Current.CancellationToken)).Joker);
             }
         }
         finally
@@ -100,7 +102,7 @@ public sealed class M401MigrationTests
             await using (var previousVersionContext = CreateContext(connectionString))
             {
                 var migrator = previousVersionContext.GetService<IMigrator>();
-                await migrator.MigrateAsync(PreviousReleaseMigration);
+                await migrator.MigrateAsync(PreviousReleaseMigration, TestContext.Current.CancellationToken);
 
                 await previousVersionContext.Database.ExecuteSqlInterpolatedAsync($@"
                     INSERT INTO [Plans] (
@@ -112,20 +114,23 @@ public sealed class M401MigrationTests
                         {planId}, {"Plan de versión anterior"}, {new DateTime(2026, 1, 1)}, NULL,
                         {52}, {1m}, {1},
                         {false}, {0m}, NULL,
-                        {createdAt}, {createdAt});");
+                        {createdAt}, {createdAt});",
+                    TestContext.Current.CancellationToken);
             }
 
             await using (var currentVersionContext = CreateContext(connectionString))
             {
-                await currentVersionContext.Database.MigrateAsync();
+                await currentVersionContext.Database.MigrateAsync(TestContext.Current.CancellationToken);
 
-                var plan = await currentVersionContext.Plans.SingleAsync(candidate => candidate.Id == planId);
+                var plan = await currentVersionContext.Plans.SingleAsync(
+                    candidate => candidate.Id == planId,
+                    TestContext.Current.CancellationToken);
                 Assert.Equal("Plan de versión anterior", plan.Name);
                 Assert.Equal(createdAt, plan.CreatedAt);
                 Assert.NotEmpty(plan.RowVersion);
 
                 var defined = currentVersionContext.Database.GetMigrations().ToArray();
-                var applied = (await currentVersionContext.Database.GetAppliedMigrationsAsync()).ToArray();
+                var applied = (await currentVersionContext.Database.GetAppliedMigrationsAsync(TestContext.Current.CancellationToken)).ToArray();
                 Assert.Equal(defined, applied);
             }
         }

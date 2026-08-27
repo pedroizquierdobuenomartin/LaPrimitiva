@@ -1,0 +1,40 @@
+name: Dependency audit
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '**/*.csproj'
+      - '.github/workflows/dependency-audit.yml'
+      - 'scripts/Verify-M503Dependencies.ps1'
+  pull_request:
+    paths:
+      - '**/*.csproj'
+      - '.github/workflows/dependency-audit.yml'
+      - 'scripts/Verify-M503Dependencies.ps1'
+  schedule:
+    - cron: '17 6 * * 1'
+
+permissions:
+  contents: read
+
+jobs:
+  dependency-audit:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 10
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Restore dependencies
+        shell: pwsh
+        run: dotnet restore LaPrimitiva.sln
+
+      - name: Check alignment, vulnerabilities and obsolescence
+        shell: pwsh
+        run: ./scripts/Verify-M503Dependencies.ps1

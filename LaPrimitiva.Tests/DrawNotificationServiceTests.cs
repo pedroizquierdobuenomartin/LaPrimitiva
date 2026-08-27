@@ -23,16 +23,16 @@ namespace LaPrimitiva.Tests
                 new GlobalState(),
                 Mock.Of<IApplicationErrorReporter>());
 
-            var firstUpdate = service.CheckForNewDrawsAsync();
-            await rssClient.Started.Task.WaitAsync(TimeSpan.FromSeconds(1));
+            var firstUpdate = service.CheckForNewDrawsAsync(TestContext.Current.CancellationToken);
+            await rssClient.Started.Task.WaitAsync(TimeSpan.FromSeconds(1), TestContext.Current.CancellationToken);
 
-            var secondUpdate = service.CheckForNewDrawsAsync();
-            await secondUpdate.WaitAsync(TimeSpan.FromSeconds(1));
+            var secondUpdate = service.CheckForNewDrawsAsync(TestContext.Current.CancellationToken);
+            await secondUpdate.WaitAsync(TimeSpan.FromSeconds(1), TestContext.Current.CancellationToken);
 
             Assert.Equal(1, rssClient.SendCount);
 
             rssClient.Release.TrySetResult();
-            await firstUpdate.WaitAsync(TimeSpan.FromSeconds(1));
+            await firstUpdate.WaitAsync(TimeSpan.FromSeconds(1), TestContext.Current.CancellationToken);
         }
 
         private sealed class BlockingRssClient : IRssClient

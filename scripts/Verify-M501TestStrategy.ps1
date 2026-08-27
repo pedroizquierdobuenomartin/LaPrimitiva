@@ -50,8 +50,17 @@ foreach ($coverageItem in @(
 
 Require-Match $strategy 'FullyQualifiedName!~Integration' 'La estrategia no separa la suite rápida de la integración SQL.'
 Require-Match $strategy 'FullyQualifiedName~Integration' 'La estrategia no ofrece un comando exclusivo para integración SQL.'
+Require-Match $strategy 'dotnet test --project' 'La estrategia debe usar la sintaxis MTP de .NET 10 para seleccionar el proyecto.'
+Require-Match $strategy 'dotnet test --solution \./LaPrimitiva\.sln' 'La estrategia debe ofrecer el cierre completo de la solución mediante la sintaxis MTP.'
 Require-Match $strategy 'LAPRIMITIVA_INTEGRATION_TEST_CONNECTION' 'La estrategia no documenta la conexión de integración configurable.'
 Require-Match $strategy '_IntegrationTests' 'La estrategia no conserva el sufijo de seguridad de la base de pruebas.'
+
+if ($strategy -match '(?m)^dotnet test[^\r\n]*--nologo') {
+    $failures.Add('La estrategia no debe reenviar --nologo al host Microsoft.Testing.Platform.')
+}
+if ($strategy -match '(?m)^dotnet test[^\r\n]*--verbosity') {
+    $failures.Add('La estrategia no debe usar la opción VSTest --verbosity con Microsoft.Testing.Platform.')
+}
 
 $readme = Read-RepoFile 'README.md'
 Require-Match $readme 'ESTRATEGIA_PRUEBAS_M501\.md' 'README no enlaza la estrategia de pruebas vigente.'

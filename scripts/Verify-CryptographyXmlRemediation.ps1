@@ -16,8 +16,8 @@ $cryptographyReference = @(
     @($projectXml.Project.ItemGroup.PackageReference) |
         Where-Object { $_.Include -eq 'System.Security.Cryptography.Xml' }
 )
-if ($cryptographyReference.Count -ne 1 -or $cryptographyReference[0].Version -ne '9.0.19') {
-    throw 'Infrastructure debe fijar una única referencia a System.Security.Cryptography.Xml 9.0.19.'
+if ($cryptographyReference.Count -ne 1 -or $cryptographyReference[0].Version -ne '10.0.11') {
+    throw 'Infrastructure debe fijar una única referencia a System.Security.Cryptography.Xml 10.0.11.'
 }
 
 if ($cryptographyReference[0].PrivateAssets -ne 'all') {
@@ -34,7 +34,7 @@ foreach ($assetsFile in $assetsFiles) {
         ForEach-Object { $_.Groups[1].Value } |
         Sort-Object -Unique
 
-    $unexpectedVersions = @($resolvedVersions | Where-Object { $_ -ne '9.0.19' })
+    $unexpectedVersions = @($resolvedVersions | Where-Object { $_ -ne '10.0.11' })
     if ($unexpectedVersions.Count -gt 0) {
         throw "'$($assetsFile.FullName)' resuelve versiones no autorizadas de Cryptography.Xml: $($unexpectedVersions -join ', ')."
     }

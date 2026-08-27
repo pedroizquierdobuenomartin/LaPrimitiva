@@ -15,9 +15,10 @@ public class WinningDrawRepositoryTests
         var draw = CreateValidDraw();
         draw.Number6 = 50;
 
-        await Assert.ThrowsAsync<InvalidOperationException>(() => repository.CreateAsync(draw));
+        await Assert.ThrowsAsync<InvalidOperationException>(
+            () => repository.CreateAsync(draw));
 
-        await using var context = await factory.CreateDbContextAsync();
+        await using var context = await factory.CreateDbContextAsync(TestContext.Current.CancellationToken);
         Assert.Empty(context.WinningDraws);
     }
 
@@ -26,18 +27,21 @@ public class WinningDrawRepositoryTests
     {
         var factory = CreateFactory();
         var repository = new WinningDrawRepository(factory);
-        await using var context = await factory.CreateDbContextAsync();
+        await using var context = await factory.CreateDbContextAsync(TestContext.Current.CancellationToken);
         var draw = CreateValidDraw();
         context.WinningDraws.Add(draw);
-        await context.SaveChangesAsync();
+        await context.SaveChangesAsync(TestContext.Current.CancellationToken);
         context.ChangeTracker.Clear();
         var invalidUpdate = CreateValidDraw();
         invalidUpdate.Id = draw.Id;
         invalidUpdate.Reintegro = 10;
 
-        await Assert.ThrowsAsync<InvalidOperationException>(() => repository.UpdateAsync(invalidUpdate));
+        await Assert.ThrowsAsync<InvalidOperationException>(
+            () => repository.UpdateAsync(invalidUpdate));
 
-        Assert.Equal(0, (await context.WinningDraws.AsNoTracking().SingleAsync()).Reintegro);
+        Assert.Equal(
+            0,
+            (await context.WinningDraws.AsNoTracking().SingleAsync(TestContext.Current.CancellationToken)).Reintegro);
     }
 
     private static IDbContextFactory<PrimitivaDbContext> CreateFactory()

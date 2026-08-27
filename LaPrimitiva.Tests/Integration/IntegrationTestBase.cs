@@ -15,9 +15,9 @@ namespace LaPrimitiva.Tests.Integration
             _factory = fixture.Factory;
         }
 
-        public Task InitializeAsync()
+        public ValueTask InitializeAsync()
         {
-            return _fixture.ResetDatabaseAsync();
+            return new ValueTask(_fixture.ResetDatabaseAsync());
         }
 
         protected Task ResetDatabaseAsync()
@@ -25,9 +25,9 @@ namespace LaPrimitiva.Tests.Integration
             return _fixture.ResetDatabaseAsync();
         }
 
-        public Task DisposeAsync()
+        public ValueTask DisposeAsync()
         {
-            return Task.CompletedTask;
+            return ValueTask.CompletedTask;
         }
 
         protected IServiceScope CreateScope() => _factory.Services.CreateScope();

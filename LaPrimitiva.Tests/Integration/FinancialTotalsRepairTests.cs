@@ -49,7 +49,7 @@ public class FinancialTotalsRepairTests(IntegrationTestFixture fixture)
                 TotalPremios = 5m,
                 Neto = 3m
             });
-            await context.SaveChangesAsync();
+            await context.SaveChangesAsync(TestContext.Current.CancellationToken);
         }
 
         using (var repairScope = CreateScope())
@@ -60,7 +60,9 @@ public class FinancialTotalsRepairTests(IntegrationTestFixture fixture)
 
         using var assertScope = CreateScope();
         var assertContext = assertScope.ServiceProvider.GetRequiredService<PrimitivaDbContext>();
-        var repaired = await assertContext.DrawRecords.AsNoTracking().SingleAsync(draw => draw.Id == drawId);
+        var repaired = await assertContext.DrawRecords
+            .AsNoTracking()
+            .SingleAsync(draw => draw.Id == drawId, TestContext.Current.CancellationToken);
         Assert.Equal(3m, repaired.TotalCoste);
         Assert.Equal(35m, repaired.TotalPremios);
         Assert.Equal(32m, repaired.Neto);

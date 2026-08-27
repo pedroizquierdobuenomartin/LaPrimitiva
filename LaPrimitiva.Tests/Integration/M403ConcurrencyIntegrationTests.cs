@@ -17,7 +17,7 @@ public class M403ConcurrencyIntegrationTests(IntegrationTestFixture fixture) : I
         await using (var arrangeScope = _factory.Services.CreateAsyncScope())
         {
             var factory = arrangeScope.ServiceProvider.GetRequiredService<IDbContextFactory<PrimitivaDbContext>>();
-            await using var context = await factory.CreateDbContextAsync();
+            await using var context = await factory.CreateDbContextAsync(TestContext.Current.CancellationToken);
             context.Plans.Add(new Plan
             {
                 Id = id,
@@ -25,7 +25,7 @@ public class M403ConcurrencyIntegrationTests(IntegrationTestFixture fixture) : I
                 EffectiveFrom = new DateTime(2040, 1, 1),
                 EffectiveTo = new DateTime(2040, 12, 31)
             });
-            await context.SaveChangesAsync();
+            await context.SaveChangesAsync(TestContext.Current.CancellationToken);
         }
 
         using var scope = CreateScope();

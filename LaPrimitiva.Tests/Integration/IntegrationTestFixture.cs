@@ -23,7 +23,7 @@ public sealed class IntegrationTestFixture : IAsyncLifetime
 
     public string TestDataDirectory => Path.Combine(AppContext.BaseDirectory, "TestData");
 
-    public async Task InitializeAsync()
+    public async ValueTask InitializeAsync()
     {
         IntegrationTestDatabase.EnsureSafe(_connectionString);
 
@@ -62,7 +62,7 @@ public sealed class IntegrationTestFixture : IAsyncLifetime
         await _respawner.ResetAsync(connection);
     }
 
-    public async Task DisposeAsync()
+    public async ValueTask DisposeAsync()
     {
         Factory?.Dispose();
         await DeleteDatabaseAsync();

@@ -20,7 +20,8 @@ namespace LaPrimitiva.Tests
                 })));
             var client = CreateClient(httpClient);
 
-            await Assert.ThrowsAsync<InvalidDataException>(() => client.GetRssXmlAsync());
+            await Assert.ThrowsAsync<InvalidDataException>(
+                () => client.GetRssXmlAsync(TestContext.Current.CancellationToken));
         }
 
         [Fact]
@@ -33,7 +34,8 @@ namespace LaPrimitiva.Tests
                 })));
             var client = CreateClient(httpClient);
 
-            await Assert.ThrowsAsync<InvalidDataException>(() => client.GetRssXmlAsync());
+            await Assert.ThrowsAsync<InvalidDataException>(
+                () => client.GetRssXmlAsync(TestContext.Current.CancellationToken));
         }
 
         [Fact]

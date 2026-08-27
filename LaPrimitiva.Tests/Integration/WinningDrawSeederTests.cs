@@ -33,8 +33,8 @@ namespace LaPrimitiva.Tests.Integration
             await seeder.SeedAsync(csvPath);
 
             // Assert
-            await using var context = await contextFactory.CreateDbContextAsync();
-            var count = await context.WinningDraws.CountAsync();
+            await using var context = await contextFactory.CreateDbContextAsync(TestContext.Current.CancellationToken);
+            var count = await context.WinningDraws.CountAsync(TestContext.Current.CancellationToken);
             Assert.True(count > 0);
             Console.WriteLine($"Total draws in DB: {count}");
         }

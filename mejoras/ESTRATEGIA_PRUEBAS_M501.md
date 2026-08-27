@@ -33,14 +33,18 @@ Desde la raíz del repositorio, con dependencias restauradas y binarios compilad
 ./scripts/Verify-M501TestStrategy.ps1
 
 # Suite rápida, sin SQL Server
-dotnet test ./LaPrimitiva.Tests/LaPrimitiva.Tests.csproj --filter 'FullyQualifiedName!~Integration' --nologo
+dotnet test --project ./LaPrimitiva.Tests/LaPrimitiva.Tests.csproj --filter 'FullyQualifiedName!~Integration'
 
 # Solo integración real
-dotnet test ./LaPrimitiva.Tests/LaPrimitiva.Tests.csproj --filter 'FullyQualifiedName~Integration' --nologo
+dotnet test --project ./LaPrimitiva.Tests/LaPrimitiva.Tests.csproj --filter 'FullyQualifiedName~Integration'
 
 # Cierre completo
-dotnet test ./LaPrimitiva.Tests/LaPrimitiva.Tests.csproj --nologo
+dotnet test --solution ./LaPrimitiva.sln
 ```
+
+El repositorio selecciona Microsoft.Testing.Platform mediante `global.json`, como exige el SDK .NET 10 para xUnit v3. En este modo el proyecto se indica con `--project`; no se usa la sintaxis posicional heredada de VSTest.
+
+No se deben añadir `--nologo` ni `--verbosity`: Microsoft.Testing.Platform los reenvía al host de pruebas como opciones desconocidas y termina con código 5 sin ejecutar casos. Si hace falta ajustar la verbosidad de MSBuild, la sintaxis admitida por el SDK 10 es `-v minimal`; para la ejecución ordinaria se conserva el valor predeterminado.
 
 `--no-build --no-restore` solo es válido cuando los binarios corresponden exactamente a las fuentes que se quieren validar. Una ejecución sobre binarios anteriores se registra como línea base previa, NUNCA como prueba posterior del cambio.
 

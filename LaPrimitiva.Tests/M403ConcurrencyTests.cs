@@ -43,7 +43,7 @@ public class M403ConcurrencyTests
                 DrawDate = DateTime.Today,
                 RowVersion = [1]
             });
-            await arrange.SaveChangesAsync();
+            await arrange.SaveChangesAsync(TestContext.Current.CancellationToken);
         }
 
         var repository = new DrawRepository(new ThrowingFactory(options));

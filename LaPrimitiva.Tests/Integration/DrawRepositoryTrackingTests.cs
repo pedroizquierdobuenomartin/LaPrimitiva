@@ -46,10 +46,12 @@ namespace LaPrimitiva.Tests.Integration
                 Played = true
             };
             context.DrawRecords.Add(draw);
-            await context.SaveChangesAsync();
+            await context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
             // Simulate a long-lived circuit context that already tracks the entity.
-            var trackedDraw = await context.DrawRecords.FindAsync(draw.Id);
+            var trackedDraw = await context.DrawRecords.FindAsync(
+                new object?[] { draw.Id },
+                TestContext.Current.CancellationToken);
             Assert.NotNull(trackedDraw);
             
             // 3. Create a NEW instance with SAME ID (detached) simulating data from UI
@@ -71,7 +73,9 @@ namespace LaPrimitiva.Tests.Integration
 
             // The repository's context was independent; reload to observe its committed update.
             context.ChangeTracker.Clear();
-            var reloaded = await context.DrawRecords.FindAsync(draw.Id);
+            var reloaded = await context.DrawRecords.FindAsync(
+                new object?[] { draw.Id },
+                TestContext.Current.CancellationToken);
             Assert.Equal("Updated Notes", reloaded?.Notes);
         }
     }

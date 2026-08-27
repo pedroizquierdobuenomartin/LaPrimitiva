@@ -57,7 +57,7 @@ public class DisconnectedDrawPersistenceTests(IntegrationTestFixture fixture)
                 CreatedAt = originalCreatedAt,
                 UpdatedAt = originalCreatedAt
             });
-            await context.SaveChangesAsync();
+            await context.SaveChangesAsync(TestContext.Current.CancellationToken);
         }
 
         var updatedAt = originalCreatedAt.AddDays(1);
@@ -94,7 +94,7 @@ public class DisconnectedDrawPersistenceTests(IntegrationTestFixture fixture)
         var assertContext = assertScope.ServiceProvider.GetRequiredService<PrimitivaDbContext>();
         var persisted = await assertContext.DrawRecords
             .AsNoTracking()
-            .SingleAsync(draw => draw.Id == drawId);
+            .SingleAsync(draw => draw.Id == drawId, TestContext.Current.CancellationToken);
 
         Assert.True(persisted.Played);
         Assert.Equal(1m, persisted.CosteFija);

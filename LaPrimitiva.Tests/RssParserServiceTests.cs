@@ -28,7 +28,7 @@ namespace LaPrimitiva.Tests
     </channel>
 </rss>";
 
-            var results = await _service.ParseRssAsync(xmlContent);
+            var results = await _service.ParseRssAsync(xmlContent, TestContext.Current.CancellationToken);
 
             var draw = Assert.Single(results);
             Assert.Equal(new DateTime(2026, 2, 2, 22, 16, 16), draw.Date);
@@ -42,7 +42,8 @@ namespace LaPrimitiva.Tests
         public async Task ParseRss_WithEmptyXml_ReturnsEmptyList()
         {
             var results = await _service.ParseRssAsync(
-                @"<rss version=""2.0""><channel></channel></rss>");
+                @"<rss version=""2.0""><channel></channel></rss>",
+                TestContext.Current.CancellationToken);
 
             Assert.Empty(results);
         }
@@ -55,7 +56,7 @@ namespace LaPrimitiva.Tests
             var xmlContent = BuildXml(
                 $"<b>{numbers}</b> Complementario: <b>C(09)</b> Reintegro: <b>R(4)</b>");
 
-            var draw = Assert.Single(await _service.ParseRssAsync(xmlContent));
+            var draw = Assert.Single(await _service.ParseRssAsync(xmlContent, TestContext.Current.CancellationToken));
 
             Assert.Equal(new[] { 4, 5, 13, 29, 30, 36 }, draw.Numbers);
         }
@@ -66,7 +67,7 @@ namespace LaPrimitiva.Tests
             var xmlContent = BuildXml(
                 "<b>04 - 05 - 13 - 29 - 30 - 36</b> Complementario: <b>C(09)</b>");
 
-            var results = await _service.ParseRssAsync(xmlContent);
+            var results = await _service.ParseRssAsync(xmlContent, TestContext.Current.CancellationToken);
 
             Assert.Empty(results);
         }
@@ -79,7 +80,7 @@ namespace LaPrimitiva.Tests
 
             IReadOnlyList<RssDraw>? results = null;
             var exception = await Record.ExceptionAsync(
-                async () => results = await _service.ParseRssAsync(xmlContent));
+                async () => results = await _service.ParseRssAsync(xmlContent, TestContext.Current.CancellationToken));
 
             Assert.Null(exception);
             Assert.Empty(results!);
@@ -88,7 +89,9 @@ namespace LaPrimitiva.Tests
         [Fact]
         public async Task ParseRss_WithMalformedXml_ReturnsEmptyList()
         {
-            var results = await _service.ParseRssAsync("<rss><channel><item>");
+            var results = await _service.ParseRssAsync(
+                "<rss><channel><item>",
+                TestContext.Current.CancellationToken);
 
             Assert.Empty(results);
         }
@@ -105,7 +108,7 @@ namespace LaPrimitiva.Tests
             var xmlContent =
                 $"<rss><channel>{string.Concat(Enumerable.Repeat(item, RssFeedLimits.MaxItems + 1))}</channel></rss>";
 
-            var results = await _service.ParseRssAsync(xmlContent);
+            var results = await _service.ParseRssAsync(xmlContent, TestContext.Current.CancellationToken);
 
             Assert.Equal(RssFeedLimits.MaxItems, results.Count);
         }

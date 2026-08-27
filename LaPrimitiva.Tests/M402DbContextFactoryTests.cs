@@ -27,10 +27,10 @@ public class M402DbContextFactoryTests
     public async Task ReadOperation_ReturnsDetachedEntities_AndDisposesItsContext()
     {
         var factory = CreateFactory();
-        await using (var arrangeContext = await factory.CreateDbContextAsync())
+        await using (var arrangeContext = await factory.CreateDbContextAsync(TestContext.Current.CancellationToken))
         {
             arrangeContext.WinningDraws.Add(CreateValidDraw());
-            await arrangeContext.SaveChangesAsync();
+            await arrangeContext.SaveChangesAsync(TestContext.Current.CancellationToken);
         }
 
         factory.ResetObservations();

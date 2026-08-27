@@ -108,7 +108,7 @@ namespace LaPrimitiva.Tests.Integration
 
             await Assert.ThrowsAsync<InvalidOperationException>(
                 () => planService.CreatePlanAsync(matchingBoundaryPlan));
-            Assert.Equal(1, await context.Plans.CountAsync());
+            Assert.Equal(1, await context.Plans.CountAsync(TestContext.Current.CancellationToken));
         }
 
         [Fact]
@@ -143,7 +143,8 @@ namespace LaPrimitiva.Tests.Integration
                 BetsPerDraw = 0
             });
 
-            await Assert.ThrowsAsync<DbUpdateException>(() => context.SaveChangesAsync());
+            await Assert.ThrowsAsync<DbUpdateException>(
+                () => context.SaveChangesAsync(TestContext.Current.CancellationToken));
         }
 
         [Fact]
@@ -159,7 +160,7 @@ namespace LaPrimitiva.Tests.Integration
                 EffectiveTo = new DateTime(2026, 12, 31),
                 BetsPerDraw = 2
             });
-            await context.SaveChangesAsync();
+            await context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
             context.Plans.Add(new Plan
             {
@@ -169,7 +170,8 @@ namespace LaPrimitiva.Tests.Integration
                 BetsPerDraw = 2
             });
 
-            await Assert.ThrowsAsync<DbUpdateException>(() => context.SaveChangesAsync());
+            await Assert.ThrowsAsync<DbUpdateException>(
+                () => context.SaveChangesAsync(TestContext.Current.CancellationToken));
         }
 
         [Fact]
@@ -252,7 +254,7 @@ namespace LaPrimitiva.Tests.Integration
                 () => planService.UpdatePlanAsync(overlappingUpdate));
             var persisted = await context.Plans
                 .AsNoTracking()
-                .SingleAsync(plan => plan.Id == editablePlan.Id);
+                .SingleAsync(plan => plan.Id == editablePlan.Id, TestContext.Current.CancellationToken);
             Assert.Equal(new DateTime(2033, 12, 31), persisted.EffectiveTo);
         }
 
@@ -300,7 +302,7 @@ namespace LaPrimitiva.Tests.Integration
             // Assert
             var persisted = await context.Plans
                 .AsNoTracking()
-                .SingleAsync(plan => plan.Id == testPlan.Id);
+                .SingleAsync(plan => plan.Id == testPlan.Id, TestContext.Current.CancellationToken);
             Assert.Equal("Timestamp Test Plan Updated", persisted.Name);
             Assert.Equal(originalCreatedAt, persisted.CreatedAt);
             Assert.True(persisted.UpdatedAt > originalUpdatedAt);

@@ -91,15 +91,6 @@ namespace LaPrimitiva.Application.Services
                 });
             }
 
-            var weightedMetrics = BuildMetrics(cases.Select(item => item.WeightedMatches));
-            var uniformMetrics = BuildMetrics(cases.Select(item => item.UniformMatches));
-            const double theoreticalUniformAverage = 36.0 / 49.0;
-            const double uniformMatchVariance = 6.0 * (6.0 / 49.0) * (43.0 / 49.0) * (43.0 / 48.0);
-            var approximateZScore = cases.Count == 0
-                ? 0
-                : (weightedMetrics.AverageMatches - theoreticalUniformAverage) /
-                  Math.Sqrt(uniformMatchVariance / cases.Count);
-
             return new AutomatedCombinationBacktestResult
             {
                 HistoricalDraws = draws.Count,
@@ -107,11 +98,8 @@ namespace LaPrimitiva.Application.Services
                 EvaluatedDraws = cases.Count,
                 FirstEvaluatedDate = cases.FirstOrDefault()?.DrawDate,
                 LastEvaluatedDate = cases.LastOrDefault()?.DrawDate,
-                WeightedModel = weightedMetrics,
-                UniformBaseline = uniformMetrics,
-                TheoreticalUniformAverageMatches = theoreticalUniformAverage,
-                ApproximateAverageZScore = approximateZScore,
-                HasConventionalStatisticalAdvantage = Math.Abs(approximateZScore) >= 1.96,
+                WeightedModel = BuildMetrics(cases.Select(item => item.WeightedMatches)),
+                UniformBaseline = BuildMetrics(cases.Select(item => item.UniformMatches)),
                 FixedCombinationAvailable = false,
                 Limitations =
                 [

@@ -9,9 +9,6 @@ public record AutomatedCombinationBacktestResult
     public DateTime? LastEvaluatedDate { get; init; }
     public PredictionBacktestMetrics WeightedModel { get; init; } = new();
     public PredictionBacktestMetrics UniformBaseline { get; init; } = new();
-    public double TheoreticalUniformAverageMatches { get; init; }
-    public double ApproximateAverageZScore { get; init; }
-    public bool HasConventionalStatisticalAdvantage { get; init; }
     public bool FixedCombinationAvailable { get; init; }
     public List<string> Limitations { get; init; } = [];
     public List<PredictionBacktestCase> Cases { get; init; } = [];

@@ -35,7 +35,7 @@
   <data name="Automated" xml:space="preserve"><value>Automática</value></data>
   <data name="AlgorithmSubtitle_Part1" xml:space="preserve"><value>Selección</value></data>
   <data name="UniformSelection" xml:space="preserve"><value>uniforme sin reemplazo</value></data>
-  <data name="AlgorithmSubtitle_Part2" xml:space="preserve"><value>validada frente a modelos históricos.</value></data>
+  <data name="AlgorithmSubtitle_Part2" xml:space="preserve"><value>sin usar el histórico como señal predictiva.</value></data>
   <data name="AnalyzingHistory" xml:space="preserve"><value>Generando combinación</value></data>
   <data name="Generator" xml:space="preserve"><value>Generador</value></data>
   <data name="Intelligent" xml:space="preserve"><value>Uniforme</value></data>
@@ -45,7 +45,7 @@
   <data name="UniformSelectionNotice" xml:space="preserve"><value>Cada combinación válida tiene la misma probabilidad de salir.</value></data>
   <data name="UniformStrategyTitle" xml:space="preserve"><value>Selección uniforme adoptada</value></data>
   <data name="UniformStrategyDescription" xml:space="preserve"><value>La evaluación histórica no encontró una ventaja predictiva fiable en modelos ponderados. Regenerar crea otra candidata uniforme sin excluir resultados anteriores.</value></data>
-  <data name="ValidatedMethod" xml:space="preserve"><value>Método validado</value></data>
+  <data name="ValidatedMethod" xml:space="preserve"><value>Generador no predictivo</value></data>
   <data name="WeeklyBet" xml:space="preserve"><value>Una apuesta semanal</value></data>
   <data name="Candidate" xml:space="preserve"><value>Candidata</value></data>
   <data name="YourAutomaticBet" xml:space="preserve"><value>Tu jugada automática</value></data>
@@ -56,14 +56,16 @@
   <data name="PreviousWinnersTitle" xml:space="preserve"><value>Todo el bombo disponible</value></data>
   <data name="PreviousWinnersDescription" xml:space="preserve"><value>Las combinaciones ganadoras anteriores siguen participando porque también pueden repetirse.</value></data>
   <data name="EvidenceTitle" xml:space="preserve"><value>Evidencia y comparación</value></data>
-  <data name="EvidenceSubtitle" xml:space="preserve"><value>Consulta el backtest que sustenta la estrategia adoptada.</value></data>
+  <data name="EvidenceSubtitle" xml:space="preserve"><value>Consulta la comparación retrospectiva que descartó usar el histórico para predecir.</value></data>
+  <data name="StatisticalScopeTitle" xml:space="preserve"><value>Alcance estadístico</value></data>
+  <data name="StatisticalScopeDescription" xml:space="preserve"><value>Los sorteos son independientes. El histórico no aumenta la probabilidad matemática de acierto: el generador crea candidatas uniformes, no predicciones.</value></data>
   <data name="Reintegro" xml:space="preserve"><value>Reintegro</value></data>
   <data name="Regenerate" xml:space="preserve"><value>Regenerar</value></data>
   <data name="LuckyPrompt" xml:space="preserve"><value>¡Mucha suerte con tu jugada!</value></data>
   <data name="FortunePrompt" xml:space="preserve"><value>Que la fortuna te acompañe</value></data>
   <data name="Today" xml:space="preserve"><value>hoy.</value></data>
   <data name="BacktestTitle" xml:space="preserve"><value>Evaluación retrospectiva</value></data>
-  <data name="BacktestDescription" xml:space="preserve"><value>Documenta por qué el modelo ponderado no sustituye a la selección uniforme adoptada.</value></data>
+  <data name="BacktestDescription" xml:space="preserve"><value>Es una simulación retrospectiva para comparar estrategias; no mide la probabilidad de acertar el próximo sorteo.</value></data>
   <data name="RunBacktest" xml:space="preserve"><value>Ejecutar backtest</value></data>
   <data name="BacktestRunning" xml:space="preserve"><value>Evaluando histórico...</value></data>
   <data name="EvaluatedDraws" xml:space="preserve"><value>Sorteos evaluados</value></data>
@@ -75,7 +77,5 @@
   <data name="FixedComparisonUnavailable" xml:space="preserve"><value>No puede compararse todavía por números con la apuesta fija: la aplicación solo guardaba su etiqueta, costes y premios.</value></data>
   <data name="BacktestNoData" xml:space="preserve"><value>No hay suficientes sorteos para reservar los 104 iniciales como entrenamiento.</value></data>
   <data name="BacktestError" xml:space="preserve"><value>No se pudo completar la evaluación retrospectiva.</value></data>
-  <data name="BacktestAdvantageDetected" xml:space="preserve"><value>El resultado supera el umbral estadístico inicial; necesita validación adicional antes de considerarlo una ventaja real.</value></data>
-  <data name="BacktestNoAdvantage" xml:space="preserve"><value>Este resultado no demuestra una ventaja predictiva estadísticamente convincente.</value></data>
-  <data name="TheoreticalUniformAverage" xml:space="preserve"><value>Media uniforme teórica</value></data>
+  <data name="BacktestInterpretation" xml:space="preserve"><value>La evaluación describe una simulación histórica: no predice sorteos futuros ni convierte frecuencias pasadas en una ventaja matemática.</value></data>
 </root>

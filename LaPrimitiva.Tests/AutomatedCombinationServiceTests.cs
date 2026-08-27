@@ -52,6 +52,7 @@ public class AutomatedCombinationServiceTests
         Assert.True(result.Numbers.SequenceEqual(result.Numbers.OrderBy(number => number)));
         Assert.InRange(result.Reintegro, 0, 9);
         Assert.Equal(13_983_816, result.DebugInfo["possible_combinations"]);
+        Assert.False(result.DebugInfo.ContainsKey("pValue"));
         Assert.False(result.DebugInfo.ContainsKey("half_life_days"));
         Assert.False(result.DebugInfo.ContainsKey("top10_by_model"));
     }
@@ -100,10 +101,6 @@ public class AutomatedCombinationServiceTests
         Assert.Equal(28, result.EvaluatedDraws);
         Assert.Equal(result.EvaluatedDraws, result.WeightedModel.MatchDistribution.Values.Sum());
         Assert.Equal(result.EvaluatedDraws, result.UniformBaseline.MatchDistribution.Values.Sum());
-        Assert.Equal(36.0 / 49.0, result.TheoreticalUniformAverageMatches, precision: 10);
-        Assert.Equal(
-            Math.Abs(result.ApproximateAverageZScore) >= 1.96,
-            result.HasConventionalStatisticalAdvantage);
         Assert.False(result.FixedCombinationAvailable);
         Assert.Contains(result.Limitations, limitation => limitation.Contains("no guarda", StringComparison.OrdinalIgnoreCase));
     }

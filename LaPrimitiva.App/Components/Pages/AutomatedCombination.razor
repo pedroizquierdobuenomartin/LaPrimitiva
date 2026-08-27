@@ -144,6 +144,11 @@
         }
     </section>
 
+    <aside class="rounded-[28px] bg-sky-50 border border-sky-100 p-6 shadow-sm" role="note">
+        <h2 class="text-xs font-black uppercase tracking-[0.16em] text-sky-900">@L["StatisticalScopeTitle"]</h2>
+        <p class="text-sm text-sky-800 mt-2 leading-relaxed">@L["StatisticalScopeDescription"]</p>
+    </aside>
+
     <div class="grid md:grid-cols-2 gap-4">
         <article class="rounded-[28px] bg-white border border-gray-100 p-6 shadow-sm flex items-start gap-4">
             <div class="h-11 w-11 rounded-2xl bg-emerald-50 text-emerald-700 flex items-center justify-center shrink-0"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg></div>
@@ -188,7 +193,7 @@
                         <div class="p-5 rounded-3xl bg-emerald-50 border border-emerald-100"><div class="text-xs font-black text-emerald-700 uppercase tracking-widest">@L["UniformBaseline"]</div><div class="text-3xl font-black text-gray-900 mt-3">@_backtest.UniformBaseline.AverageMatches.ToString("F3")</div><div class="text-xs text-gray-500 font-bold mt-1">@L["AverageMatches"]</div><div class="text-xs text-gray-600 mt-3">@L["MaximumMatches"]: @_backtest.UniformBaseline.MaximumMatches · @L["AtLeastThree"]: @_backtest.UniformBaseline.DrawsWithAtLeastThreeMatches</div></div>
                     </div>
                     <div class="p-4 rounded-2xl bg-amber-50 text-amber-800 text-xs font-medium">@L["FixedComparisonUnavailable"]</div>
-                    <div class="p-4 rounded-2xl @(_backtest.HasConventionalStatisticalAdvantage ? "bg-emerald-50 text-emerald-800" : "bg-slate-100 text-slate-700") text-xs font-bold">@(_backtest.HasConventionalStatisticalAdvantage ? L["BacktestAdvantageDetected"] : L["BacktestNoAdvantage"]) Z ≈ @_backtest.ApproximateAverageZScore.ToString("F3") · @L["TheoreticalUniformAverage"]: @_backtest.TheoreticalUniformAverageMatches.ToString("F3")</div>
+                    <div class="p-4 rounded-2xl bg-slate-100 text-slate-700 text-xs font-bold">@L["BacktestInterpretation"]</div>
                 }
             }
         </div>

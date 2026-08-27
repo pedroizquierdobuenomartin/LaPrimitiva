@@ -53,7 +53,6 @@ builder.Services.AddScoped<IWinningDrawRepository, WinningDrawRepository>();
 
 // Register Application Services
 builder.Services.AddScoped<PlanService>();
-builder.Services.AddScoped<DrawGenerationService>();
 builder.Services.AddScoped<SummaryService>();
 builder.Services.AddScoped<IDashboardService, DashboardService>();
 builder.Services.AddScoped<IDataExportService, DataExportService>();

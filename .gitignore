@@ -3,6 +3,7 @@
 [Oo]bj/
 [Pp]ublish/
 [Aa]rtifacts/
+build_output.txt
 *.pfx
 *.p12
 *.key

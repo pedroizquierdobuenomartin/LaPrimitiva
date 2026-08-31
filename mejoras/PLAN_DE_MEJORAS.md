@@ -20,7 +20,7 @@
 | 2 | Errores funcionales | Completada |
 | 3 | Seguridad local robusta | Completada |
 | 4 | Persistencia y arquitectura | Completada |
-| 5 | Calidad, observabilidad y mantenimiento | Pendiente |
+| 5 | Calidad, observabilidad y mantenimiento | Completada |
 | 6 | Verificación final | Pendiente |
 
 ---
@@ -1252,7 +1252,9 @@ Estos descartes describen el código auditado y deben revisarse si cambian las f
 | M-405 | 2026-08-26 | Commit de cierre de esta publicación, sobre `5bc67f0`; release `v1.13.0` | Completado | Eliminados los cuatro `async void`; tareas con excepciones observadas y logging; guardas tras disposición; `_feedbackTimer` y todas las suscripciones liberadas; prueba fuente y verificador focalizados añadidos sin ejecutar mediante build; verificadores M-403/M-404/M-405 y `git diff --check` correctos. |
 | M-501 | 2026-08-26 | Commit de cierre de esta publicación, sobre `93eb3e3` | Completado | Estrategia trazable para las siete áreas mínimas, separación rápida/integración, verificador M-501 y migración desde versión anterior; compatibilidad local corregida con `Encrypt=False` y suite final **146/146**, sin fallos ni omisiones. |
 | M-502 | 2026-08-26 | Commit de cierre de esta publicación, sobre `c8ed271`; release `v1.14.0` | Completado | Logs JSON estructurados y rotados, correlación, mensajes seguros, eventos RSS/migración/backup y health checks `live`/`ready`; build y funcionamiento aportados por el usuario, suite final **150/150** y verificadores M-101/M-401/M-404/M-502 correctos. |
+| M-503 | 2026-08-26 / 2026-08-27 | Commit `chore: review dependencies`, sobre `1532ea8` | Completado | Paquetes alineados con .NET 10.0.11 y xUnit v3 MTP; suprimida la ruta VSTest; `TestingPlatformDotnetTestSupport=true`; workflow CI; suite final **150/150** y verificador M-503 correcto. |
 | M-504 | 2026-08-27 | Commit de cierre de esta publicación, sobre `0bc6da5`; release `v1.14.1` | Completado | Retiradas páginas y navegación de plantilla, test vacío, servicio sin consumidores, log versionado y 8,68 MB de Bootstrap no cargado; build Debug fresco de los cinco proyectos y ejecución de la aplicación correctos, aportados por el usuario; verificador M-504 y regresiones estáticas correctos. |
 | M-505 | 2026-08-27 | Commit de cierre de esta publicación, sobre `e30c191`; release `v1.15.0` | Completado | Generador presentado como uniforme y no predictivo; independencia de sorteos y límites del histórico visibles; retirada la inferencia binaria basada en z aproximado; build fresco correcto aportado por el usuario y verificadores M-404/M-505/M-702 correctos. |
 | M-506 | 2026-08-27 | Commit de cierre de esta publicación, sobre `2ddffae`; release `v1.16.0` | Completado | Taxonomía transversal, traducciones EF/SQL/HTTP/RSS, resultados tipados, mensajes seguros y límite Blazor correlacionable; corrección de la jerarquía sellada; compilación y funcionamiento correctos aportados por el usuario; verificadores M-204/M-304/M-404/M-506 correctos. |
+| M-507 | 2026-08-31 | Commit `91a8b80`, sobre `5ea3fea`; release `v1.17.0` | Completado | Cultura `es-ES` global en runtime y componentes; 12 catálogos `.es-ES.resx` segregados por bounded context; `RequiredStringLocalizerFactory` detecta claves ausentes; neutralidad en contratos CSV/RSS; verificadores y suite xUnit correctos. |
 | M-702 | 2026-08-24 | `e2402f6`, `19defe6`, release `373561a`, tag `v1.1.0` | Completado | Generación uniforme y rediseño validados; títulos de Histórico y Combinación automática unificados con `PageTitle`; footer enlazado a la versión del ensamblado y release `1.1.0` publicada. Verificación estática correcta y validación visual del usuario; casos xUnit nuevos no ejecutados por la prohibición de compilar. |

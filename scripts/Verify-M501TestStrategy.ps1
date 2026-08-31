@@ -95,7 +95,7 @@ $coverageSources = @{
         'UpdateAsync_PersistsEditableValuesWithoutChangingStructuralColumns'
     )
     'LaPrimitiva.Tests/RssParserServiceTests.cs' = @(
-        'ParseRss_WithMalformedXml_ReturnsEmptyList',
+        'ParseRss_WithMalformedXml_ReportsInvalidExternalFormat',
         'ParseRss_WithTooManyItems_StopsAtConfiguredLimit'
     )
     'LaPrimitiva.Tests/RssClientTests.cs' = @(

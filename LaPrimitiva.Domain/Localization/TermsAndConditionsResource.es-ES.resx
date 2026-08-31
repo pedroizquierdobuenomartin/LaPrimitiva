@@ -54,4 +54,5 @@
   <data name="ContactTitle" xml:space="preserve"><value>¿Necesitas aclaraciones?</value></data>
   <data name="ContactDesc" xml:space="preserve"><value>Nuestro equipo legal está a tu disposición para resolver cualquier duda sobre estos términos.</value></data>
   <data name="ContactButton" xml:space="preserve"><value>Contactar Soporte</value></data>
+  <data name="LegalGuarantee" xml:space="preserve"><value>Garantía legal</value></data>
 </root>

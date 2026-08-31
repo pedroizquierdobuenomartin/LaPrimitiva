@@ -58,8 +58,10 @@ $pages = @(
 foreach ($path in $pages) {
     $content = Read-RepoFile $path
     Require-Match $content 'catch \(ConcurrencyConflictException' "$path no informa del conflicto de concurrencia."
-    Require-Match $content 'Recargar datos actuales' "$path no ofrece recargar el registro vigente."
+    Require-Match $content 'ReloadCurrentData' "$path no ofrece recargar el registro vigente mediante un recurso localizado."
 }
+$globalResource = Read-RepoFile 'LaPrimitiva.Domain/Localization/GlobalResource.es-ES.resx'
+Require-Match $globalResource 'Recargar datos actuales' 'El catálogo global no traduce la acción de recargar tras concurrencia.'
 
 $unitTests = Read-RepoFile 'LaPrimitiva.Tests/M403ConcurrencyTests.cs'
 Require-Match $unitTests 'EditableEntities_ConfigureRowVersionAsGeneratedConcurrencyToken' 'Falta la prueba del modelo de concurrencia.'

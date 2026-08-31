@@ -82,4 +82,5 @@
   <data name="Bets" xml:space="preserve"><value>Apuestas</value></data>
   <data name="DrawsFijoAuto" xml:space="preserve"><value>{0} Sorteos (fijo + automático)</value></data>
   <data name="Totals" xml:space="preserve"><value>Totales</value></data>
+  <data name="DefaultPlanName" xml:space="preserve"><value>Plan {0}</value></data>
 </root>

@@ -98,11 +98,18 @@ namespace LaPrimitiva.Application.Services
             set { if (_isLoading != value) { _isLoading = value; NotifyStateChanged(); } }
         }
 
-        private string? _lastError;
-        public string? LastError
+        private ApplicationError? _lastError;
+        public ApplicationError? LastError
         {
             get => _lastError;
             set { if (_lastError != value) { _lastError = value; NotifyStateChanged(); } }
+        }
+
+        private string? _lastErrorReference;
+        public string? LastErrorReference
+        {
+            get => _lastErrorReference;
+            set { if (_lastErrorReference != value) { _lastErrorReference = value; NotifyStateChanged(); } }
         }
 
         public bool HasNewDraws => NewDrawsCount > 0;

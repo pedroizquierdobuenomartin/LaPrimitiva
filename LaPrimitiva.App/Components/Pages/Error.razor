@@ -1,21 +1,24 @@
 ﻿@page "/Error"
 @using System.Diagnostics
 
-<PageTitle>Error - La Primitiva Audit</PageTitle>
+@inject IStringLocalizer<ErrorResource> LE
+@inject IStringLocalizer<GlobalResource> LG
+
+<PageTitle>@LE["PageTitle"]</PageTitle>
 
 <main class="mx-auto max-w-2xl p-8">
-    <h1 class="text-3xl font-black text-rose-700">No hemos podido completar la operación</h1>
+    <h1 class="text-3xl font-black text-rose-700">@LE["OperationFailedTitle"]</h1>
     <p class="mt-4 text-slate-700">
-        La aplicación ha registrado el detalle técnico de forma segura. Puedes volver a la página anterior e intentarlo de nuevo.
+        @LE["GlobalErrorDescription"]
     </p>
 
 @if (ShowRequestId)
 {
     <p class="mt-4 text-sm text-slate-600">
-        <strong>Referencia:</strong> <code>@RequestId</code>
+        <strong>@LG["ReferenceLabel"]:</strong> <code>@RequestId</code>
     </p>
 }
-    <a class="mt-6 inline-flex rounded-xl bg-emerald-700 px-5 py-3 font-bold text-white" href="/">Volver al inicio</a>
+    <a class="mt-6 inline-flex rounded-xl bg-emerald-700 px-5 py-3 font-bold text-white" href="/">@LG["BackToHome"]</a>
 </main>
 
 @code{

@@ -77,13 +77,15 @@ Require-Match $persistenceTranslator 'PersistenceUnavailableException' 'No se tr
 $routes = Read-RepoFile 'LaPrimitiva.App\Components\Routes.razor'
 Require-Match $routes '<AppErrorBoundary>' 'Las rutas Blazor no están protegidas por el límite transversal de errores.'
 $boundary = Read-RepoFile 'LaPrimitiva.App\Components\Shared\AppErrorBoundary.razor'
-Require-Match $boundary 'Referencia:' 'El límite Blazor no muestra una referencia comunicable.'
+Require-Match $boundary 'ReferenceLabel' 'El límite Blazor no muestra una referencia comunicable localizada.'
 Require-Match $boundary 'ErrorReporter\.Report' 'El límite Blazor no registra el error inesperado.'
 Reject-Match $boundary '@CurrentException\.Message|@context\.Message' 'El límite Blazor expone detalles técnicos.'
 
 $errorPage = Read-RepoFile 'LaPrimitiva.App\Components\Pages\Error.razor'
-Require-Match $errorPage 'Referencia:' 'La página global no muestra una referencia.'
+Require-Match $errorPage 'ReferenceLabel' 'La página global no muestra una referencia localizada.'
 Reject-Match $errorPage 'Development Mode|Exception\.Message|StackTrace' 'La página global expone contenido técnico.'
+$errorResource = Read-RepoFile 'LaPrimitiva.Domain\Localization\ErrorResource.es-ES.resx'
+Require-Match $errorResource 'Referencia:' 'El catálogo de errores no traduce la referencia comunicable.'
 
 foreach ($componentPath in @(
     'LaPrimitiva.App\Components\Layout\MainLayout.razor',
@@ -110,7 +112,7 @@ Require-Match $documentation 'Excepciones estándar conservadas' 'No se document
 Require-Match $documentation 'OperationCanceledException' 'No se documenta la semántica de cancelación.'
 $roadmap = Read-RepoFile 'mejoras\PLAN_DE_MEJORAS.md'
 Require-Match $roadmap '### \[x\] M-506' 'El plan no marca M-506 como completado.'
-Require-Match $roadmap '### \[ \] M-507' 'Se avanzó indebidamente al hito M-507.'
+Require-Match $roadmap '### \[[ x]\] M-507' 'El plan ha perdido la trazabilidad del hito M-507.'
 foreach ($field in @('Fecha:', 'Commit o referencia:', 'Pruebas realizadas:', 'Resultado:', 'Decisiones:')) {
     Require-Match $roadmap ([regex]::Escape($field)) "El cierre M-506 no documenta $field"
 }

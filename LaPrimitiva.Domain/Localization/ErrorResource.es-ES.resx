@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="PageTitle" xml:space="preserve"><value>Error - La Primitiva Audit</value></data>
+  <data name="OperationFailedTitle" xml:space="preserve"><value>No hemos podido completar la operación</value></data>
+  <data name="GlobalErrorDescription" xml:space="preserve"><value>La aplicación ha registrado el detalle técnico de forma segura. Puedes volver a la página anterior e intentarlo de nuevo.</value></data>
+  <data name="BoundaryErrorDescription" xml:space="preserve"><value>El detalle técnico se ha registrado de forma segura. Puedes reintentar la operación o volver al inicio.</value></data>
+  <data name="ErrorWithReference" xml:space="preserve"><value>Referencia: {0}.</value></data>
+  <data name="Error.business.rule" xml:space="preserve"><value>Revisa los datos indicados y corrige los campos marcados.</value></data>
+  <data name="Error.entity.not-found" xml:space="preserve"><value>El elemento solicitado ya no está disponible.</value></data>
+  <data name="Error.persistence.concurrency" xml:space="preserve"><value>Otro usuario ha modificado este registro. Recarga los datos antes de volver a guardar.</value></data>
+  <data name="Error.persistence.integrity" xml:space="preserve"><value>Los datos entran en conflicto con información ya registrada.</value></data>
+  <data name="Error.persistence.unavailable" xml:space="preserve"><value>No se puede acceder a los datos en este momento. Inténtalo de nuevo.</value></data>
+  <data name="Error.external.unavailable" xml:space="preserve"><value>El servicio externo no está disponible en este momento. Inténtalo de nuevo más tarde.</value></data>
+  <data name="Error.external.invalid-data" xml:space="preserve"><value>El servicio externo devolvió datos que no se pueden procesar.</value></data>
+  <data name="Error.unexpected" xml:space="preserve"><value>Ha ocurrido un error inesperado. El detalle técnico se ha registrado de forma segura.</value></data>
+  <data name="MessageWithReference" xml:space="preserve"><value>{0} Referencia: {1}.</value></data>
+  <data name="NotFoundTitle" xml:space="preserve"><value>Página no encontrada</value></data>
+  <data name="NotFoundDescription" xml:space="preserve"><value>Parece que te has perdido entre los números. No te preocupes, la suerte todavía puede estar de tu lado.</value></data>
+</root>

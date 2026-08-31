@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="PageTitle" xml:space="preserve"><value>Datos - La Primitiva Audit</value></data>
+  <data name="Title" xml:space="preserve"><value>Exportación de datos</value></data>
+  <data name="Subtitle" xml:space="preserve"><value>Descarga tu histórico en formato CSV para auditoría externa o copias de seguridad.</value></data>
+  <data name="ExportAllTitle" xml:space="preserve"><value>Exportar todo</value></data>
+  <data name="ExportAllDescription" xml:space="preserve"><value>Descarga el registro completo de todos los años y planes en un único archivo .csv.</value></data>
+  <data name="DownloadCompleteCsv" xml:space="preserve"><value>Descargar CSV completo</value></data>
+  <data name="ImportTitle" xml:space="preserve"><value>Importar datos</value></data>
+  <data name="ImportPlanned" xml:space="preserve"><value>Funcionalidad planificada para futuras versiones.</value></data>
+</root>

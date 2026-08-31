@@ -1,6 +1,5 @@
-﻿@using Microsoft.Extensions.Options
-@using LaPrimitiva.App.Models
-@inject IOptionsSnapshot<ReconnectionLabels> Labels
+@inject IStringLocalizer<ReconnectionResource> L
+@inject IStringLocalizer<GlobalResource> LG
 <script type="module" src="@Assets["Components/Layout/ReconnectModal.razor.js"]"></script>
 
 <dialog id="components-reconnect-modal" data-nosnippet>
@@ -10,25 +9,25 @@
             <div></div>
         </div>
         <p class="components-reconnect-first-attempt-visible">
-            @Labels.Value.Rejoining
+            @L["Rejoining"]
         </p>
         <p class="components-reconnect-repeated-attempt-visible">
-            @((MarkupString)string.Format(Labels.Value.RejoinFailed, "<span id=\"components-seconds-to-next-attempt\"></span>"))
+            @((MarkupString)string.Format(L["RejoinFailed"], "<span id=\"components-seconds-to-next-attempt\"></span>"))
         </p>
         <p class="components-reconnect-failed-visible">
-            @((MarkupString)Labels.Value.FailedToRejoin)
+            @((MarkupString)L["FailedToRejoin"].Value)
         </p>
         <button id="components-reconnect-button" class="components-reconnect-failed-visible px-6 py-2.5 bg-[#007041] hover:bg-[#004D2D] text-white font-semibold rounded-[12px] transition-colors duration-200">
-            @Labels.Value.Retry
+            @LG["Retry"]
         </button>
         <p class="components-pause-visible">
-            @Labels.Value.SessionPaused
+            @L["SessionPaused"]
         </p>
         <button id="components-resume-button" class="components-pause-visible px-6 py-2.5 bg-[#F3C388] hover:bg-[#e2b377] text-[#1A1A1A] font-semibold rounded-[12px] transition-colors duration-200">
-            @Labels.Value.Resume
+            @L["Resume"]
         </button>
         <p class="components-resume-failed-visible">
-            @((MarkupString)Labels.Value.FailedToResume)
+            @((MarkupString)L["FailedToResume"].Value)
         </p>
     </div>
 </dialog>

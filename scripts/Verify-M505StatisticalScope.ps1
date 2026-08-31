@@ -20,7 +20,7 @@ $interface = Read-RepositoryFile 'LaPrimitiva.Application\Interfaces\IAutomatedC
 $backtestDto = Read-RepositoryFile 'LaPrimitiva.Application\DTOs\AutomatedCombinationBacktestResult.cs'
 $page = Read-RepositoryFile 'LaPrimitiva.App\Components\Pages\AutomatedCombination.razor'
 $tests = Read-RepositoryFile 'LaPrimitiva.Tests\AutomatedCombinationServiceTests.cs'
-[xml]$resources = Read-RepositoryFile 'LaPrimitiva.Domain\Localization\CombinationResource.es.resx'
+[xml]$resources = Read-RepositoryFile 'LaPrimitiva.Domain\Localization\CombinationResource.es-ES.resx'
 
 $runtimeStatisticalSurface = $service + $interface + $backtestDto + $page
 Assert-NotContains $runtimeStatisticalSurface 'pValue' 'El marcador pValue continúa en la superficie de ejecución.'

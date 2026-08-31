@@ -26,7 +26,7 @@ $reconnectCss = Read-RepositoryFile 'LaPrimitiva.App\Components\Layout\Reconnect
 $homePage = Read-RepositoryFile 'LaPrimitiva.App\Components\Pages\Home.razor'
 $cloverSvg = Read-RepositoryFile 'LaPrimitiva.App\wwwroot\images\trebol-suerte.svg'
 $tests = Read-RepositoryFile 'LaPrimitiva.Tests\AutomatedCombinationServiceTests.cs'
-[xml]$resources = Read-RepositoryFile 'LaPrimitiva.Domain\Localization\CombinationResource.es.resx'
+[xml]$resources = Read-RepositoryFile 'LaPrimitiva.Domain\Localization\CombinationResource.es-ES.resx'
 
 $generatorStart = $service.IndexOf('public Task<CombinationResult> GenerateCombinationAsync')
 $backtestStart = $service.IndexOf('public async Task<AutomatedCombinationBacktestResult> BacktestAsync')
@@ -52,10 +52,10 @@ Assert-Contains $appCss 'fonts/poppins/poppins-latin-500-normal.woff2' 'No se ca
 Assert-Contains $appCss 'fonts/poppins/poppins-latin-600-normal.woff2' 'No se carga localmente el peso 600 de Poppins.'
 Assert-Contains $appCss 'fonts/poppins/poppins-latin-700-normal.woff2' 'No se carga localmente el peso 700 de Poppins.'
 if ($appProject -notmatch '<Version>\d+\.\d+\.\d+</Version>') { throw 'La aplicación no declara una versión semántica.' }
-Assert-Contains $mainLayout '<span aria-label="Versión de la aplicación">@($"v{AppVersion}")</span>' 'El footer no muestra la versión real de la aplicación mediante una expresión Razor explícita.'
-Assert-NotContains $mainLayout '<span aria-label="Versión de la aplicación">v@AppVersion</span>' 'El footer conserva la sintaxis ambigua que renderiza v@AppVersion como texto literal.'
+Assert-Contains $mainLayout '<span aria-label="@LL["ApplicationVersion"]">@($"v{AppVersion}")</span>' 'El footer no muestra la versión real con una etiqueta localizada y una expresión Razor explícita.'
+Assert-NotContains $mainLayout '>v@AppVersion</span>' 'El footer conserva la sintaxis ambigua que renderiza v@AppVersion como texto literal.'
 Assert-Contains $mainLayout 'typeof(MainLayout).Assembly.GetName().Version' 'El footer no obtiene la versión desde el ensamblado.'
-Assert-NotContains $mainLayout '<span aria-label="Versión de la aplicación">v1.1.0</span>' 'La versión del footer está escrita manualmente.'
+Assert-NotContains $mainLayout '>v1.1.0</span>' 'La versión del footer está escrita manualmente.'
 Assert-Contains $appCss 'font-family: "Poppins", system-ui, sans-serif;' 'La fuente base global no es Poppins autoalojada con fallbacks locales.'
 Assert-NotContains $appCss "'Poppins', 'Inter', sans-serif" 'Inter continúa como fallback tipográfico global.'
 Assert-Contains $appShell '<body class="h-full text-slate-900 overflow-hidden">' 'El body conserva una clase que puede anular la fuente base.'

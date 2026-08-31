@@ -69,7 +69,9 @@ foreach ($component in @(
 }
 
 $errorPage = Read-RepoFile 'LaPrimitiva.App/Components/Pages/Error.razor'
-Require-Match $errorPage 'Referencia:' 'La página global de error no muestra una referencia correlacionable.'
+Require-Match $errorPage 'ReferenceLabel' 'La página global de error no muestra una referencia correlacionable localizada.'
+$errorResource = Read-RepoFile 'LaPrimitiva.Domain/Localization/ErrorResource.es-ES.resx'
+Require-Match $errorResource 'Referencia:' 'El catálogo de errores no traduce la referencia correlacionable.'
 if ($errorPage -match 'Development Mode|Exception|StackTrace') {
     $failures.Add('La página global de error vuelve a exponer detalles técnicos.')
 }

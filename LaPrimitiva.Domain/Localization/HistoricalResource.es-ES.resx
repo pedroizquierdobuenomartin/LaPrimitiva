@@ -39,4 +39,13 @@
   <data name="Comp" xml:space="preserve"><value>C</value></data>
   <data name="Rein" xml:space="preserve"><value>R</value></data>
   <data name="SaveWinningDraw" xml:space="preserve"><value>Guardar Resultado</value></data>
+  <data name="NoUndo" xml:space="preserve"><value>Esta acción no se puede deshacer.</value></data>
+  <data name="DeleteResultTitle" xml:space="preserve"><value>¿Eliminar resultado?</value></data>
+  <data name="Complementary" xml:space="preserve"><value>Complementario</value></data>
+  <data name="Year" xml:space="preserve"><value>Año</value></data>
+  <data name="ConfigureResults" xml:space="preserve"><value>Configura los resultados auditados del sorteo.</value></data>
+  <data name="DeleteResultDescription" xml:space="preserve"><value>Estás a punto de borrar el sorteo del {0}.</value></data>
+  <data name="Reintegro" xml:space="preserve"><value>Reintegro</value></data>
+  <data name="JokerPlaceholder" xml:space="preserve"><value>P. ej. 1234567</value></data>
+  <data name="UnexpectedSaveError" xml:space="preserve"><value>Ha ocurrido un error inesperado al guardar el sorteo.</value></data>
 </root>

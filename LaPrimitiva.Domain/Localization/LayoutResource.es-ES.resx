@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="ToggleSidebar" xml:space="preserve"><value>Contraer o ampliar la barra lateral</value></data>
+  <data name="OpenMenu" xml:space="preserve"><value>Abrir menú</value></data>
+  <data name="ApplicationVersion" xml:space="preserve"><value>Versión de la aplicación</value></data>
+  <data name="Copyright" xml:space="preserve"><value>© {0} LA PRIMITIVA AUDIT</value></data>
+  <data name="AutomatedCombinations" xml:space="preserve"><value>Combinaciones automáticas</value></data>
+  <data name="FeedbackError" xml:space="preserve"><value>Error</value></data>
+  <data name="FeedbackSuccess" xml:space="preserve"><value>Éxito</value></data>
+  <data name="RecentDraws" xml:space="preserve"><value>Sorteos recientes</value></data>
+  <data name="PendingRegistrationResults" xml:space="preserve"><value>Resultados pendientes de registro</value></data>
+  <data name="Refresh" xml:space="preserve"><value>Actualizar</value></data>
+  <data name="SynchronizingFeed" xml:space="preserve"><value>Sincronizando feed...</value></data>
+  <data name="AllUpToDate" xml:space="preserve"><value>¡Todo al día!</value></data>
+  <data name="NoNewDraws" xml:space="preserve"><value>No hay sorteos nuevos pendientes de registro</value></data>
+  <data name="SearchDraws" xml:space="preserve"><value>Buscar sorteos</value></data>
+  <data name="OrdinaryDraw" xml:space="preserve"><value>Sorteo ordinario</value></data>
+  <data name="SaveToHistorical" xml:space="preserve"><value>Guardar en Histórico</value></data>
+  <data name="ViewHistorical" xml:space="preserve"><value>Ver Histórico</value></data>
+  <data name="SavedToHistorical" xml:space="preserve"><value>Sorteo guardado correctamente en el histórico.</value></data>
+  <data name="SaveDrawError" xml:space="preserve"><value>No se ha podido guardar el sorteo.</value></data>
+  <data name="AppLogoAlt" xml:space="preserve"><value>Logotipo de La Primitiva Audit</value></data>
+  <data name="BreadcrumbAria" xml:space="preserve"><value>Ruta de navegación</value></data>
+</root>

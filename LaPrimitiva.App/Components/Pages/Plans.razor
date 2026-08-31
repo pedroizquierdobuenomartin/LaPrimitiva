@@ -9,6 +9,7 @@
 @using LaPrimitiva.Domain.Localization
 @inject IStringLocalizer<PlansResource> L
 @inject IStringLocalizer<GlobalResource> LG
+@inject IStringLocalizer<ErrorResource> LE
 @inject GlobalState GlobalState
 @inject PlanService PlanService
 @inject NavigationManager Nav
@@ -76,7 +77,7 @@
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                 </svg>
-                                <span class="tracking-tight">@plan.EffectiveFrom.ToString("dd MMM yyyy") - @(plan.EffectiveTo?.ToString("dd MMM yyyy") ?? "∞")</span>
+                                <span class="tracking-tight">@plan.EffectiveFrom.ToString("d") - @(plan.EffectiveTo?.ToString("d") ?? "∞")</span>
                             </div>
                         </div>
                         <div class="flex gap-2 md:gap-3">
@@ -104,11 +105,11 @@
                                 </div>
                                 <div class="p-4 bg-rose-50 rounded-2xl text-center transition-transform hover:scale-105">
                                     <div class="text-[10px] font-bold text-rose-400 uppercase tracking-widest mb-1">@L["TotalCost"]</div>
-                                    <div class="text-xl font-bold text-rose-700">@plan.TotalInvested.ToString("N2")€</div>
+                                    <div class="text-xl font-bold text-rose-700">@plan.TotalInvested.ToString("C2")</div>
                                 </div>
                                 <div class="p-4 bg-emerald-50 rounded-2xl text-center transition-transform hover:scale-105">
                                     <div class="text-[10px] font-bold text-emerald-400 uppercase tracking-widest mb-1">@L["Prizes"]</div>
-                                    <div class="text-xl font-bold text-emerald-700">@plan.TotalPrizesAmount.ToString("N2")€</div>
+                                    <div class="text-xl font-bold text-emerald-700">@plan.TotalPrizesAmount.ToString("C2")</div>
                                 </div>
 
                                 <!-- Row 2 -->
@@ -130,7 +131,7 @@
                             <div class="p-5 md:p-6 @(plan.NetBalance > 0 ? "bg-[var(--brand-positive)]" : plan.NetBalance < 0 ? "bg-[var(--brand-negativo)]" : "bg-slate-500") rounded-2xl shadow-lg flex justify-between items-center transform transition-all hover:-translate-y-1">
                                 <div>
                                     <div class="text-[10px] font-bold text-white/70 uppercase tracking-widest">@L["NetBalance"]</div>
-                                    <div class="text-xl md:text-2xl font-bold text-white tracking-tight">@plan.NetBalance.ToString("N2")€</div>
+                                    <div class="text-xl md:text-2xl font-bold text-white tracking-tight">@plan.NetBalance.ToString("C2")</div>
                                 </div>
                                 <div class="h-10 w-10 md:h-12 md:w-12 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 md:h-7 md:w-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -160,7 +161,7 @@
                                 </div>
                             </div>
                             <div class="space-y-1">
-                                <div class="text-[10px] font-bold text-[var(--brand-text-secondary)] uppercase tracking-widest">Joker</div>
+                                <div class="text-[10px] font-bold text-[var(--brand-text-secondary)] uppercase tracking-widest">@LG["Joker"]</div>
                                 <div class="text-xs md:text-sm font-bold @(plan.EnableJoker ? "text-blue-700" : "text-slate-400") flex items-center gap-2">
                                     <div class="h-2.5 w-2.5 rounded-full @(plan.EnableJoker ? "bg-blue-600" : "bg-slate-300")"></div>
                                     @(plan.EnableJoker ? $"{L["Active"]} ({plan.JokerCostPerBet:N2}€)" : L["Inactive"])
@@ -224,7 +225,7 @@
                         @if (_hasConcurrencyConflict)
                         {
                             <button type="button" @onclick="ReloadPlanAsync" class="mt-3 text-xs font-black uppercase tracking-widest text-rose-700 underline">
-                                Recargar datos actuales
+                                @LG["ReloadCurrentData"]
                             </button>
                         }
                     </div>
@@ -431,7 +432,7 @@
         var year = GlobalState.SelectedYear;
         newPlan = new Plan 
         { 
-            Name = $"Plan {year}", 
+            Name = string.Format(L["DefaultPlanName"], year),
             EffectiveFrom = new DateTime(year, 1, 1), 
             EffectiveTo = new DateTime(year, 12, 31) 
         };
@@ -489,17 +490,17 @@
         {
             ErrorReporter.Report(ex, "SavePlan");
             _hasConcurrencyConflict = true;
-            errorMessage = ApplicationError.FromException(ex).Message;
+            errorMessage = ApplicationError.FromException(ex).ToLocalizedMessage(LE);
         }
         catch (Exception ex) when (ex is IErrorException)
         {
             ErrorReporter.Report(ex, "SavePlan");
-            errorMessage = ApplicationError.FromException(ex).Message;
+            errorMessage = ApplicationError.FromException(ex).ToLocalizedMessage(LE);
         }
         catch (Exception ex)
         {
             var reference = ErrorReporter.Report(ex, "SavePlan");
-            errorMessage = $"{L["SavePlanError"]} Referencia: {reference}.";
+            errorMessage = string.Format(LE["MessageWithReference"], L["SavePlanError"], reference);
         }
     }
 
@@ -560,13 +561,13 @@
         catch (Exception ex) when (ex is IErrorException)
         {
             ErrorReporter.Report(ex, "DeletePlan");
-            _deleteErrorMessage = ApplicationError.FromException(ex).Message;
+            _deleteErrorMessage = ApplicationError.FromException(ex).ToLocalizedMessage(LE);
             _hasLinkedDraws = true; // Refresh state if backend rejected it
         }
         catch (Exception ex)
         {
             var reference = ErrorReporter.Report(ex, "DeletePlan");
-            _deleteErrorMessage = $"{L["UnexpectedDeleteError"]} Referencia: {reference}.";
+            _deleteErrorMessage = string.Format(LE["MessageWithReference"], L["UnexpectedDeleteError"], reference);
         }
     }
 

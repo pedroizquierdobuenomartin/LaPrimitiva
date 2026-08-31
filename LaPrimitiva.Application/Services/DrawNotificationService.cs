@@ -27,6 +27,7 @@ namespace LaPrimitiva.Application.Services
 
             globalState.IsLoading = true;
             globalState.LastError = null;
+            globalState.LastErrorReference = null;
             using var timeoutSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
             timeoutSource.CancelAfter(RssFeedLimits.Timeout);
 
@@ -61,7 +62,7 @@ namespace LaPrimitiva.Application.Services
             {
                 var timeout = new ExternalServiceTimeoutException("SELAE", RssFeedLimits.Timeout, exception);
                 errorReporter.Report(timeout, "RssImport");
-                globalState.LastError = ApplicationError.FromException(timeout).Message;
+                globalState.LastError = ApplicationError.FromException(timeout);
             }
             catch (OperationCanceledException)
             {
@@ -70,12 +71,13 @@ namespace LaPrimitiva.Application.Services
             catch (Exception ex) when (ex is IErrorException)
             {
                 errorReporter.Report(ex, "RssImport");
-                globalState.LastError = ApplicationError.FromException(ex).Message;
+                globalState.LastError = ApplicationError.FromException(ex);
             }
             catch (Exception ex)
             {
                 var reference = errorReporter.Report(ex, "RssImport");
-                globalState.LastError = $"{ApplicationError.FromException(ex).Message} Referencia: {reference}.";
+                globalState.LastError = ApplicationError.FromException(ex);
+                globalState.LastErrorReference = reference;
             }
             finally
             {

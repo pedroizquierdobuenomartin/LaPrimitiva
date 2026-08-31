@@ -5,6 +5,7 @@
 @using LaPrimitiva.Application.DTOs
 @using LaPrimitiva.Application.Services
 @inject IStringLocalizer<CombinationResource> L
+@inject IStringLocalizer<ErrorResource> LE
 @inject IAutomatedCombinationService CombinationService
 @inject ILogger<AutomatedCombination> Logger
 @inject IApplicationErrorReporter ErrorReporter
@@ -19,7 +20,7 @@
                 @L["ValidatedMethod"]
             </div>
             <h1 class="text-3xl md:text-5xl font-black text-gray-950 tracking-[-0.04em] leading-none">
-                @L["Creade"] <span class="text-[var(--brand-primary)]">@L["Combination"]</span> @L["Automated"]
+                @L["CreationOf"] <span class="text-[var(--brand-primary)]">@L["Combination"]</span> @L["Automated"]
             </h1>
             <p class="text-sm md:text-base text-gray-500 font-medium max-w-3xl">
                 @L["AlgorithmSubtitle_Part1"] <span class="text-gray-800 font-bold">@L["UniformSelection"]</span> @L["AlgorithmSubtitle_Part2"]
@@ -103,7 +104,7 @@
                         <ol class="flex flex-wrap items-center justify-center xl:justify-between gap-3 md:gap-4" aria-label="@L["MainNumbers"]">
                             @foreach (var n in _result.Numbers)
                             {
-                                <li class="group/ball relative overflow-hidden h-16 w-16 md:h-20 md:w-20 lg:h-24 lg:w-24 shrink-0 rounded-full bg-gradient-to-br from-white to-emerald-50 border-[3px] border-[var(--brand-primary)]/15 shadow-[inset_0_-8px_16px_rgba(0,112,65,0.08),0_8px_20px_rgba(0,77,45,0.08)] flex items-center justify-center text-2xl md:text-3xl font-black text-[var(--brand-secondary)] transition-transform hover:-translate-y-1" aria-label="Número @n">
+                                <li class="group/ball relative overflow-hidden h-16 w-16 md:h-20 md:w-20 lg:h-24 lg:w-24 shrink-0 rounded-full bg-gradient-to-br from-white to-emerald-50 border-[3px] border-[var(--brand-primary)]/15 shadow-[inset_0_-8px_16px_rgba(0,112,65,0.08),0_8px_20px_rgba(0,77,45,0.08)] flex items-center justify-center text-2xl md:text-3xl font-black text-[var(--brand-secondary)] transition-transform hover:-translate-y-1" aria-label="@string.Format(L["NumberAria"], n)">
                                     <img data-ui="number-ball-clover" src="/images/trebol-suerte.svg" alt="" class="absolute -bottom-1 -right-1 h-10 w-10 md:h-14 md:w-14 lg:h-16 lg:w-16 opacity-[0.14] pointer-events-none rotate-[15deg] transition-transform duration-700 group-hover/ball:rotate-[45deg]" aria-hidden="true" />
                                     <span class="relative z-10">@n</span>
                                 </li>
@@ -189,7 +190,7 @@
                 }
                 else
                 {
-                    <div class="text-xs font-bold text-gray-500 uppercase tracking-widest">@L["EvaluatedDraws"]: @_backtest.EvaluatedDraws (@_backtest.FirstEvaluatedDate?.ToString("dd/MM/yyyy") - @_backtest.LastEvaluatedDate?.ToString("dd/MM/yyyy"))</div>
+                    <div class="text-xs font-bold text-gray-500 uppercase tracking-widest">@L["EvaluatedDraws"]: @_backtest.EvaluatedDraws (@_backtest.FirstEvaluatedDate?.ToString("d") - @_backtest.LastEvaluatedDate?.ToString("d"))</div>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div class="p-5 rounded-3xl bg-indigo-50 border border-indigo-100"><div class="text-xs font-black text-indigo-700 uppercase tracking-widest">@L["WeightedModel"]</div><div class="text-3xl font-black text-gray-900 mt-3">@_backtest.WeightedModel.AverageMatches.ToString("F3")</div><div class="text-xs text-gray-500 font-bold mt-1">@L["AverageMatches"]</div><div class="text-xs text-gray-600 mt-3">@L["MaximumMatches"]: @_backtest.WeightedModel.MaximumMatches · @L["AtLeastThree"]: @_backtest.WeightedModel.DrawsWithAtLeastThreeMatches</div></div>
                         <div class="p-5 rounded-3xl bg-emerald-50 border border-emerald-100"><div class="text-xs font-black text-emerald-700 uppercase tracking-widest">@L["UniformBaseline"]</div><div class="text-3xl font-black text-gray-900 mt-3">@_backtest.UniformBaseline.AverageMatches.ToString("F3")</div><div class="text-xs text-gray-500 font-bold mt-1">@L["AverageMatches"]</div><div class="text-xs text-gray-600 mt-3">@L["MaximumMatches"]: @_backtest.UniformBaseline.MaximumMatches · @L["AtLeastThree"]: @_backtest.UniformBaseline.DrawsWithAtLeastThreeMatches</div></div>
@@ -251,7 +252,7 @@
         catch (Exception ex)
         {
             var reference = ErrorReporter.Report(ex, "AutomatedCombinationBacktest");
-            _backtestError = $"{L["BacktestError"]} Referencia: {reference}.";
+            _backtestError = string.Format(LE["MessageWithReference"], L["BacktestError"], reference);
         }
         finally
         {

@@ -9,12 +9,13 @@
 @inject IDrawService DrawService
 @inject IStringLocalizer<RegistrationResource> L
 @inject IStringLocalizer<GlobalResource> LG
+@inject IStringLocalizer<ErrorResource> LE
 @inject ILogger<Register> Logger
 @inject IApplicationErrorReporter ErrorReporter
 @implements IDisposable
 @attribute [Microsoft.AspNetCore.Components.RouteAttribute(AppRoutes.Registration)]
 
-<PageTitle>Registro - La Primitiva Audit</PageTitle>
+<PageTitle>@L["PageTitle"]</PageTitle>
 
 <div class="space-y-10 animate-in fade-in duration-700">
     <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
@@ -45,7 +46,7 @@
                 }
                 else
                 {
-                    <span class="text-rose-600 text-sm font-bold">No existe plan</span>
+                    <span class="text-rose-600 text-sm font-bold">@L["NoPlanExists"]</span>
                 }
             </div>
         </div>
@@ -56,7 +57,7 @@
         <div class="flex justify-center p-32">
             <div class="relative">
                 <div class="h-24 w-24 rounded-full border-4 border-[var(--brand-bg)] border-t-[var(--brand-primary)] animate-spin"></div>
-                <div class="absolute inset-0 flex items-center justify-center text-[var(--brand-primary)] font-bold text-xs uppercase tracking-tighter">Cargando</div>
+                <div class="absolute inset-0 flex items-center justify-center text-[var(--brand-primary)] font-bold text-xs uppercase tracking-tighter">@L["Loading"]</div>
             </div>
         </div>
     }
@@ -72,8 +73,8 @@
                         <div class="flex justify-between items-start">
                             <div>
                                 <div class="flex items-center gap-2">
-                                    <span class="bg-[var(--brand-secondary)] text-white text-[10px] font-bold px-2 py-0.5 rounded-md">W @draw.WeekNumber</span>
-                                    <span class="text-xs font-bold text-[var(--brand-secondary)]">@draw.DrawDate.ToString("dd/MM/yy")</span>
+                                    <span class="bg-[var(--brand-secondary)] text-white text-[10px] font-bold px-2 py-0.5 rounded-md">@L["WeekShort"] @draw.WeekNumber</span>
+                                    <span class="text-xs font-bold text-[var(--brand-secondary)]">@draw.DrawDate.ToString("d")</span>
                                 </div>
                                 <div class="text-[10px] text-[var(--brand-text-secondary)] italic mt-1 font-medium uppercase tracking-tight">@draw.DrawType</div>
                             </div>
@@ -84,24 +85,24 @@
 
                         <div class="grid grid-cols-3 gap-2">
                             <div class="bg-purple-50 p-2.5 rounded-xl text-center">
-                                <div class="text-[8px] font-bold text-purple-400 uppercase">Coste</div>
-                                <div class="text-xs font-bold text-purple-700 mt-0.5">@draw.TotalCoste.ToString("N2")€</div>
+                                <div class="text-[8px] font-bold text-purple-400 uppercase">@L["Cost"]</div>
+                                <div class="text-xs font-bold text-purple-700 mt-0.5">@draw.TotalCoste.ToString("C2")</div>
                             </div>
                             <div class="bg-emerald-50 p-2.5 rounded-xl text-center">
-                                <div class="text-[8px] font-bold text-emerald-400 uppercase">Premio</div>
-                                <div class="text-xs font-bold text-emerald-700 mt-0.5">@draw.TotalPremios.ToString("N2")€</div>
+                                <div class="text-[8px] font-bold text-emerald-400 uppercase">@L["Prize"]</div>
+                                <div class="text-xs font-bold text-emerald-700 mt-0.5">@draw.TotalPremios.ToString("C2")</div>
                             </div>
                             <div class="p-2.5 rounded-xl text-center @(draw.Neto >= 0 ? "bg-emerald-50" : "bg-rose-50")">
-                                <div class="text-[8px] font-bold @(draw.Neto >= 0 ? "text-emerald-600" : "text-rose-600") uppercase">Neto</div>
-                                <div class="text-xs font-bold @(draw.Neto >= 0 ? "text-emerald-700" : "text-rose-700") mt-0.5">@draw.Neto.ToString("N2")€</div>
+                                <div class="text-[8px] font-bold @(draw.Neto >= 0 ? "text-emerald-600" : "text-rose-600") uppercase">@L["Net"]</div>
+                                <div class="text-xs font-bold @(draw.Neto >= 0 ? "text-emerald-700" : "text-rose-700") mt-0.5">@draw.Neto.ToString("C2")</div>
                             </div>
                         </div>
 
                         <div class="flex justify-between items-end py-1">
                             <div class="px-3 py-2 rounded-xl @(draw.Acumulado < 0 ? "bg-rose-50" : draw.Acumulado == 0 ? "bg-slate-50" : "bg-emerald-50")">
-                                <div class="text-[8px] font-bold @(draw.Acumulado < 0 ? "text-rose-600" : draw.Acumulado == 0 ? "text-slate-600" : "text-emerald-600") uppercase tracking-wider">Acumulado</div>
+                                <div class="text-[8px] font-bold @(draw.Acumulado < 0 ? "text-rose-600" : draw.Acumulado == 0 ? "text-slate-600" : "text-emerald-600") uppercase tracking-wider">@L["Acumulado"]</div>
                                 <div class="text-sm font-black @(draw.Acumulado < 0 ? "text-rose-700" : draw.Acumulado == 0 ? "text-slate-700" : "text-emerald-700")">
-                                    @draw.Acumulado.ToString("N2")€
+                                    @draw.Acumulado.ToString("C2")
                                 </div>
                             </div>
                             <div class="flex gap-2 mb-0.5">
@@ -130,15 +131,15 @@
                                 <th class="sticky left-0 z-20 bg-[var(--brand-bg)]/90 backdrop-blur-sm px-6 py-5 text-[10px] font-bold text-[var(--brand-text-secondary)] uppercase tracking-widest border-r border-[var(--brand-borders)]">@LG["Week"]</th>
                                 <th class="sticky left-[82px] z-20 bg-[var(--brand-bg)]/90 backdrop-blur-sm px-6 py-5 text-[10px] font-bold text-[var(--brand-text-secondary)] uppercase tracking-widest border-r border-[var(--brand-borders)]">@L["DrawType"]</th>
                                 <th class="sticky left-[152px] z-20 bg-[var(--brand-bg)]/90 backdrop-blur-sm px-6 py-5 text-[10px] font-bold text-[var(--brand-text-secondary)] uppercase tracking-widest border-r border-[var(--brand-borders)]">@LG["Date"]</th>
-                                <th class="px-4 py-5 text-[10px] font-bold text-[var(--brand-text-secondary)] uppercase tracking-widest text-center">J.</th>
+                                <th class="px-4 py-5 text-[10px] font-bold text-[var(--brand-text-secondary)] uppercase tracking-widest text-center">@L["JokerShort"]</th>
                                 
-                                <th class="px-4 py-5 text-[10px] font-bold text-[var(--brand-text-secondary)] uppercase tracking-widest text-right bg-white/50">C. Fija</th>
-                                <th class="px-4 py-5 text-[10px] font-bold text-[var(--brand-text-secondary)] uppercase tracking-widest text-right bg-white/50">C. Auto</th>
-                                <th class="px-6 py-5 text-[10px] font-bold text-[var(--brand-secondary)] uppercase tracking-widest text-right bg-white">Total C.</th>
+                                <th class="px-4 py-5 text-[10px] font-bold text-[var(--brand-text-secondary)] uppercase tracking-widest text-right bg-white/50">@L["FixedCostShort"]</th>
+                                <th class="px-4 py-5 text-[10px] font-bold text-[var(--brand-text-secondary)] uppercase tracking-widest text-right bg-white/50">@L["AutoCostShort"]</th>
+                                <th class="px-6 py-5 text-[10px] font-bold text-[var(--brand-secondary)] uppercase tracking-widest text-right bg-white">@L["TotalCostShort"]</th>
                                 
-                                <th class="px-4 py-5 text-[10px] font-bold text-[var(--brand-primary)] uppercase tracking-widest text-right bg-[var(--brand-primary)]/5">P. Fija</th>
-                                <th class="px-4 py-5 text-[10px] font-bold text-[var(--brand-primary)] uppercase tracking-widest text-right bg-[var(--brand-primary)]/5">P. Auto</th>
-                                <th class="px-6 py-5 text-[10px] font-bold text-[var(--brand-secondary)] uppercase tracking-widest text-right bg-[var(--brand-primary)]/10">Total P.</th>
+                                <th class="px-4 py-5 text-[10px] font-bold text-[var(--brand-primary)] uppercase tracking-widest text-right bg-[var(--brand-primary)]/5">@L["FixedPrizeShort"]</th>
+                                <th class="px-4 py-5 text-[10px] font-bold text-[var(--brand-primary)] uppercase tracking-widest text-right bg-[var(--brand-primary)]/5">@L["AutoPrizeShort"]</th>
+                                <th class="px-6 py-5 text-[10px] font-bold text-[var(--brand-secondary)] uppercase tracking-widest text-right bg-[var(--brand-primary)]/10">@L["TotalPrizeShort"]</th>
                                 
                                 <th class="px-6 py-5 text-[10px] font-bold text-[var(--brand-secondary)] uppercase tracking-widest text-right border-l border-[var(--brand-borders)]">@L["Net"]</th>
                                 <th class="px-6 py-5 text-[10px] font-bold text-white uppercase tracking-widest text-right bg-[var(--brand-secondary)]">@L["Acumulado"]</th>
@@ -153,7 +154,7 @@
                                 <tr class="hover:bg-[var(--brand-bg)]/30 transition-colors group">
                                     <td class="sticky left-0 z-10 bg-white group-hover:bg-[var(--brand-bg)]/20 px-6 py-4 font-bold text-[var(--brand-secondary)] border-r border-[var(--brand-bg)] text-center">@draw.WeekNumber</td>
                                     <td class="sticky left-[82px] z-10 bg-white group-hover:bg-[var(--brand-bg)]/20 px-6 py-4 border-r border-[var(--brand-bg)] text-[var(--brand-text-secondary)] italic">@draw.DrawType</td>
-                                    <td class="sticky left-[152px] z-10 bg-white group-hover:bg-[var(--brand-bg)]/20 px-6 py-4 border-r border-[var(--brand-bg)] font-bold">@draw.DrawDate.ToString("dd/MM/yy")</td>
+                                    <td class="sticky left-[152px] z-10 bg-white group-hover:bg-[var(--brand-bg)]/20 px-6 py-4 border-r border-[var(--brand-bg)] font-bold">@draw.DrawDate.ToString("d")</td>
                                     <td class="px-4 py-4 text-center">
                                         <div class="flex justify-center">
                                             <div class="h-5 w-5 rounded-lg @(draw.Played ? "bg-[var(--brand-primary)]" : "bg-slate-100") flex items-center justify-center text-[10px] text-white transition-all transform @(draw.Played ? "rotate-0" : "rotate-45 opacity-50")">
@@ -162,30 +163,30 @@
                                         </div>
                                     </td>
                                     
-                                    <td class="px-4 py-4 text-right text-[var(--brand-text-secondary)]">@draw.CosteFija.ToString("N2")€</td>
-                                    <td class="px-4 py-4 text-right text-[var(--brand-text-secondary)]">@draw.CosteAuto.ToString("N2")€</td>
-                                    <td class="px-6 py-4 text-right font-bold text-[var(--brand-secondary)] bg-slate-50/10">@draw.TotalCoste.ToString("N2")€</td>
+                                    <td class="px-4 py-4 text-right text-[var(--brand-text-secondary)]">@draw.CosteFija.ToString("C2")</td>
+                                    <td class="px-4 py-4 text-right text-[var(--brand-text-secondary)]">@draw.CosteAuto.ToString("C2")</td>
+                                    <td class="px-6 py-4 text-right font-bold text-[var(--brand-secondary)] bg-slate-50/10">@draw.TotalCoste.ToString("C2")</td>
                                     
-                                    <td class="px-4 py-4 text-right text-[var(--brand-primary)]">@draw.FixedPrize.ToString("N2")€</td>
-                                    <td class="px-4 py-4 text-right text-[var(--brand-primary)]">@draw.AutoPrize.ToString("N2")€</td>
-                                    <td class="px-6 py-4 text-right font-bold text-[var(--brand-secondary)] bg-[var(--brand-primary)]/5">@draw.TotalPremios.ToString("N2")€</td>
+                                    <td class="px-4 py-4 text-right text-[var(--brand-primary)]">@draw.FixedPrize.ToString("C2")</td>
+                                    <td class="px-4 py-4 text-right text-[var(--brand-primary)]">@draw.AutoPrize.ToString("C2")</td>
+                                    <td class="px-6 py-4 text-right font-bold text-[var(--brand-secondary)] bg-[var(--brand-primary)]/5">@draw.TotalPremios.ToString("C2")</td>
                                     
                                     <td class="px-6 py-4 text-right font-bold border-l border-[var(--brand-bg)] @(draw.Neto >= 0 ? "text-[var(--brand-positive)]" : "text-[var(--brand-negativo)]")">
-                                        @draw.Neto.ToString("N2")€
+                                        @draw.Neto.ToString("C2")
                                     </td>
                                     <td class="px-6 py-4 text-right font-bold bg-[var(--brand-secondary)]/5 @(draw.Acumulado >= 0 ? "text-[var(--brand-positive)]" : "text-[var(--brand-negativo)]")">
-                                        @draw.Acumulado.ToString("N2")€
+                                        @draw.Acumulado.ToString("C2")
                                     </td>
                                     
                                     <td class="px-6 py-4 max-w-[200px] truncate text-[var(--brand-text-secondary)] italic">@draw.Notes</td>
                                     
                                     <td class="px-6 py-4 flex items-center justify-end gap-3">
-                                        <button @onclick="() => EditDraw(draw)" class="h-9 w-9 rounded-xl text-[var(--brand-accent)] hover:text-[var(--brand-primary)] hover:bg-[var(--brand-primary)]/10 transition-all flex items-center justify-center" title="Editar Semana">
+                                        <button @onclick="() => EditDraw(draw)" class="h-9 w-9 rounded-xl text-[var(--brand-accent)] hover:text-[var(--brand-primary)] hover:bg-[var(--brand-primary)]/10 transition-all flex items-center justify-center" title="@L["EditWeek"]">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                             </svg>
                                         </button>
-                                        <button @onclick="() => ConfirmDeleteWeek(draw.WeekNumber, draw.DrawDate.Year, draw.PlanId)" class="h-9 w-9 rounded-xl text-[var(--brand-accent)] hover:text-rose-500 hover:bg-rose-50 transition-all flex items-center justify-center" title="Eliminar Semana">
+                                        <button @onclick="() => ConfirmDeleteWeek(draw.WeekNumber, draw.DrawDate.Year, draw.PlanId)" class="h-9 w-9 rounded-xl text-[var(--brand-accent)] hover:text-rose-500 hover:bg-rose-50 transition-all flex items-center justify-center" title="@L["DeleteWeek"]">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                             </svg>
@@ -275,12 +276,12 @@
                             </svg>
                         </div>
                         <div class="flex-1">
-                            <p class="text-xs font-bold text-rose-900 uppercase tracking-widest">Error Detectado</p>
+                            <p class="text-xs font-bold text-rose-900 uppercase tracking-widest">@L["DetectedError"]</p>
                             <p class="text-[13px] font-medium text-rose-700/80">@modalErrorMessage</p>
                             @if (_hasConcurrencyConflict)
                             {
                                 <button type="button" @onclick="ReloadWeekAfterConflictAsync" class="mt-2 text-[10px] font-black uppercase tracking-widest text-rose-700 underline">
-                                    Recargar datos actuales
+                                    @LG["ReloadCurrentData"]
                                 </button>
                             }
                         </div>
@@ -296,10 +297,10 @@
                             </svg>
                         </div>
                         <div class="text-center md:text-left space-y-2">
-                            <h4 class="text-xl font-bold text-amber-900 tracking-tight">Semana ya registrada</h4>
+                            <h4 class="text-xl font-bold text-amber-900 tracking-tight">@L["WeekAlreadyRegistered"]</h4>
                             <p class="text-sm font-medium text-amber-800/70 leading-relaxed">
-                                La semana <span class="font-bold text-amber-900">@modalWeek</span> ya tiene sorteos registrados. 
-                                Si deseas modificarlos, por favor pulsa el botón de edición en la lista principal.
+                                @string.Format(L["WeekExistsDescription"], modalWeek)
+                                @L["WeekAlreadyRegisteredHelp"]
                             </p>
                         </div>
                     </div>
@@ -320,9 +321,9 @@
                         
                         <div class="max-w-4xl mx-auto space-y-8 md:space-y-12 relative z-10">
                             <div class="text-center space-y-2">
-                                <span class="inline-block px-3 py-1 rounded-full bg-[var(--brand-bg)] text-[var(--brand-primary)] text-[8px] md:text-[10px] font-bold uppercase tracking-widest mb-1 md:mb-2">Configurador Inteligente</span>
-                                <h4 class="text-2xl md:text-4xl font-bold text-[var(--brand-secondary)] tracking-tight">Personaliza tu Semana</h4>
-                                <p class="text-[var(--brand-text-secondary)] font-medium text-sm md:text-lg">Configura el plan de apuestas para la semana @modalWeek.</p>
+                                <span class="inline-block px-3 py-1 rounded-full bg-[var(--brand-bg)] text-[var(--brand-primary)] text-[8px] md:text-[10px] font-bold uppercase tracking-widest mb-1 md:mb-2">@L["SmartConfigurator"]</span>
+                                <h4 class="text-2xl md:text-4xl font-bold text-[var(--brand-secondary)] tracking-tight">@L["CustomizeWeek"]</h4>
+                                <p class="text-[var(--brand-text-secondary)] font-medium text-sm md:text-lg">@string.Format(L["ConfigureWeekPlan"], modalWeek)</p>
                             </div>
 
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12">
@@ -334,7 +335,7 @@
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                                             </svg>
                                         </div>
-                                        <label class="text-[10px] md:text-xs font-bold text-[var(--brand-secondary)] uppercase tracking-widest">Modelo de Plan</label>
+                                        <label class="text-[10px] md:text-xs font-bold text-[var(--brand-secondary)] uppercase tracking-widest">@L["PlanModel"]</label>
                                     </div>
                                     <div class="relative group">
                                         <select @bind="selectedPlanId" class="w-full bg-[var(--brand-bg)] border-2 border-[var(--brand-bg)] rounded-xl md:rounded-[1.5rem] p-4 md:p-5 text-sm md:text-base font-bold text-[var(--brand-secondary)] focus:ring-4 focus:ring-[var(--brand-primary)]/10 focus:border-[var(--brand-primary)]/20 transition-all appearance-none cursor-pointer">
@@ -362,12 +363,12 @@
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                                             </svg>
                                         </div>
-                                        <label class="text-[10px] md:text-xs font-bold text-[var(--brand-secondary)] uppercase tracking-widest">Añadir Sorteos</label>
+                                        <label class="text-[10px] md:text-xs font-bold text-[var(--brand-secondary)] uppercase tracking-widest">@L["AddDraws"]</label>
                                     </div>
                                     <div class="flex flex-wrap gap-2 md:gap-3">
-                                        <button @onclick='() => AddDrawTemplate(DayOfWeek.Monday)' class="flex-1 bg-white border-2 border-[var(--brand-bg)] text-[var(--brand-text-secondary)] px-3 md:px-6 py-3 md:py-4 rounded-xl md:rounded-2xl text-[10px] md:text-[11px] font-bold uppercase tracking-wider hover:border-[var(--brand-primary)] hover:text-[var(--brand-primary)] hover:bg-[var(--brand-primary)]/5 transition-all active:scale-95">Lunes</button>
-                                        <button @onclick='() => AddDrawTemplate(DayOfWeek.Thursday)' class="flex-1 bg-white border-2 border-[var(--brand-bg)] text-[var(--brand-text-secondary)] px-3 md:px-6 py-3 md:py-4 rounded-xl md:rounded-2xl text-[10px] md:text-[11px] font-bold uppercase tracking-wider hover:border-[var(--brand-primary)] hover:text-[var(--brand-primary)] hover:bg-[var(--brand-primary)]/5 transition-all active:scale-95">Jueves</button>
-                                        <button @onclick='() => AddDrawTemplate(DayOfWeek.Saturday)' class="flex-1 bg-white border-2 border-[var(--brand-bg)] text-[var(--brand-text-secondary)] px-3 md:px-6 py-3 md:py-4 rounded-xl md:rounded-2xl text-[10px] md:text-[11px] font-bold uppercase tracking-wider hover:border-[var(--brand-primary)] hover:text-[var(--brand-primary)] hover:bg-[var(--brand-primary)]/5 transition-all active:scale-95">Sábado</button>
+                                        <button @onclick='() => AddDrawTemplate(DayOfWeek.Monday)' class="flex-1 bg-white border-2 border-[var(--brand-bg)] text-[var(--brand-text-secondary)] px-3 md:px-6 py-3 md:py-4 rounded-xl md:rounded-2xl text-[10px] md:text-[11px] font-bold uppercase tracking-wider hover:border-[var(--brand-primary)] hover:text-[var(--brand-primary)] hover:bg-[var(--brand-primary)]/5 transition-all active:scale-95">@L["Monday"]</button>
+                                        <button @onclick='() => AddDrawTemplate(DayOfWeek.Thursday)' class="flex-1 bg-white border-2 border-[var(--brand-bg)] text-[var(--brand-text-secondary)] px-3 md:px-6 py-3 md:py-4 rounded-xl md:rounded-2xl text-[10px] md:text-[11px] font-bold uppercase tracking-wider hover:border-[var(--brand-primary)] hover:text-[var(--brand-primary)] hover:bg-[var(--brand-primary)]/5 transition-all active:scale-95">@L["Thursday"]</button>
+                                        <button @onclick='() => AddDrawTemplate(DayOfWeek.Saturday)' class="flex-1 bg-white border-2 border-[var(--brand-bg)] text-[var(--brand-text-secondary)] px-3 md:px-6 py-3 md:py-4 rounded-xl md:rounded-2xl text-[10px] md:text-[11px] font-bold uppercase tracking-wider hover:border-[var(--brand-primary)] hover:text-[var(--brand-primary)] hover:bg-[var(--brand-primary)]/5 transition-all active:scale-95">@L["Saturday"]</button>
                                     </div>
                                     
                                     @if (tempModalDraws.Any())
@@ -382,7 +383,7 @@
                                                         </div>
                                                         <div>
                                                             <div class="text-[10px] md:text-xs font-bold text-[var(--brand-secondary)] uppercase tracking-tight">@d.DrawType</div>
-                                                            <div class="text-[9px] md:text-[10px] text-[var(--brand-text-secondary)] font-medium">@d.DrawDate.ToString("MMMM yyyy")</div>
+                                                            <div class="text-[9px] md:text-[10px] text-[var(--brand-text-secondary)] font-medium">@d.DrawDate.ToString("Y")</div>
                                                         </div>
                                                     </div>
                                                     <button @onclick="() => tempModalDraws.Remove(d)" class="h-8 w-8 md:h-10 md:w-10 text-[var(--brand-accent)] hover:text-rose-500 hover:bg-rose-50 rounded-lg md:rounded-xl transition-all flex items-center justify-center">
@@ -399,7 +400,7 @@
 
                             <div class="pt-6 md:pt-8 flex justify-center border-t border-[var(--brand-bg)]">
                                 <button @onclick="PrepareNewWeek" disabled="@(!tempModalDraws.Any())" class="group relative bg-[var(--brand-secondary)] text-white px-8 md:px-12 py-4 md:py-5 rounded-xl md:rounded-[2rem] text-xs md:text-sm font-bold uppercase tracking-[0.2em] shadow-xl shadow-[var(--brand-secondary)]/10 hover:bg-black transition-all flex items-center gap-3 md:gap-4 disabled:opacity-20 disabled:grayscale disabled:pointer-events-none active:scale-95">
-                                    <span>Comenzar Auditoría</span>
+                                    <span>@L["StartAudit"]</span>
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 md:h-5 md:w-5 transition-transform group-hover:translate-x-1" viewBox="0 0 20 20" fill="currentColor">
                                         <path fill-rule="evenodd" d="M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd" />
                                     </svg>
@@ -419,7 +420,7 @@
                                     <div class="space-y-1">
                                         <div class="text-[8px] md:text-[10px] font-bold text-[var(--brand-text-secondary)] uppercase tracking-widest">@L["DrawType"]</div>
                                         <div class="text-lg md:text-2xl font-bold text-[var(--brand-secondary)]">@draw.DrawType</div>
-                                        <div class="text-[10px] md:text-sm font-bold text-[var(--brand-text-secondary)]/60 font-mono">@draw.DrawDate.ToString("dd/MM/yyyy")</div>
+                                        <div class="text-[10px] md:text-sm font-bold text-[var(--brand-text-secondary)]/60 font-mono">@draw.DrawDate.ToString("d")</div>
                                     </div>
                                     <label class="flex items-center gap-2 md:gap-3 p-2 md:p-3 rounded-xl md:rounded-2xl cursor-pointer transition-all @(draw.Played ? "bg-[var(--brand-primary)]/10 text-[var(--brand-primary)]" : "bg-[var(--brand-bg)] text-[var(--brand-text-secondary)] hover:bg-[var(--brand-borders)]") shrink-0">
                                         <input type="checkbox" @bind="draw.Played" @bind:after="() => RecalculateDraw(draw, forceDefaults: true)" class="h-4 w-4 md:h-5 md:w-5 rounded-lg border-current focus:ring-0 text-[var(--brand-primary)]" />
@@ -444,11 +445,11 @@
                                             @if (IsJokerVisible(draw))
                                             {
                                                 <div class="group">
-                                                    <label class="text-[8px] md:text-[9px] font-bold text-[var(--brand-text-secondary)]/50 uppercase ml-1">Joker Fija (€)</label>
+                                                    <label class="text-[8px] md:text-[9px] font-bold text-[var(--brand-text-secondary)]/50 uppercase ml-1">@L["FixedJoker"]</label>
                                                     <input type="number" step="0.01" @bind="draw.CosteJokerFija" @bind:after="() => RecalculateDraw(draw)" disabled="@(!draw.Played)" class="w-full bg-[var(--brand-bg)] border-none rounded-xl p-2 md:p-3 text-xs md:text-sm font-bold focus:ring-2 focus:ring-[var(--brand-primary)]/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all" />
                                                 </div>
                                                 <div class="group">
-                                                    <label class="text-[8px] md:text-[9px] font-bold text-[var(--brand-text-secondary)]/50 uppercase ml-1">Joker Auto (€)</label>
+                                                    <label class="text-[8px] md:text-[9px] font-bold text-[var(--brand-text-secondary)]/50 uppercase ml-1">@L["AutoJoker"]</label>
                                                     <input type="number" step="0.01" @bind="draw.CosteJokerAuto" @bind:after="() => RecalculateDraw(draw)" disabled="@(!draw.Played)" class="w-full bg-[var(--brand-bg)] border-none rounded-xl p-2 md:p-3 text-xs md:text-sm font-bold focus:ring-2 focus:ring-[var(--brand-primary)]/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all" />
                                                 </div>
                                             }
@@ -457,24 +458,24 @@
 
                                     <!-- Prizes Entry -->
                                     <div class="space-y-3 md:space-y-4">
-                                        <div class="text-[9px] md:text-[10px] font-bold text-[var(--brand-primary)] uppercase tracking-widest px-1">Premios</div>
+                                        <div class="text-[9px] md:text-[10px] font-bold text-[var(--brand-primary)] uppercase tracking-widest px-1">@L["Prizes"]</div>
                                         <div class="grid grid-cols-2 sm:grid-cols-1 gap-3">
                                             <div class="group">
-                                                <label class="text-[8px] md:text-[9px] font-bold text-[var(--brand-primary)]/50 uppercase ml-1">Fija (€)</label>
+                                                <label class="text-[8px] md:text-[9px] font-bold text-[var(--brand-primary)]/50 uppercase ml-1">@L["Fixed"]</label>
                                                 <input type="number" step="0.01" @bind="draw.FixedPrize" @bind:after="() => RecalculateDraw(draw)" disabled="@(!draw.Played || draw.CosteFija == 0)" class="w-full bg-[var(--brand-primary)]/5 border-none rounded-xl p-2 md:p-3 text-xs md:text-sm font-bold text-[var(--brand-primary)] focus:ring-2 focus:ring-[var(--brand-primary)]/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all" />
                                             </div>
                                             <div class="group">
-                                                <label class="text-[8px] md:text-[9px] font-bold text-[var(--brand-primary)]/50 uppercase ml-1">Auto (€)</label>
+                                                <label class="text-[8px] md:text-[9px] font-bold text-[var(--brand-primary)]/50 uppercase ml-1">@L["Auto"]</label>
                                                 <input type="number" step="0.01" @bind="draw.AutoPrize" @bind:after="() => RecalculateDraw(draw)" disabled="@(!draw.Played || draw.CosteAuto == 0)" class="w-full bg-[var(--brand-primary)]/5 border-none rounded-xl p-2 md:p-3 text-xs md:text-sm font-bold text-[var(--brand-primary)] focus:ring-2 focus:ring-[var(--brand-primary)]/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all" />
                                             </div>
                                             @if (IsJokerVisible(draw))
                                             {
                                                 <div class="group">
-                                                    <label class="text-[8px] md:text-[9px] font-bold text-[var(--brand-primary)]/50 uppercase ml-1">Joker Fija (€)</label>
+                                                    <label class="text-[8px] md:text-[9px] font-bold text-[var(--brand-primary)]/50 uppercase ml-1">@L["FixedJoker"]</label>
                                                     <input type="number" step="0.01" @bind="draw.JokerFixedPrize" @bind:after="() => RecalculateDraw(draw)" disabled="@(!draw.Played || draw.CosteJokerFija == 0)" class="w-full bg-[var(--brand-primary)]/5 border-none rounded-xl p-2 md:p-3 text-xs md:text-sm font-bold text-[var(--brand-primary)] focus:ring-2 focus:ring-[var(--brand-primary)]/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all" />
                                                 </div>
                                                 <div class="group">
-                                                    <label class="text-[8px] md:text-[9px] font-bold text-[var(--brand-primary)]/50 uppercase ml-1">Joker Auto (€)</label>
+                                                    <label class="text-[8px] md:text-[9px] font-bold text-[var(--brand-primary)]/50 uppercase ml-1">@L["AutoJoker"]</label>
                                                     <input type="number" step="0.01" @bind="draw.JokerAutoPrize" @bind:after="() => RecalculateDraw(draw)" disabled="@(!draw.Played || draw.CosteJokerAuto == 0)" class="w-full bg-[var(--brand-primary)]/5 border-none rounded-xl p-2 md:p-3 text-xs md:text-sm font-bold text-[var(--brand-primary)] focus:ring-2 focus:ring-[var(--brand-primary)]/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all" />
                                                 </div>
                                             }
@@ -487,23 +488,23 @@
                                         <div class="bg-[var(--brand-bg)] rounded-2xl p-3 md:p-4 space-y-2 md:space-y-4">
                                             <div class="flex justify-between items-center text-[8px] md:text-[10px] font-bold">
                                                 <span class="text-[var(--brand-text-secondary)]/50">@L["TotalCostLabel"]:</span>
-                                                <span class="text-[var(--brand-secondary)]">@draw.TotalCoste.ToString("N2")€</span>
+                                                <span class="text-[var(--brand-secondary)]">@draw.TotalCoste.ToString("C2")</span>
                                             </div>
                                             <div class="flex justify-between items-center text-[8px] md:text-[10px] font-bold">
                                                 <span class="text-[var(--brand-primary)]">@L["TotalPrizesLabel"]:</span>
-                                                <span class="text-[var(--brand-primary)]">@draw.TotalPremios.ToString("N2")€</span>
+                                                <span class="text-[var(--brand-primary)]">@draw.TotalPremios.ToString("C2")</span>
                                             </div>
                                             <div class="pt-1 md:pt-2 border-t border-[var(--brand-borders)] flex justify-between items-center">
                                                 <span class="text-[8px] md:text-[10px] font-bold text-[var(--brand-text-secondary)]">@L["NetDrawLabel"]:</span>
-                                                <span class="text-base md:text-xl font-bold @(draw.Neto >= 0 ? "text-[var(--brand-positive)]" : "text-[var(--brand-negativo)]")">@draw.Neto.ToString("N2")€</span>
+                                                <span class="text-base md:text-xl font-bold @(draw.Neto >= 0 ? "text-[var(--brand-positive)]" : "text-[var(--brand-negativo)]")">@draw.Neto.ToString("C2")</span>
                                             </div>
                                         </div>
                                     </div>
 
                                     <!-- Notes -->
                                     <div class="space-y-3 md:space-y-4">
-                                        <div class="text-[9px] md:text-[10px] font-bold text-[var(--brand-text-secondary)] uppercase tracking-widest px-1">Observaciones</div>
-                                        <textarea @bind="draw.Notes" class="w-full bg-[var(--brand-bg)] border-none rounded-xl md:rounded-2xl p-3 md:p-4 text-[10px] md:text-[11px] font-medium text-[var(--brand-text-secondary)] focus:ring-2 focus:ring-[var(--brand-primary)]/20 h-20 md:h-28 resize-none transition-all" placeholder="Notas de auditoría..."></textarea>
+                                        <div class="text-[9px] md:text-[10px] font-bold text-[var(--brand-text-secondary)] uppercase tracking-widest px-1">@L["Observations"]</div>
+                                        <textarea @bind="draw.Notes" class="w-full bg-[var(--brand-bg)] border-none rounded-xl md:rounded-2xl p-3 md:p-4 text-[10px] md:text-[11px] font-medium text-[var(--brand-text-secondary)] focus:ring-2 focus:ring-[var(--brand-primary)]/20 h-20 md:h-28 resize-none transition-all" placeholder="@L["AuditNotesPlaceholder"]"></textarea>
                                     </div>
                                 </div>
                             </div>
@@ -581,7 +582,7 @@
 
 @code {
     private List<DrawWithCumulative>? drawsWithCumulative;
-    private string activePlanName = "Sin Plan";
+    private string activePlanName = string.Empty;
     private Plan? modalPlan;
 
     // Modal State
@@ -739,11 +740,11 @@
             if (rawDraws.Any())
             {
                 var lastDraw = rawDraws.Last();
-                activePlanName = allPlans?.FirstOrDefault(p => p.Id == lastDraw.PlanId)?.Name ?? "Sin Plan";
+                activePlanName = allPlans?.FirstOrDefault(p => p.Id == lastDraw.PlanId)?.Name ?? L["NoPlanExists"];
             }
             else
             {
-                activePlanName = allPlans?.FirstOrDefault(p => p.Id == GlobalState.SelectedPlanId)?.Name ?? "Sin Plan";
+                activePlanName = allPlans?.FirstOrDefault(p => p.Id == GlobalState.SelectedPlanId)?.Name ?? L["NoPlanExists"];
             }
             
             StateHasChanged();
@@ -879,7 +880,7 @@
         
         if (tempModalDraws.Any(d => d.DrawDate.Date == draw.DrawDate.Date))
         {
-            modalErrorMessage = $"Ya has añadido un sorteo para el {draw.DrawDate:dd/MM/yyyy}.";
+            modalErrorMessage = string.Format(L["DuplicateTemplate"], draw.DrawDate.ToString("d"));
             return;
         }
 
@@ -912,17 +913,17 @@
         {
             ErrorReporter.Report(ex, "SaveDraw");
             _hasConcurrencyConflict = true;
-            modalErrorMessage = ApplicationError.FromException(ex).Message;
+            modalErrorMessage = ApplicationError.FromException(ex).ToLocalizedMessage(LE);
         }
         catch (Exception ex) when (ex is IErrorException)
         {
             ErrorReporter.Report(ex, "SaveDraw");
-            modalErrorMessage = ApplicationError.FromException(ex).Message;
+            modalErrorMessage = ApplicationError.FromException(ex).ToLocalizedMessage(LE);
         }
         catch (Exception ex)
         {
             var reference = ErrorReporter.Report(ex, "SaveDraw");
-            modalErrorMessage = $"Ha ocurrido un error inesperado al guardar los cambios. Referencia: {reference}.";
+            modalErrorMessage = string.Format(L["UnexpectedSaveWithReference"], reference);
         }
     }
 

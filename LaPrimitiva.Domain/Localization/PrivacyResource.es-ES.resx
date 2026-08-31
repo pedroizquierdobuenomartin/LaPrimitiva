@@ -54,4 +54,5 @@
   <data name="ContactTitle" xml:space="preserve"><value>¿Dudas sobre tus datos?</value></data>
   <data name="ContactDesc" xml:space="preserve"><value>Para cualquier consulta legal o técnica sobre privacidad, contacta con nuestro DPO.</value></data>
   <data name="ContactButton" xml:space="preserve"><value>Consultar DPO</value></data>
+  <data name="CertifiedSecurity" xml:space="preserve"><value>Seguridad certificada</value></data>
 </root>

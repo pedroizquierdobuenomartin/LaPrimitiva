@@ -50,4 +50,6 @@
   </data>
   <data name="Expense" xml:space="preserve"><value>Gasto</value></data>
   <data name="Prize" xml:space="preserve"><value>Premio</value></data>
+  <data name="JokerTotal" xml:space="preserve"><value>Joker (Total)</value></data>
+  <data name="LoadingData" xml:space="preserve"><value>Cargando datos...</value></data>
 </root>

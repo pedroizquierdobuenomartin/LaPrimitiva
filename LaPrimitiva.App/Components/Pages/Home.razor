@@ -1,4 +1,4 @@
-﻿@page "/"
+@page "/"
 @using LaPrimitiva.Application.Services
 @using LaPrimitiva.Application.Interfaces
 @using LaPrimitiva.Application.DTOs
@@ -25,7 +25,7 @@
     {
         <div class="flex flex-col items-center justify-center p-32 bg-white rounded-[var(--radius-card)] border border-[var(--brand-borders)] shadow-sm">
             <div class="animate-spin rounded-full h-16 w-16 border-b-4 border-[var(--brand-primary)] mb-6"></div>
-            <p class="text-[var(--brand-text-secondary)] font-bold text-lg">Cargando datos...</p>
+            <p class="text-[var(--brand-text-secondary)] font-bold text-lg">@L["LoadingData"]</p>
         </div>
     }
     else
@@ -81,13 +81,13 @@
                         <div class="flex justify-between text-sm mb-4">
                             <span class="font-bold text-[var(--brand-text-primary)] group-hover:text-[var(--brand-primary)] transition-colors">@L["FixedCombination"]</span>
                             <span class="@(summary.FixedNet >= 0 ? "text-[var(--brand-positive)]" : "text-[var(--brand-negativo)]") font-bold text-lg">
-                                @(summary.FixedNet.ToString("N2"))€
+                                @(summary.FixedNet.ToString("C2"))
                             </span>
                         </div>
                         <BreakdownBar Spent="@summary.FixedSpent" Won="@summary.FixedWon" AriaLabel="@L["FixedCombination"]" />
                         <div class="flex justify-between text-xs font-bold text-[var(--brand-text-secondary)] mt-3">
-                            <span>@L["Expense"]: @summary.FixedSpent.ToString("N2")€</span>
-                            <span>@L["Prize"]: @summary.FixedWon.ToString("N2")€</span>
+                            <span>@L["Expense"]: @summary.FixedSpent.ToString("C2")</span>
+                            <span>@L["Prize"]: @summary.FixedWon.ToString("C2")</span>
                         </div>
                     </div>
 
@@ -95,29 +95,29 @@
                         <div class="flex justify-between text-sm mb-4">
                             <span class="font-bold text-[var(--brand-text-primary)] group-hover:text-[var(--brand-primary)] transition-colors">@L["AutoCombination"]</span>
                             <span class="@(summary.AutoNet >= 0 ? "text-[var(--brand-positive)]" : "text-[var(--brand-negativo)]") font-bold text-lg">
-                                @(summary.AutoNet.ToString("N2"))€
+                                @(summary.AutoNet.ToString("C2"))
                             </span>
                         </div>
                         <BreakdownBar Spent="@summary.AutoSpent" Won="@summary.AutoWon" AriaLabel="@L["AutoCombination"]" />
                         <div class="flex justify-between text-xs font-bold text-[var(--brand-text-secondary)] mt-3">
-                            <span>@L["Expense"]: @summary.AutoSpent.ToString("N2")€</span>
-                            <span>@L["Prize"]: @summary.AutoWon.ToString("N2")€</span>
+                            <span>@L["Expense"]: @summary.AutoSpent.ToString("C2")</span>
+                            <span>@L["Prize"]: @summary.AutoWon.ToString("C2")</span>
                         </div>
                     </div>
 
                     <div class="group px-1">
                         <div class="flex justify-between text-sm mb-4">
-                            <span class="font-bold text-[var(--brand-text-primary)] group-hover:text-[var(--brand-primary)] transition-colors">Joker (Total)</span>
+                            <span class="font-bold text-[var(--brand-text-primary)] group-hover:text-[var(--brand-primary)] transition-colors">@L["JokerTotal"]</span>
                             <span class="@(summary.JokerNet >= 0 ? "text-[var(--brand-positive)]" : "text-[var(--brand-negativo)]") font-bold text-lg">
-                                @(summary.JokerNet.ToString("N2"))€
+                                @(summary.JokerNet.ToString("C2"))
                             </span>
                         </div>
                         <BreakdownBar Spent="@summary.JokerSpent"
                                       Won="@summary.JokerWon"
-                                      AriaLabel="Joker (Total)" />
+                                      AriaLabel="@L["JokerTotal"]" />
                         <div class="flex justify-between text-xs font-bold text-[var(--brand-text-secondary)] mt-3">
-                            <span>@L["Expense"]: @(summary.JokerSpent.ToString("N2"))€</span>
-                            <span>@L["Prize"]: @(summary.JokerWon.ToString("N2"))€</span>
+                            <span>@L["Expense"]: @(summary.JokerSpent.ToString("C2"))</span>
+                            <span>@L["Prize"]: @(summary.JokerWon.ToString("C2"))</span>
                         </div>
                     </div>
                 </div>

@@ -1,6 +1,5 @@
 using LaPrimitiva.Domain.Repositories;
 using LaPrimitiva.Infrastructure.Persistence.Seed;
-using LaPrimitiva.App.Models;
 using LaPrimitiva.Infrastructure.Repositories;
 using LaPrimitiva.Infrastructure.Persistence;
 using LaPrimitiva.Infrastructure.Services;
@@ -15,6 +14,9 @@ using LaPrimitiva.App.Observability;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using System.Text.Json;
+using LaPrimitiva.App.Localization;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.Localization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -31,13 +33,19 @@ builder.Logging.AddProvider(new SecureJsonFileLoggerProvider(
     Path.Combine(builder.Environment.ContentRootPath, "logs")));
 
 // Add services to the container.
-builder.Configuration.AddJsonFile("reconnection.json", optional: false, reloadOnChange: true);
-builder.Services.Configure<ReconnectionLabels>(builder.Configuration.GetSection("ReconnectionLabels"));
-
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
 builder.Services.AddLocalization();
+builder.Services.AddSingleton<IStringLocalizerFactory, RequiredStringLocalizerFactory>();
+var requestLocalizationOptions = LocalizationConfiguration.CreateRequestLocalizationOptions();
+builder.Services.Configure<RequestLocalizationOptions>(options =>
+{
+    options.DefaultRequestCulture = requestLocalizationOptions.DefaultRequestCulture;
+    options.SupportedCultures = requestLocalizationOptions.SupportedCultures;
+    options.SupportedUICultures = requestLocalizationOptions.SupportedUICultures;
+    options.ApplyCurrentCultureToResponseHeaders = requestLocalizationOptions.ApplyCurrentCultureToResponseHeaders;
+});
 
 // Create a short-lived DbContext for each data operation. A scoped DbContext
 // would otherwise live for the complete interactive Blazor circuit.
@@ -83,6 +91,7 @@ app.UseMiddleware<LocalOnlyMiddleware>();
 app.UseMiddleware<CorrelationIdMiddleware>();
 app.UseMiddleware<SecurityHeadersMiddleware>();
 app.UseHttpsRedirection();
+app.UseRequestLocalization(requestLocalizationOptions);
 
 app.UseAntiforgery();
 

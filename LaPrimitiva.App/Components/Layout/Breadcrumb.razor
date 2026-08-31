@@ -2,9 +2,10 @@
 @using LaPrimitiva.Domain.Localization
 @inject NavigationManager NavigationManager
 @inject IStringLocalizer<GlobalResource> L
+@inject IStringLocalizer<LayoutResource> LL
 @implements IDisposable
 
-<nav class="flex" aria-label="Breadcrumb">
+<nav class="flex" aria-label="@LL["BreadcrumbAria"]">
     <ol class="inline-flex items-center space-x-1 md:space-x-3 text-xs font-medium uppercase tracking-wider">
         <li class="inline-flex items-center">
             <NavLink href="" class="inline-flex items-center text-[var(--brand-text-secondary)] hover:text-[var(--brand-primary)] transition-colors">
@@ -21,7 +22,7 @@
                 <li>
                     <div class="flex items-center">
                         <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
-                        <span class="ml-1 text-[var(--brand-secondary)] font-bold md:ml-2">@L[segment]</span>
+                        <span class="ml-1 text-[var(--brand-secondary)] font-bold md:ml-2">@GetSegmentLabel(segment)</span>
                     </div>
                 </li>
             }
@@ -50,6 +51,19 @@
         _currentPath = NavigationManager.ToBaseRelativePath(NavigationManager.Uri);
         _segments = _currentPath.Split('/', StringSplitOptions.RemoveEmptyEntries);
     }
+
+    private string GetSegmentLabel(string segment) => segment.ToLowerInvariant() switch
+    {
+        "registro" => L["Registration"],
+        "planes" => L["Plans"],
+        "historico" => L["Historical"],
+        "datos" => L["Data"],
+        "ayuda" => L["Help"],
+        "privacidad" => L["Privacy"],
+        "terminos" => L["Terms"],
+        "combinacion-automatica" => LL["AutomatedCombinations"],
+        _ => throw new MissingLocalizationResourceException($"Breadcrumb route: {segment}")
+    };
 
     public void Dispose()
     {

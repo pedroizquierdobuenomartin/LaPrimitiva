@@ -5,6 +5,7 @@ using System.Linq.Expressions;
 using System.Threading.Tasks;
 using LaPrimitiva.Application.Services;
 using LaPrimitiva.Domain.Entities;
+using LaPrimitiva.Domain.Errors;
 using LaPrimitiva.Domain.Repositories;
 using Moq;
 using Xunit;
@@ -48,7 +49,7 @@ namespace LaPrimitiva.Tests
                 .ReturnsAsync(true);
 
             // Act & Assert
-            await Assert.ThrowsAsync<InvalidOperationException>(() => 
+            await Assert.ThrowsAsync<DataIntegrityException>(() =>
                 _service.ValidateDrawAsync(Guid.NewGuid(), DateTime.Now));
         }
 
@@ -69,11 +70,11 @@ namespace LaPrimitiva.Tests
             _planRepoMock.Setup(r => r.GetAsync(planId)).ReturnsAsync(plan);
 
             // Act & Assert (Date before)
-            await Assert.ThrowsAsync<InvalidOperationException>(() => 
+            await Assert.ThrowsAsync<BusinessRuleException>(() =>
                 _service.ValidateDrawAsync(planId, new DateTime(2025, 12, 31)));
 
             // Act & Assert (Date after)
-            await Assert.ThrowsAsync<InvalidOperationException>(() => 
+            await Assert.ThrowsAsync<BusinessRuleException>(() =>
                 _service.ValidateDrawAsync(planId, new DateTime(2027, 1, 1)));
         }
 

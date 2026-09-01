@@ -1,4 +1,5 @@
 using LaPrimitiva.Domain.Entities;
+using LaPrimitiva.Domain.Errors;
 using LaPrimitiva.Infrastructure.Persistence;
 using LaPrimitiva.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
@@ -15,7 +16,7 @@ public class WinningDrawRepositoryTests
         var draw = CreateValidDraw();
         draw.Number6 = 50;
 
-        await Assert.ThrowsAsync<InvalidOperationException>(
+        await Assert.ThrowsAsync<BusinessRuleException>(
             () => repository.CreateAsync(draw));
 
         await using var context = await factory.CreateDbContextAsync(TestContext.Current.CancellationToken);
@@ -36,7 +37,7 @@ public class WinningDrawRepositoryTests
         invalidUpdate.Id = draw.Id;
         invalidUpdate.Reintegro = 10;
 
-        await Assert.ThrowsAsync<InvalidOperationException>(
+        await Assert.ThrowsAsync<BusinessRuleException>(
             () => repository.UpdateAsync(invalidUpdate));
 
         Assert.Equal(

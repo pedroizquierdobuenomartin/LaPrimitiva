@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Text.Json;
 
 namespace LaPrimitiva.App.Observability;
@@ -39,7 +40,7 @@ public sealed class SecureJsonFileLoggerProvider : ILoggerProvider, ISupportExte
             {
                 foreach (var property in structuredState.Where(property => property.Key != "{OriginalFormat}"))
                 {
-                    properties[property.Key] = property.Value;
+                    properties[property.Key] = NormalizeValue(property.Value);
                 }
             }
 
@@ -48,7 +49,9 @@ public sealed class SecureJsonFileLoggerProvider : ILoggerProvider, ISupportExte
             {
                 if (scope is IEnumerable<KeyValuePair<string, object?>> structuredScope)
                 {
-                    target.Add(structuredScope.ToDictionary(item => item.Key, item => item.Value));
+                    target.Add(structuredScope.ToDictionary(
+                        item => item.Key,
+                        item => NormalizeValue(item.Value)));
                 }
                 else
                 {
@@ -90,6 +93,66 @@ public sealed class SecureJsonFileLoggerProvider : ILoggerProvider, ISupportExte
         {
             // A serialization failure in this optional sink must not terminate the application.
         }
+        catch (NotSupportedException)
+        {
+            // Provider state can contain framework types that System.Text.Json cannot serialize.
+            // The optional file sink must never break the request that produced the log entry.
+        }
+    }
+
+    private static object? NormalizeValue(object? value, int depth = 0)
+    {
+        if (value is null || value is string || value is bool || value is byte || value is sbyte ||
+            value is short || value is ushort || value is int || value is uint || value is long ||
+            value is ulong || value is float || value is double || value is decimal ||
+            value is DateTime || value is DateTimeOffset || value is Guid || value is JsonElement)
+        {
+            return value;
+        }
+
+        if (value is Type type)
+        {
+            return type.FullName ?? type.Name;
+        }
+
+        if (value is Enum || value is char || value is TimeSpan || value is Uri)
+        {
+            return value.ToString();
+        }
+
+        if (depth >= 4)
+        {
+            return value.ToString();
+        }
+
+        if (value is IEnumerable<KeyValuePair<string, object?>> structuredValue)
+        {
+            return structuredValue.ToDictionary(
+                item => item.Key,
+                item => NormalizeValue(item.Value, depth + 1));
+        }
+
+        if (value is IDictionary dictionary)
+        {
+            var normalized = new Dictionary<string, object?>();
+            foreach (DictionaryEntry item in dictionary)
+            {
+                normalized[item.Key?.ToString() ?? "<null>"] = NormalizeValue(item.Value, depth + 1);
+            }
+
+            return normalized;
+        }
+
+        if (value is IEnumerable sequence)
+        {
+            return sequence
+                .Cast<object?>()
+                .Take(50)
+                .Select(item => NormalizeValue(item, depth + 1))
+                .ToArray();
+        }
+
+        return value.ToString();
     }
 
     private string GetCurrentLogPath()

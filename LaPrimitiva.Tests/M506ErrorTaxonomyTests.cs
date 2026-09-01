@@ -130,7 +130,7 @@ public class M506ErrorTaxonomyTests
         var reporter = ReadRepoFile("LaPrimitiva.App/Observability/ApplicationErrorReporter.cs");
 
         Assert.Contains("ErrorReporter.Report(exception, \"BlazorCircuit\")", boundary);
-        Assert.Contains("Referencia:", boundary);
+        Assert.Contains("LG[\"ReferenceLabel\"]", boundary);
         Assert.DoesNotContain("CurrentException.Message", boundary);
         Assert.Contains("ErrorReference", reporter);
         Assert.Contains("ErrorCategory", reporter);

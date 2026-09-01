@@ -1,4 +1,5 @@
 using LaPrimitiva.Domain.Entities;
+using LaPrimitiva.Domain.Errors;
 
 namespace LaPrimitiva.Tests;
 
@@ -22,7 +23,7 @@ public class WinningDrawTests
         var draw = CreateValidDraw();
         draw.Number1 = invalidNumber;
 
-        var exception = Assert.Throws<InvalidOperationException>(draw.Validate);
+        var exception = Assert.Throws<BusinessRuleException>(draw.Validate);
 
         Assert.Contains("entre 1 y 49", exception.Message);
     }
@@ -33,7 +34,7 @@ public class WinningDrawTests
         var draw = CreateValidDraw();
         draw.Number6 = draw.Number5;
 
-        Assert.Throws<InvalidOperationException>(draw.Validate);
+        Assert.Throws<BusinessRuleException>(draw.Validate);
     }
 
     [Theory]
@@ -44,7 +45,7 @@ public class WinningDrawTests
         var draw = CreateValidDraw();
         draw.Complementario = invalidNumber;
 
-        Assert.Throws<InvalidOperationException>(draw.Validate);
+        Assert.Throws<BusinessRuleException>(draw.Validate);
     }
 
     [Fact]
@@ -53,7 +54,7 @@ public class WinningDrawTests
         var draw = CreateValidDraw();
         draw.Complementario = draw.Number3;
 
-        Assert.Throws<InvalidOperationException>(draw.Validate);
+        Assert.Throws<BusinessRuleException>(draw.Validate);
     }
 
     [Theory]
@@ -64,7 +65,7 @@ public class WinningDrawTests
         var draw = CreateValidDraw();
         draw.Reintegro = invalidReintegro;
 
-        Assert.Throws<InvalidOperationException>(draw.Validate);
+        Assert.Throws<BusinessRuleException>(draw.Validate);
     }
 
     [Theory]
@@ -76,7 +77,7 @@ public class WinningDrawTests
         var draw = CreateValidDraw();
         draw.Joker = invalidJoker;
 
-        Assert.Throws<InvalidOperationException>(draw.Validate);
+        Assert.Throws<BusinessRuleException>(draw.Validate);
     }
 
     private static WinningDraw CreateValidDraw() => new()

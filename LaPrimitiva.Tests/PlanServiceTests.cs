@@ -5,6 +5,7 @@ using System.Linq.Expressions;
 using System.Threading.Tasks;
 using LaPrimitiva.Application.Services;
 using LaPrimitiva.Domain.Entities;
+using LaPrimitiva.Domain.Errors;
 using LaPrimitiva.Domain.Repositories;
 using Moq;
 using Xunit;
@@ -40,7 +41,7 @@ namespace LaPrimitiva.Tests
             };
 
             // Act & Assert
-            await Assert.ThrowsAsync<InvalidOperationException>(() => _service.CreatePlanAsync(overlappingPlan));
+            await Assert.ThrowsAsync<DataIntegrityException>(() => _service.CreatePlanAsync(overlappingPlan));
         }
 
         [Fact]
@@ -54,7 +55,7 @@ namespace LaPrimitiva.Tests
                 BetsPerDraw = 0
             };
 
-            await Assert.ThrowsAsync<InvalidOperationException>(() => _service.CreatePlanAsync(invalidPlan));
+            await Assert.ThrowsAsync<BusinessRuleException>(() => _service.CreatePlanAsync(invalidPlan));
 
             _planRepoMock.Verify(repository => repository.CreateAsync(It.IsAny<Plan>()), Times.Never);
             _planRepoMock.Verify(repository => repository.AnyAsync(It.IsAny<Expression<Func<Plan, bool>>>()), Times.Never);
@@ -69,7 +70,7 @@ namespace LaPrimitiva.Tests
                 .ReturnsAsync(true);
 
             // Act & Assert
-            await Assert.ThrowsAsync<InvalidOperationException>(() => _service.DeletePlanAsync(planId));
+            await Assert.ThrowsAsync<DataIntegrityException>(() => _service.DeletePlanAsync(planId));
         }
 
         [Fact]
@@ -135,6 +136,28 @@ namespace LaPrimitiva.Tests
             Assert.True(result[0].HasOverlap, "Plan A should have overlap detected");
             Assert.True(result[1].HasOverlap, "Plan B should have overlap detected");
             Assert.False(result[2].HasOverlap, "Plan C should not have overlap detected");
+        }
+
+        [Fact]
+        public async Task GetAvailableYearsAsync_IncludesFinitePlanBeyondDisplayHorizon()
+        {
+            var futureYear = DateTime.Now.Year + 10;
+            _planRepoMock
+                .Setup(repository => repository.GetListAsync(false))
+                .ReturnsAsync(
+                [
+                    new Plan
+                    {
+                        Name = "Future plan",
+                        EffectiveFrom = new DateTime(futureYear, 1, 1),
+                        EffectiveTo = new DateTime(futureYear, 12, 31)
+                    }
+                ]);
+
+            var years = await _service.GetAvailableYearsAsync();
+
+            Assert.Contains(futureYear, years);
+            Assert.Contains(DateTime.Now.Year, years);
         }
     }
 }

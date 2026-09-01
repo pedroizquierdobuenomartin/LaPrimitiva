@@ -66,6 +66,34 @@ public class M502ObservabilityTests
     }
 
     [Fact]
+    public void SecureJsonFileLogger_NormalizesUnsupportedStructuredValuesWithoutThrowing()
+    {
+        var directory = Path.Combine(Path.GetTempPath(), "laprimitiva-m601-" + Guid.NewGuid().ToString("N"));
+        try
+        {
+            using var provider = new SecureJsonFileLoggerProvider(directory);
+            var logger = provider.CreateLogger("M601Test");
+
+            logger.LogInformation(
+                "Endpoint metadata {Metadata}",
+                (object)new object[] { typeof(M502ObservabilityTests) });
+
+            var logPath = Assert.Single(Directory.GetFiles(directory, "application-*.jsonl"));
+            using var entry = JsonDocument.Parse(File.ReadAllText(logPath));
+            var metadata = entry.RootElement.GetProperty("properties").GetProperty("Metadata");
+            Assert.Equal(JsonValueKind.Array, metadata.ValueKind);
+            Assert.Equal(typeof(M502ObservabilityTests).FullName, metadata[0].GetString());
+        }
+        finally
+        {
+            if (Directory.Exists(directory))
+            {
+                Directory.Delete(directory, recursive: true);
+            }
+        }
+    }
+
+    [Fact]
     public void UnexpectedUiErrors_AreLoggedButSafeMessagesDoNotUseProviderExceptionText()
     {
         foreach (var relativePath in new[]
@@ -80,7 +108,7 @@ public class M502ObservabilityTests
         }
 
         var errorPage = ReadRepoFile("LaPrimitiva.App/Components/Pages/Error.razor");
-        Assert.Contains("Referencia:", errorPage);
+        Assert.Contains("LG[\"ReferenceLabel\"]", errorPage);
         Assert.DoesNotContain("Exception", errorPage);
         Assert.DoesNotContain("Development Mode", errorPage);
 

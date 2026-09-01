@@ -1,3 +1,4 @@
+using System.Net;
 using LaPrimitiva.Domain.Entities;
 using LaPrimitiva.Domain.Errors;
 using LaPrimitiva.Domain.Repositories;
@@ -14,13 +15,26 @@ public sealed class M506PersistenceTranslationIntegrationTests(IntegrationTestFi
     {
         using var client = _factory.CreateClient();
 
-        var html = await client.GetStringAsync("/Error", TestContext.Current.CancellationToken);
+        var html = WebUtility.HtmlDecode(
+            await client.GetStringAsync("/Error", TestContext.Current.CancellationToken));
 
-        Assert.Contains("No hemos podido completar la operación", html);
+        Assert.Contains("La aplicación ha registrado el detalle técnico de forma segura", html);
         Assert.Contains("Referencia:", html);
         Assert.Contains("Volver al inicio", html);
         Assert.DoesNotContain("StackTrace", html);
         Assert.DoesNotContain("Development Mode", html);
+    }
+
+    [Fact]
+    public async Task NotFoundPage_IsLocalizedAndDoesNotFallIntoTheErrorBoundary()
+    {
+        using var client = _factory.CreateClient();
+
+        var html = WebUtility.HtmlDecode(
+            await client.GetStringAsync("/not-found", TestContext.Current.CancellationToken));
+
+        Assert.Contains("Página no encontrada", html);
+        Assert.DoesNotContain("No hemos podido completar la operación", html);
     }
 
     [Fact]

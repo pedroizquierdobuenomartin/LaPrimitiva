@@ -1,5 +1,6 @@
 using Xunit;
 using LaPrimitiva.Domain.Entities;
+using LaPrimitiva.Domain.Errors;
 using System;
 
 namespace LaPrimitiva.Tests
@@ -61,7 +62,7 @@ namespace LaPrimitiva.Tests
         [MemberData(nameof(InvalidPlans))]
         public void Validate_ShouldRejectInvalidBusinessRules(Plan plan, string expectedMessage)
         {
-            var exception = Assert.Throws<InvalidOperationException>(plan.Validate);
+            var exception = Assert.Throws<BusinessRuleException>(plan.Validate);
 
             Assert.Contains(expectedMessage, exception.Message);
         }

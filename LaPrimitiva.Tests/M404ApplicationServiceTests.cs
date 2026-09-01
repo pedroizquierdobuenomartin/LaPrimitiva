@@ -47,19 +47,23 @@ public class M404ApplicationServiceTests
     [Fact]
     public async Task DataExportService_ReturnsEveryDrawOrderedChronologically()
     {
+        var firstPlanId = Guid.NewGuid();
+        var secondPlanId = Guid.NewGuid();
         var repository = new Mock<IDrawRepository>();
         repository.Setup(port => port.GetListAsync(null)).ReturnsAsync(
         [
-            new DrawRecord { DrawDate = new DateTime(2026, 1, 8) },
-            new DrawRecord { DrawDate = new DateTime(2026, 1, 5) }
+            new DrawRecord { PlanId = firstPlanId, DrawDate = new DateTime(2026, 1, 8), Neto = -2m, Acumulado = 999m },
+            new DrawRecord { PlanId = secondPlanId, DrawDate = new DateTime(2026, 1, 7), Neto = 4m, Acumulado = 999m },
+            new DrawRecord { PlanId = firstPlanId, DrawDate = new DateTime(2026, 1, 5), Neto = 5m, Acumulado = 999m }
         ]);
         var service = new DataExportService(repository.Object);
 
         var result = await service.GetAllDrawsAsync();
 
         Assert.Equal(
-            new[] { new DateTime(2026, 1, 5), new DateTime(2026, 1, 8) },
+            new[] { new DateTime(2026, 1, 5), new DateTime(2026, 1, 7), new DateTime(2026, 1, 8) },
             result.Select(draw => draw.DrawDate));
+        Assert.Equal(new[] { 5m, 4m, 3m }, result.Select(draw => draw.Acumulado));
         repository.Verify(port => port.GetListAsync(null), Times.Once);
     }
 

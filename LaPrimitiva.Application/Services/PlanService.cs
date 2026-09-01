@@ -150,10 +150,7 @@ namespace LaPrimitiva.Application.Services
             foreach (var plan in plans)
             {
                 int startYear = plan.EffectiveFrom.Year;
-                int endYear = plan.EffectiveTo?.Year ?? maxFutureYear;
-
-                // Clamp future years for indefinite plans to avoid huge lists
-                if (endYear > maxFutureYear + 5) endYear = maxFutureYear + 5;
+                int endYear = plan.EffectiveTo?.Year ?? Math.Max(startYear, maxFutureYear);
 
                 for (int y = startYear; y <= endYear; y++)
                 {

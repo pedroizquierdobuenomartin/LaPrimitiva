@@ -3,6 +3,7 @@
 @inject NavigationManager NavigationManager
 @inject IStringLocalizer<GlobalResource> L
 @inject IStringLocalizer<LayoutResource> LL
+@inject IStringLocalizer<ErrorResource> LE
 @implements IDisposable
 
 <nav class="flex" aria-label="@LL["BreadcrumbAria"]">
@@ -62,6 +63,8 @@
         "privacidad" => L["Privacy"],
         "terminos" => L["Terms"],
         "combinacion-automatica" => LL["AutomatedCombinations"],
+        "error" => LE["OperationFailedTitle"],
+        "404" or "not-found" => LE["NotFoundTitle"],
         _ => throw new MissingLocalizationResourceException($"Breadcrumb route: {segment}")
     };
 

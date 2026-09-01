@@ -1,9 +1,12 @@
+using System.Net;
 using LaPrimitiva.Infrastructure.Persistence;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Respawn;
 using Respawn.Graph;
@@ -93,6 +96,8 @@ public sealed class IntegrationTestFixture : IAsyncLifetime
         {
             builder.UseEnvironment("IntegrationTests");
             builder.ConfigureLogging(logging => logging.ClearProviders());
+            builder.ConfigureServices(services =>
+                services.AddSingleton<IStartupFilter, LoopbackConnectionStartupFilter>());
             builder.ConfigureAppConfiguration((_, configuration) =>
             {
                 configuration.AddInMemoryCollection(new Dictionary<string, string?>
@@ -101,5 +106,18 @@ public sealed class IntegrationTestFixture : IAsyncLifetime
                 });
             });
         }
+    }
+
+    private sealed class LoopbackConnectionStartupFilter : IStartupFilter
+    {
+        public Action<IApplicationBuilder> Configure(Action<IApplicationBuilder> next) => app =>
+        {
+            app.Use((context, nextMiddleware) =>
+            {
+                context.Connection.RemoteIpAddress = IPAddress.Loopback;
+                return nextMiddleware();
+            });
+            next(app);
+        };
     }
 }

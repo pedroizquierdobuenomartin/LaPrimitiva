@@ -260,7 +260,7 @@
                             <label class="block text-[9px] md:text-[10px] font-bold text-white/60 uppercase tracking-widest mb-1 md:mb-2">@L["ActivePlanDetected"]</label>
                             <div class="text-xl md:text-3xl font-black">@activePlanName</div>
                             <div class="mt-1 md:mt-2 text-[10px] md:text-xs font-medium text-white/50">
-                                @(modalPlan?.BetsPerDraw ?? 0) @L["BetsPerDraw"] • Joker @(modalPlan?.EnableJoker == true ? LG["Yes"] : LG["No"])
+                                @(DisplayedModalPlan?.BetsPerDraw ?? 0) @L["BetsPerDraw"] • Joker @(DisplayedModalPlan?.EnableJoker == true ? LG["Yes"] : LG["No"])
                             </div>
                         </div>
                         <svg class="absolute -right-4 -bottom-4 h-24 w-24 md:h-32 md:w-32 text-white opacity-5" fill="currentColor" viewBox="0 0 20 20"><path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z"/></svg>
@@ -594,6 +594,7 @@
     private bool weekAlreadyExists = false;
     private List<Plan>? allPlans;
     private Guid? selectedPlanId;
+    private Plan? DisplayedModalPlan => modalPlan ?? allPlans?.FirstOrDefault(plan => plan.Id == selectedPlanId);
     private List<DrawRecord> tempModalDraws = new();
     private string? modalErrorMessage;
     private bool _hasConcurrencyConflict;
@@ -788,6 +789,7 @@
     private void ShowRegisterModal()
     {
         isNewRegistration = true;
+        modalPlan = null;
         weekAlreadyExists = false;
         modalWeek = DrawService.GetCurrentWeekNumber(GlobalState.SelectedYear, DateTime.Now);
         modalDraws = null;
@@ -844,6 +846,7 @@
         else
         {
             weekAlreadyExists = false;
+            modalPlan = null;
             if (isNewRegistration)
             {
                 modalDraws = null;

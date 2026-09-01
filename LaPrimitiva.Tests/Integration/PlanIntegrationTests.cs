@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using LaPrimitiva.Application.DTOs;
 using LaPrimitiva.Application.Services;
 using LaPrimitiva.Domain.Entities;
+using LaPrimitiva.Domain.Errors;
 using LaPrimitiva.App;
 using LaPrimitiva.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
@@ -79,7 +80,7 @@ namespace LaPrimitiva.Tests.Integration
             };
 
             // Act & Assert
-            await Assert.ThrowsAsync<InvalidOperationException>(() => planService.CreatePlanAsync(overlappingPlan));
+            await Assert.ThrowsAsync<DataIntegrityException>(() => planService.CreatePlanAsync(overlappingPlan));
         }
 
         [Fact]
@@ -106,7 +107,7 @@ namespace LaPrimitiva.Tests.Integration
                 BetsPerDraw = 2
             };
 
-            await Assert.ThrowsAsync<InvalidOperationException>(
+            await Assert.ThrowsAsync<DataIntegrityException>(
                 () => planService.CreatePlanAsync(matchingBoundaryPlan));
             Assert.Equal(1, await context.Plans.CountAsync(TestContext.Current.CancellationToken));
         }
@@ -125,7 +126,7 @@ namespace LaPrimitiva.Tests.Integration
                 BetsPerDraw = 2
             };
 
-            await Assert.ThrowsAsync<InvalidOperationException>(() => repository.CreateAsync(invalidPlan));
+            await Assert.ThrowsAsync<BusinessRuleException>(() => repository.CreateAsync(invalidPlan));
         }
 
         [Fact]
@@ -250,7 +251,7 @@ namespace LaPrimitiva.Tests.Integration
                 BetsPerDraw = editablePlan.BetsPerDraw
             };
 
-            await Assert.ThrowsAsync<InvalidOperationException>(
+            await Assert.ThrowsAsync<DataIntegrityException>(
                 () => planService.UpdatePlanAsync(overlappingUpdate));
             var persisted = await context.Plans
                 .AsNoTracking()

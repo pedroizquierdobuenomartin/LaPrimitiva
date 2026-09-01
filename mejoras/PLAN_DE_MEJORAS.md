@@ -811,12 +811,22 @@ la actualización inmediata del formulario delega en el caso de uso que invoca l
 
 ## Fase 6 — Verificación final
 
-### [ ] M-601 — Verificación funcional completa
+### [x] M-601 — Verificación funcional completa
 
 - Ejecutar todas las pruebas unitarias y de integración.
 - Recorrer manualmente cada flujo crítico.
 - Comprobar los cálculos contra ejemplos conocidos.
 - Crear, modificar y eliminar datos usando una base de pruebas.
+
+**Cierre:** 2026-09-01
+
+**Referencia:** commit de cierre de esta publicación, sobre `c5d76a6`; release `v1.17.1`.
+
+**Pruebas realizadas:** suite fresca ejecutada por el usuario con `dotnet test --solution .\LaPrimitiva.sln`: 182/182 correctas, 0 errores y 0 omitidas (9,725 s); verificadores estáticos M-502, M-506, M-507 y M-601; `git diff --check`; recorrido real contra `PrimitivaAuditV2_M601Tests` de Planes, Registro, premios, Joker, Dashboard, Histórico, RSS, exportación CSV, generación automática y limpieza CRUD.
+
+**Resultado:** APTO. Se contrastaron los importes conocidos —coste `5,25`, premios `38,00`, neto/acumulado `32,75` y ROI `623,8 %`—, la persistencia y eliminación de datos, el selector futuro 2036, la cabecera `3 Apuestas/Joker SÍ`, el CSV con acumulado `32.75`, la ausencia de errores de consola y el filtrado idempotente de RSS.
+
+**Decisiones:** se mantuvo la política loopback de producción y el loopback sintético quedó limitado al host de integración; el acumulado exportado se recalcula cronológicamente por plan y año; la comparación HTTP decodifica entidades antes de validar recursos localizados; no se creó ningún certificado y se conserva el paquete HTTPS descargable y transferible de M-306 en `artifacts/local-https`; las correcciones compatibles se publican como patch `v1.17.1`. La evidencia completa queda en `mejoras/VERIFICACION_FUNCIONAL_M601.md`. No se inició M-602.
 
 ### [ ] M-602 — Verificación de seguridad
 
@@ -1257,4 +1267,5 @@ Estos descartes describen el código auditado y deben revisarse si cambian las f
 | M-505 | 2026-08-27 | Commit de cierre de esta publicación, sobre `e30c191`; release `v1.15.0` | Completado | Generador presentado como uniforme y no predictivo; independencia de sorteos y límites del histórico visibles; retirada la inferencia binaria basada en z aproximado; build fresco correcto aportado por el usuario y verificadores M-404/M-505/M-702 correctos. |
 | M-506 | 2026-08-27 | Commit de cierre de esta publicación, sobre `2ddffae`; release `v1.16.0` | Completado | Taxonomía transversal, traducciones EF/SQL/HTTP/RSS, resultados tipados, mensajes seguros y límite Blazor correlacionable; corrección de la jerarquía sellada; compilación y funcionamiento correctos aportados por el usuario; verificadores M-204/M-304/M-404/M-506 correctos. |
 | M-507 | 2026-08-31 | Commit `91a8b80`, sobre `5ea3fea`; release `v1.17.0` | Completado | Cultura `es-ES` global en runtime y componentes; 12 catálogos `.es-ES.resx` segregados por bounded context; `RequiredStringLocalizerFactory` detecta claves ausentes; neutralidad en contratos CSV/RSS; verificadores y suite xUnit correctos. |
+| M-601 | 2026-09-01 | Commit de cierre de esta publicación, sobre `c5d76a6`; release `v1.17.1` | Completado | Suite fresca **182/182**, recorrido real completo contra base aislada, cálculos conocidos y CRUD verificados; logger JSON seguro, años futuros, metadatos del alta, acumulado CSV, rutas localizadas y SVG corregidos; datos temporales eliminados y M-602 no iniciado. |
 | M-702 | 2026-08-24 | `e2402f6`, `19defe6`, release `373561a`, tag `v1.1.0` | Completado | Generación uniforme y rediseño validados; títulos de Histórico y Combinación automática unificados con `PageTitle`; footer enlazado a la versión del ensamblado y release `1.1.0` publicada. Verificación estática correcta y validación visual del usuario; casos xUnit nuevos no ejecutados por la prohibición de compilar. |

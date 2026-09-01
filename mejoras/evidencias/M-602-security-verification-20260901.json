@@ -1,0 +1,38 @@
+{
+  "milestone": "M-602",
+  "checkedAtUtc": "2026-09-01T06:45:32.6877894Z",
+  "repositoryCommit": "b66611604b0a9e3587da7391813afde56acd95cd",
+  "staticAnalysis": {
+    "passed": true,
+    "reusedVerifiers": [
+      "Verify-M301LocalOnly.ps1",
+      "Verify-M302ContentSecurity.ps1",
+      "Verify-M304RssLimits.ps1",
+      "Verify-M305CsvFormulaNeutralization.ps1"
+    ],
+    "forbiddenProductionPatterns": [
+      "SQL dinámico sin parametrizar",
+      "Ejecución de procesos desde producto",
+      "Deserialización binaria insegura",
+      "XML con DTD habilitado",
+      "Ejecución dinámica de JavaScript"
+    ],
+    "externalMutableScripts": 0
+  },
+  "dependencies": {
+    "performed": true,
+    "nugetVulnerabilities": 0,
+    "npmVulnerabilities": 0
+  },
+  "runtime": {
+    "performed": true,
+    "appDll": "E:\\Repositorios\\LaPrimitiva\\LaPrimitiva.App\\bin\\Debug\\net10.0\\LaPrimitiva.App.dll",
+    "appDllSha256": "16B90061AC4322ED7314DE46BB9DBF354DF95AB6216B9477F685A791B1C90C3B",
+    "rejectedNonLoopback": true,
+    "listeners": [
+      "TCP    127.0.0.1:62166        0.0.0.0:0              LISTENING       47188"
+    ],
+    "healthStatus": 200,
+    "contentSecurityPolicy": "default-src 'self'; base-uri 'self'; font-src 'self'; form-action 'self'; frame-ancestors 'none'; img-src 'self' data:; object-src 'none'; script-src 'self'; style-src 'self'; connect-src 'self' ws://127.0.0.1:62166"
+  }
+}

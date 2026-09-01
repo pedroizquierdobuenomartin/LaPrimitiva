@@ -828,13 +828,23 @@ la actualización inmediata del formulario delega en el caso de uso que invoca l
 
 **Decisiones:** se mantuvo la política loopback de producción y el loopback sintético quedó limitado al host de integración; el acumulado exportado se recalcula cronológicamente por plan y año; la comparación HTTP decodifica entidades antes de validar recursos localizados; no se creó ningún certificado y se conserva el paquete HTTPS descargable y transferible de M-306 en `artifacts/local-https`; las correcciones compatibles se publican como patch `v1.17.1`. La evidencia completa queda en `mejoras/VERIFICACION_FUNCIONAL_M601.md`. No se inició M-602.
 
-### [ ] M-602 — Verificación de seguridad
+### [x] M-602 — Verificación de seguridad
 
 - Repetir el análisis estático de seguridad.
 - Ejecutar comprobación online de dependencias vulnerables.
 - Verificar que la aplicación no escucha fuera de loopback.
 - Probar límites del RSS y neutralización CSV.
 - Confirmar CSP y ausencia de scripts externos mutables.
+
+**Fecha de cierre:** 2026-09-01.
+
+**Referencia:** `scripts/Verify-M602SecurityVerification.ps1`, scan Codex Security `95f84eb6-0417-4317-8a9b-6b32fab35ad3` sobre `b666116` (`v1.17.1`) y evidencia `mejoras/evidencias/M-602-security-verification-20260901.json`; commit de cierre pendiente de la publicación de este cambio.
+
+**Pruebas realizadas:** antes de editar, los verificadores M-301, M-302, M-304 y M-305 fueron correctos y los 33 casos focalizados de loopback, cabeceras, RSS y CSV pasaron sobre el binario existente. La suite completa `--no-build --no-restore` ejecutó 199 casos: 162 correctos y 37 errores de integración por `Failed to generate SSPI context` dentro del sandbox, por lo que no se presenta como suite satisfactoria. Después de añadir únicamente artefactos M-602 pasaron el análisis sintáctico PowerShell, la ruta estática del nuevo verificador y su ejecución integral con consultas online y runtime. NuGet —incluidas transitivas— y npm —77 dependencias de producción y desarrollo— devolvieron cero vulnerabilidades. El binario identificado por SHA-256 rechazó `0.0.0.0`, escuchó únicamente en `127.0.0.1`, respondió HTTP 200 y emitió CSP restrictiva, `nosniff` y `no-referrer`. No se ejecutó ningún build ni restore.
+
+**Resultado:** APTO. El análisis estático estándar cerró seis superficies sin hallazgos confirmados; la ejecución fue secuencial por no estar autorizados subagentes y los bundles minificados se comprobaron mediante hash, versión y advisories, no línea por línea. Los límites RSS, la neutralización CSV, la CSP y el autoalojamiento continúan conformes. La evidencia completa queda en `mejoras/VERIFICACION_SEGURIDAD_M602.md`.
+
+**Decisiones:** no se modifica código de producción porque no se confirmó una vulnerabilidad; se mantienen separadas la evidencia de fuente, advisories y runtime; el binario se identifica por hash y sigue siendo válido porque M-602 solo añade verificación y documentación; el binding IIS instalado es estado externo y debe repetirse con `Manage-M306LocalHttps.ps1 -Action Verify` si cambia el despliegue. No se inició M-603.
 
 ### [ ] M-603 — Simulacro de recuperación
 
@@ -1215,6 +1225,85 @@ Esta es una fase viva para registrar problemas y oportunidades confirmados duran
 
 **Dependencias:** M-405 para el ciclo de vida seguro del refresco; M-502 para logging, correlación y health checks; coordinación con el `ReconnectModal` existente para no confundir readiness con conectividad del circuito.
 
+### [ ] M-713 — Ampliar la neutralización de fórmulas en exportaciones CSV
+
+**Problema:** la defensa de M-305 solo antepone un apóstrofo cuando el primer carácter del campo es `=`, `+`, `-` o `@`. No contempla caracteres de control que algunas hojas de cálculo interpretan como inicio o continuación de fórmula —tabulador, retorno de carro y salto de línea— ni las variantes Unicode de ancho completo `＝`, `＋`, `－` y `＠`. Además, ninguna neutralización es universal para todos los consumidores CSV, por lo que el contrato de compatibilidad debe quedar explícito antes de cambiar el formato.
+
+**Evidencia (2026-09-01):** `CsvFieldFormatter.FormulaPrefixes` contiene exactamente los cuatro caracteres ASCII y `CsvFieldFormatterTests` solo cubre esos prefijos, comillas y texto normal. La revisión posterior a M-602 contrastó esta cobertura con la guía de OWASP sobre CSV Injection, que también enumera `0x09`, `0x0D`, `0x0A` y las variantes Unicode de ancho completo. El riesgo actual es bajo porque las notas proceden de una aplicación local monousuario, pero un valor importado, restaurado o pegado puede terminar abierto en Excel o LibreOffice.
+
+**Decisión a tomar antes de implementar:** definir el consumidor soportado y comparar al menos tres alternativas: apóstrofo visible, prefijo tabulador compatible con Excel y exportación a un formato estructurado alternativo. No se aplicará una transformación más amplia sin comprobar la fidelidad al reabrir el archivo, porque una mitigación que impida fórmulas puede alterar el contenido que ve o recupera el usuario.
+
+**Criterios de aceptación:**
+
+- El contrato documenta qué aplicaciones de hoja de cálculo se soportan, qué entradas se consideran peligrosas y qué pérdida de fidelidad acepta la solución elegida.
+- La neutralización cubre `=`, `+`, `-`, `@`, tabulador, retorno de carro, salto de línea y sus cuatro variantes Unicode de ancho completo cuando aparecen en una posición interpretable como fórmula.
+- El escape RFC 4180 continúa impidiendo que comas, comillas o saltos de línea rompan la celda y creen una nueva posición peligrosa.
+- Existen pruebas parametrizadas para cada prefijo, combinaciones con espacios y comillas, valores benignos y contenido multilínea; también se comprueba que números, fechas e importes invariantes no cambian.
+- Un artefacto real se abre y se vuelve a importar con los consumidores declarados sin ejecutar fórmulas y con el resultado esperado documentado.
+- Si cambia el contrato del CSV, se repite la parte de exportación afectada de M-601 y se actualiza la evidencia de seguridad de M-602.
+
+**Dependencias:** M-305 para el formateador y su contrato de exportación; M-507 para preservar los valores protocolarios invariantes; M-601 y M-602 para repetir la verificación afectada.
+
+### [ ] M-714 — Restringir y validar las redirecciones del cliente RSS
+
+**Problema:** la URL inicial del RSS está fijada en código, pero el `HttpClient` tipado usa el handler predeterminado y, por tanto, puede seguir redirecciones automáticamente. Fijar el origen inicial no garantiza que el destino final conserve el mismo esquema, host y puerto; una respuesta `3xx` del servidor o de un intermediario podría desplazar la descarga a otro origen antes de que `RssClient` aplique sus límites de tamaño y parseo.
+
+**Evidencia (2026-09-01):** `Program.cs` registra `AddHttpClient<IRssClient, RssClient>()` sin configurar `HttpClientHandler.AllowAutoRedirect`, mientras `RssClient` controla la URL inicial. La documentación de .NET establece que `AllowAutoRedirect` vale `true` por defecto; las versiones modernas bloquean la degradación HTTPS→HTTP, pero siguen permitiendo redirecciones HTTPS hacia otro host. M-304 limita tiempo, bytes y elementos, aunque no define una política de destino final.
+
+**Alternativas a valorar:**
+
+1. **No seguir redirecciones (opción más segura):** configurar `AllowAutoRedirect = false` y tratar cualquier `3xx` como indisponibilidad externa. Reduce superficie y complejidad, a costa de fallar si Loterías cambia legítimamente la URL.
+2. **Seguimiento manual acotado:** aceptar un número pequeño de saltos y validar en cada uno HTTPS, host, puerto y destino permitidos. Conserva compatibilidad controlada, pero añade estados y pruebas de seguridad.
+
+**Criterios de aceptación:**
+
+- Existe una política explícita y centralizada para redirecciones; no se delega silenciosamente en el valor predeterminado del handler.
+- Se rechazan cualquier degradación de HTTPS, cambio a un host o puerto no autorizado, URL sin esquema esperado, credenciales embebidas y cadena de redirecciones superior al límite definido.
+- Las pruebas usan handlers controlados para cubrir ausencia de redirección, salto permitido, host distinto, degradación de esquema, bucle y exceso de saltos sin acceder a Internet.
+- Se conservan el timeout global, el límite incremental de 512 KiB, la cancelación, la exclusión mutua y el máximo de elementos definidos en M-304.
+- Los rechazos se traducen mediante la taxonomía de M-506, se registran con operación y correlación, y no exponen URL de destino ni detalles del proveedor en la interfaz.
+- La comprobación funcional del RSS de M-601 y la superficie RSS de M-602 se repiten contra el comportamiento elegido.
+
+**Dependencias:** M-304 para los límites del cliente RSS; M-506 para traducción y observabilidad segura; M-601 y M-602 para la regresión funcional y de seguridad.
+
+### [ ] M-715 — Fijar el grafo NuGet y restaurarlo en modo bloqueado
+
+**Problema:** la auditoría de M-602 confirmó cero vulnerabilidades conocidas en el grafo resuelto ese día, pero el repositorio no versiona ningún `packages.lock.json`. Una restauración futura puede resolver versiones transitivas distintas sin que cambien los `PackageReference`, de modo que la evidencia de seguridad y la compilación dejan de referirse necesariamente al mismo grafo.
+
+**Evidencia (2026-09-01):** `git ls-files` no devuelve archivos `packages.lock.json`. M-503 automatiza la revisión de dependencias y M-602 consulta advisories, pero ambos dependen del grafo que NuGet haya resuelto en cada ejecución. La guía oficial de NuGet recomienda lockfiles para aplicaciones y restore en modo bloqueado cuando se exige repetibilidad; esto es una mejora de garantía de cadena de suministro, no una vulnerabilidad confirmada en los paquetes actuales.
+
+**Decisión de alcance:** bloquear como mínimo el proyecto ejecutable y documentar si los proyectos de pruebas y capas internas comparten o generan su propio lockfile. No se activará globalmente sin evaluar el ruido producido por la poda de paquetes de .NET 10 y por los distintos identificadores de runtime usados en desarrollo, CI y publicación.
+
+**Criterios de aceptación:**
+
+- Se documenta el alcance elegido y se generan mediante un restore explícito los lockfiles que correspondan; los archivos quedan versionados y revisables.
+- CI y el verificador de dependencias ejecutan restore con `--locked-mode` —o propiedad equivalente— y fallan si el grafo solicitado difiere del bloqueado.
+- La auditoría de vulnerabilidades se ejecuta sobre un grafo restaurado de forma fresca y bloqueada, sin reutilizar silenciosamente activos antiguos mediante `--no-restore`.
+- Existe una prueba controlada que modifica una dependencia o el lockfile y demuestra que el restore bloqueado falla, además de un procedimiento explícito para actualizar el grafo de forma intencionada.
+- Se comprueba la compatibilidad con `global.json`, .NET 10, Microsoft.Testing.Platform, restauración de publicación y los sistemas operativos soportados.
+- El proceso de actualización conserva la revisión online de advisories de M-503/M-602 y registra por separado cambio directo, cambio transitivo y motivo de aceptación.
+
+**Dependencias:** M-503 para el workflow y la política de dependencias; M-602 para incorporar el grafo bloqueado a la evidencia de seguridad.
+
+### [ ] M-716 — Verificar el despliegue IIS dentro de la comprobación operativa de seguridad
+
+**Problema:** M-602 verificó el binario Kestrel y su rechazo de configuraciones no loopback, pero no inspeccionó el binding IIS realmente instalado porque ese estado vive fuera del repositorio. Una configuración versionada correcta no demuestra por sí sola que el sitio desplegado siga limitado a loopback, use el certificado previsto y entregue HTTPS/HSTS sin advertencias.
+
+**Evidencia (2026-09-01):** el informe de M-602 declara expresamente esta limitación y remite a `Manage-M306LocalHttps.ps1 -Action Verify`. Ese script ya puede validar la instalación creada por M-306, pero su resultado no forma parte de la evidencia estructurada de M-602 ni distingue de forma automatizada entre entorno sin IIS, despliegue no declarado y despliegue local incumplidor.
+
+**Principio de diseño:** la comprobación instalada será un control operativo opcional y consciente del entorno, no un requisito portable de análisis estático. Si se declara un despliegue IIS para una release, su fallo sí bloqueará el cierre; si IIS no está instalado o no forma parte de ese entorno, el resultado será `No aplicable` con causa explícita, nunca un éxito ficticio.
+
+**Criterios de aceptación:**
+
+- El verificador de seguridad puede invocar o consumir de forma no interactiva la comprobación `Verify` de M-306 sin instalar, modificar ni eliminar bindings o certificados.
+- La evidencia diferencia al menos: controles de fuente, runtime Kestrel y estado IIS instalado; cada bloque registra `Apto`, `No apto` o `No aplicable` con motivo.
+- Para un despliegue declarado se validan binding exclusivo en loopback, host y SNI esperados, ausencia de HTTP, certificado con SAN/EKU/vigencia y confianza correctos, respuesta HTTPS, HSTS y rechazo de acceso no local.
+- La salida estructurada evita claves privadas, contraseñas, cadenas de conexión y mensajes técnicos sensibles; cualquier identificador de certificado se limita a lo estrictamente necesario para trazabilidad local.
+- Existen casos reproducibles para entorno sin IIS, sitio ausente, binding incorrecto, certificado inválido o próximo a expirar y configuración conforme; los casos destructivos usan dobles o un entorno aislado.
+- La documentación de release indica cuándo esta comprobación es obligatoria, qué privilegios necesita y cómo adjuntar su evidencia sin confundirla con una validación portable de CI.
+
+**Dependencias:** M-301 para el modelo local-only; M-306 para HTTPS y el verificador IIS; M-502 para salud y logging seguro; M-602 para integrar la evidencia operativa.
+
 **Criterio de cierre del plan:** todas las fases y todos los hitos emergentes aplicables están completados, verificados y asociados a evidencia reproducible.
 
 ---
@@ -1268,4 +1357,5 @@ Estos descartes describen el código auditado y deben revisarse si cambian las f
 | M-506 | 2026-08-27 | Commit de cierre de esta publicación, sobre `2ddffae`; release `v1.16.0` | Completado | Taxonomía transversal, traducciones EF/SQL/HTTP/RSS, resultados tipados, mensajes seguros y límite Blazor correlacionable; corrección de la jerarquía sellada; compilación y funcionamiento correctos aportados por el usuario; verificadores M-204/M-304/M-404/M-506 correctos. |
 | M-507 | 2026-08-31 | Commit `91a8b80`, sobre `5ea3fea`; release `v1.17.0` | Completado | Cultura `es-ES` global en runtime y componentes; 12 catálogos `.es-ES.resx` segregados por bounded context; `RequiredStringLocalizerFactory` detecta claves ausentes; neutralidad en contratos CSV/RSS; verificadores y suite xUnit correctos. |
 | M-601 | 2026-09-01 | Commit de cierre de esta publicación, sobre `c5d76a6`; release `v1.17.1` | Completado | Suite fresca **182/182**, recorrido real completo contra base aislada, cálculos conocidos y CRUD verificados; logger JSON seguro, años futuros, metadatos del alta, acumulado CSV, rutas localizadas y SVG corregidos; datos temporales eliminados y M-602 no iniciado. |
+| M-602 | 2026-09-01 | Verificador y evidencia de cierre sobre `b666116`; scan `95f84eb6-0417-4317-8a9b-6b32fab35ad3` | Completado | Seis superficies de seguridad sin hallazgos confirmados; NuGet/npm con 0 vulnerabilidades; rechazo runtime de `0.0.0.0`, listener exclusivo en `127.0.0.1`, RSS/CSV/CSP conformes; 33/33 pruebas focalizadas correctas y limitación SSPI de la suite completa registrada. |
 | M-702 | 2026-08-24 | `e2402f6`, `19defe6`, release `373561a`, tag `v1.1.0` | Completado | Generación uniforme y rediseño validados; títulos de Histórico y Combinación automática unificados con `PageTitle`; footer enlazado a la versión del ensamblado y release `1.1.0` publicada. Verificación estática correcta y validación visual del usuario; casos xUnit nuevos no ejecutados por la prohibición de compilar. |

@@ -31,6 +31,25 @@ namespace LaPrimitiva.Application.Services
             return await _repository.GetLatestDateAsync();
         }
 
+        public async Task<IReadOnlyCollection<DateTime>> GetExistingDrawDatesAsync(
+            IReadOnlyCollection<DateTime> candidateDates)
+        {
+            var normalizedDates = candidateDates
+                .Select(date => date.Date)
+                .Distinct()
+                .ToArray();
+            if (normalizedDates.Length == 0)
+            {
+                return Array.Empty<DateTime>();
+            }
+
+            var draws = await _repository.GetListAsync(draw => normalizedDates.Contains(draw.DrawDate.Date));
+            return draws
+                .Select(draw => draw.DrawDate.Date)
+                .Distinct()
+                .ToArray();
+        }
+
         public async Task<WinningDrawDto?> GetByIdAsync(Guid id)
         {
             var draw = await _repository.GetAsync(id);

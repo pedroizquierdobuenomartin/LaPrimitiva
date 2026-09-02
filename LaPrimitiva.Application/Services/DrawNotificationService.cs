@@ -46,17 +46,23 @@ namespace LaPrimitiva.Application.Services
                     throw new ExternalDataFormatException("SELAE", "rss.no-valid-items");
                 }
 
-                // Filter draws by the latest historical date in database
-                var latestHistoricalDate = await winningDrawService.GetLatestDrawDateAsync();
-                if (latestHistoricalDate.HasValue)
-                {
-                    // Use .Date for comparison to avoid time issues if present
-                    rssDraws = rssDraws.Where(d => d.Date.Date > latestHistoricalDate.Value.Date).ToList();
-                }
+                var rssDates = rssDraws
+                    .Select(draw => draw.Date.Date)
+                    .Distinct()
+                    .ToArray();
+                var existingDates = await winningDrawService.GetExistingDrawDatesAsync(rssDates);
+                var existingDateSet = existingDates
+                    .Select(date => date.Date)
+                    .ToHashSet();
+                rssDraws = rssDraws
+                    .Where(draw => !existingDateSet.Contains(draw.Date.Date))
+                    .GroupBy(draw => draw.Date.Date)
+                    .Select(group => group.First())
+                    .ToList();
 
                 // Update global state
                 globalState.RecentDraws = rssDraws.Take(10).ToList();
-                globalState.NewDrawsCount = globalState.RecentDraws.Count;
+                globalState.NewDrawsCount = rssDraws.Count;
             }
             catch (OperationCanceledException exception) when (!cancellationToken.IsCancellationRequested)
             {

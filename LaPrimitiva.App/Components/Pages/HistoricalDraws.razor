@@ -6,7 +6,9 @@
 @using LaPrimitiva.Domain.Exceptions
 @using LaPrimitiva.Domain.Errors
 @using Microsoft.Extensions.Localization
+@implements IDisposable
 @inject IWinningDrawService WinningDrawService
+@inject GlobalState GlobalState
 @inject IStringLocalizer<HistoricalResource> L
 @inject IStringLocalizer<GlobalResource> LG
 @inject IStringLocalizer<ErrorResource> LE
@@ -297,9 +299,11 @@
     private WinningDrawDto _editingDraw = CreateNewDto();
     private string? _errorMessage;
     private bool _hasConcurrencyConflict;
+    private bool _disposed;
 
     protected override async Task OnInitializedAsync()
     {
+        GlobalState.OnDataRefreshRequired += HandleDataChange;
         _availableYears = await WinningDrawService.GetAvailableYearsAsync();
         if (_availableYears.Any())
         {
@@ -313,11 +317,56 @@
         await LoadDraws();
     }
 
-    private async Task LoadDraws()
+    private async Task LoadDraws(bool showLoader = true)
     {
-        _draws = null; // Show loader
-        StateHasChanged();
-        _draws = await WinningDrawService.GetAllAsync(_selectedYear);
+        if (showLoader)
+        {
+            _draws = null;
+            StateHasChanged();
+        }
+
+        var draws = await WinningDrawService.GetAllAsync(_selectedYear);
+        if (!_disposed)
+        {
+            _draws = draws;
+        }
+    }
+
+    private void HandleDataChange()
+    {
+        if (_disposed)
+        {
+            return;
+        }
+
+        _ = HandleDataChangeAsync();
+    }
+
+    private async Task HandleDataChangeAsync()
+    {
+        try
+        {
+            await InvokeAsync(async () =>
+            {
+                if (_disposed)
+                {
+                    return;
+                }
+
+                await LoadDraws(showLoader: false);
+                if (!_disposed)
+                {
+                    StateHasChanged();
+                }
+            });
+        }
+        catch (Exception exception)
+        {
+            if (!_disposed)
+            {
+                ErrorReporter.Report(exception, "HistoricalDraws.RefreshAfterExternalSave");
+            }
+        }
     }
 
     private async Task OnYearChanged(ChangeEventArgs e)
@@ -452,4 +501,10 @@
         DateTime.Today,
         0, 0, 0, 0, 0, 0, 0, 0, null
     );
+
+    public void Dispose()
+    {
+        _disposed = true;
+        GlobalState.OnDataRefreshRequired -= HandleDataChange;
+    }
 }

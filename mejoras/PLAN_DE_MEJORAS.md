@@ -11,6 +11,34 @@
 - No mezclar refactorizaciones estructurales con correcciones funcionales urgentes.
 - Antes de cerrar un hito, ejecutar sus pruebas y comprobar manualmente los flujos afectados.
 
+## Mapa documental de la carpeta `mejoras/`
+
+La carpeta `mejoras/` contiene el plan director, las evidencias operativas y los informes técnicos de auditoría, guías y verificaciones:
+
+### 1. Auditorías Externas Independientes
+- [Fases 0, 1 y 2: Preparación, Integridad y Correcciones](AUDITORIA_FASES_0_1_2.md)
+- [Fase 3: Seguridad Local Robusta](AUDITORIA_FASE_3.md)
+- [Fase 4: Persistencia y Arquitectura](AUDITORIA_FASE_4.md)
+- [Fase 5: Calidad, Observabilidad y Mantenimiento](AUDITORIA_FASE_5.md)
+- [Fase 6: Verificación Final (M-601, M-602, M-603)](AUDITORIA_FASE_6.md)
+
+### 2. Guías y Procedimientos Operativos
+- [Línea Base y Flujos Críticos (M-000)](LINEA_BASE_M000.md)
+- [Procedimiento de Recuperación de Backups (M-102)](RECUPERACION_BACKUPS.md)
+- [Guía de Configuración HTTPS e IIS Local con PKI (M-306)](GUIA_M306_HTTPS_IIS.md)
+- [Estrategia y Pirámide de Pruebas (M-501)](ESTRATEGIA_PRUEBAS_M501.md)
+- [Taxonomía y Manejo Transversal de Errores (M-506)](TAXONOMIA_DE_ERRORES.md)
+- [Estrategia de Localización y Cultura es-ES (M-507)](LOCALIZACION.md)
+- [Procedimiento del Simulacro de Recuperación (M-603)](SIMULACRO_RECUPERACION_M603.md)
+
+### 3. Informes de Verificación y Análisis
+- [Verificación Funcional Completa (M-601)](VERIFICACION_FUNCIONAL_M601.md)
+- [Verificación Integral de Seguridad (M-602)](VERIFICACION_SEGURIDAD_M602.md)
+- [Comparación y Evaluación de Estrategias Estadísticas (M-702)](M-702_COMPARACION_ESTRATEGIAS.md)
+
+### 4. Evidencias de Ejecución
+- Carpeta [`evidencias/`](evidencias/): JSONs y artefactos inmutables de verificaciones, scans, simulacros y backtests.
+
 ## Estado general
 
 | Fase | Objetivo | Estado |
@@ -21,7 +49,7 @@
 | 3 | Seguridad local robusta | Completada |
 | 4 | Persistencia y arquitectura | Completada |
 | 5 | Calidad, observabilidad y mantenimiento | Completada |
-| 6 | Verificación final | Pendiente |
+| 6 | Verificación final | Completada |
 
 ---
 
@@ -1367,4 +1395,5 @@ Estos descartes describen el código auditado y deben revisarse si cambian las f
 | M-507 | 2026-08-31 | Commit `91a8b80`, sobre `5ea3fea`; release `v1.17.0` | Completado | Cultura `es-ES` global en runtime y componentes; 12 catálogos `.es-ES.resx` segregados por bounded context; `RequiredStringLocalizerFactory` detecta claves ausentes; neutralidad en contratos CSV/RSS; verificadores y suite xUnit correctos. |
 | M-601 | 2026-09-01 | Commit de cierre de esta publicación, sobre `c5d76a6`; release `v1.17.1` | Completado | Suite fresca **182/182**, recorrido real completo contra base aislada, cálculos conocidos y CRUD verificados; logger JSON seguro, años futuros, metadatos del alta, acumulado CSV, rutas localizadas y SVG corregidos; datos temporales eliminados y M-602 no iniciado. |
 | M-602 | 2026-09-01 | Verificador y evidencia de cierre sobre `b666116`; scan `95f84eb6-0417-4317-8a9b-6b32fab35ad3` | Completado | Seis superficies de seguridad sin hallazgos confirmados; NuGet/npm con 0 vulnerabilidades; rechazo runtime de `0.0.0.0`, listener exclusivo en `127.0.0.1`, RSS/CSV/CSP conformes; 33/33 pruebas focalizadas correctas y limitación SSPI de la suite completa registrada. |
+| M-603 | 2026-09-02 | Artefactos y evidencia sobre `e0fdd2c`; `scripts/Invoke-M603RecoveryDrill.ps1` | Completado | Backup nuevo verificado (CHECKSUM/SHA-256), restauración temporal aislada `PrimitivaRestoreTest_M603_*`, DBCC CHECKDB correcto; cotejo de instantáneas coincidente al céntimo (92 draws, -129,00 €); arranque del binario sin build con conexión en proceso, readiness Healthy, 5 rutas HTTP 200 y limpieza determinista. |
 | M-702 | 2026-08-24 | `e2402f6`, `19defe6`, release `373561a`, tag `v1.1.0` | Completado | Generación uniforme y rediseño validados; títulos de Histórico y Combinación automática unificados con `PageTitle`; footer enlazado a la versión del ensamblado y release `1.1.0` publicada. Verificación estática correcta y validación visual del usuario; casos xUnit nuevos no ejecutados por la prohibición de compilar. |

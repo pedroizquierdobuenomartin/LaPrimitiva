@@ -1,0 +1,88 @@
+{
+  "milestone": "M-603",
+  "result": "successful",
+  "serverInstance": "localhost\\LOCALSERVER",
+  "sourceDatabase": "PrimitivaAuditV2",
+  "temporaryDatabase": "PrimitivaRestoreTest_M603_20260902_3",
+  "backupFile": "E:\\Repositorios\\LaPrimitiva\\artifacts\\M603-backups\\PrimitivaAuditV2_LaPrimitiva_20260902_081000.bak",
+  "backupBytes": 6737920,
+  "backupSha256": "e9424f28939d7f3166fba8315b81ad981d881b02c2de72e5e58ae979b54d3007",
+  "appDll": "E:\\Repositorios\\LaPrimitiva\\LaPrimitiva.App\\bin\\Debug\\net10.0\\LaPrimitiva.App.dll",
+  "appDllSha256": "16b90061ac4322ed7314de46bb9dbf354df95ab6216b9477f685a791b1c90c3b",
+  "appUrl": "http://127.0.0.1:5063",
+  "readiness": "Healthy",
+  "sourceSnapshot": {
+    "drawRecords": 92,
+    "plans": 1,
+    "winningDraws": 4182,
+    "playedDraws": 90,
+    "recordsWithPrizes": 20,
+    "totalSpent": 179.0,
+    "totalWon": 50.0,
+    "fixedPrizes": 35.0,
+    "automaticPrizes": 15.0,
+    "jokerPrizes": 0.0,
+    "netResult": -129.0
+  },
+  "restoredSnapshot": {
+    "drawRecords": 92,
+    "plans": 1,
+    "winningDraws": 4182,
+    "playedDraws": 90,
+    "recordsWithPrizes": 20,
+    "totalSpent": 179.0,
+    "totalWon": 50.0,
+    "fixedPrizes": 35.0,
+    "automaticPrizes": 15.0,
+    "jokerPrizes": 0.0,
+    "netResult": -129.0
+  },
+  "routeChecks": {
+    "/": {
+      "statusCode": 200,
+      "markers": [
+        "Total Gastado",
+        "Total Ganado"
+      ]
+    },
+    "/planes": {
+      "statusCode": 200,
+      "markers": [
+        "Planes",
+        "Premios"
+      ]
+    },
+    "/registro": {
+      "statusCode": 200,
+      "markers": [
+        "Registro",
+        "Listado de sorteos para el año"
+      ]
+    },
+    "/historico": {
+      "statusCode": 200,
+      "markers": [
+        "Histórico"
+      ]
+    },
+    "/datos": {
+      "statusCode": 200,
+      "markers": [
+        "Datos"
+      ]
+    }
+  },
+  "timingsSeconds": {
+    "sourceSnapshotSeconds": 0.181,
+    "backupSeconds": 2.361,
+    "restoreAndCheckDbSeconds": 0.894,
+    "functionalComparisonSeconds": 0.159,
+    "applicationStartupSeconds": 2.262,
+    "applicationRoutesSeconds": 0.687
+  },
+  "totalDurationSeconds": 6.543,
+  "startedAt": "2026-09-02T08:09:58.476755+02:00",
+  "completedAt": "2026-09-02T08:10:05.0201594+02:00",
+  "cleanup": "completed",
+  "cleanupCompletedAt": "2026-09-02T08:11:26.8424789+02:00"
+}

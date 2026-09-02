@@ -846,13 +846,22 @@ la actualización inmediata del formulario delega en el caso de uso que invoca l
 
 **Decisiones:** no se modifica código de producción porque no se confirmó una vulnerabilidad; se mantienen separadas la evidencia de fuente, advisories y runtime; el binario se identifica por hash y sigue siendo válido porque M-602 solo añade verificación y documentación; el binding IIS instalado es estado externo y debe repetirse con `Manage-M306LocalHttps.ps1 -Action Verify` si cambia el despliegue. No se inició M-603.
 
-### [ ] M-603 — Simulacro de recuperación
+### [x] M-603 — Simulacro de recuperación
 
 - Crear un backup nuevo.
 - Restaurarlo en una base temporal limpia.
 - Arrancar la aplicación contra la copia restaurada.
 - Verificar registros, planes, premios y totales.
 - Documentar duración y pasos del proceso.
+
+**Ejecución:**
+
+- **Fecha:** 2 de septiembre de 2026.
+- **Commit o referencia:** artefactos `scripts/Invoke-M603RecoveryDrill.ps1`, `scripts/Verify-M603RecoveryDrill.ps1`, `mejoras/SIMULACRO_RECUPERACION_M603.md` y evidencia `mejoras/evidencias/M-603-recovery-drill-20260902.json`; cambio preparado sobre `e0fdd2c`, sin commit ni publicación solicitados.
+- **Evidencia previa:** M-102 demostraba `RESTORE VERIFYONLY`, restauración aislada y `DBCC CHECKDB`, pero eliminaba inmediatamente la base temporal. No existía un flujo que arrancase la aplicación contra la copia ni comparase registros, planes, premios y totales; tampoco existían script, verificador, procedimiento o evidencia M-603. `scripts/Verify-M102Restore.ps1` era correcto antes del cambio, confirmando que la brecha era funcional y operativa, no de integridad física del backup.
+- **Pruebas realizadas:** análisis sintáctico PowerShell y `scripts/Verify-M603RecoveryDrill.ps1` correctos; regresión `scripts/Verify-M102Restore.ps1` correcta. Simulacro real contra `localhost\LOCALSERVER` sin compilar: backup nuevo de 6.737.920 bytes y SHA-256 `e9424f28939d7f3166fba8315b81ad981d881b02c2de72e5e58ae979b54d3007`; `RESTORE VERIFYONLY`, restauración como `PrimitivaRestoreTest_M603_20260902_3` y `DBCC CHECKDB` correctos; readiness `Healthy`; HTTP 200 en `/`, `/planes`, `/registro`, `/historico` y `/datos`. La comparación origen/copia coincidió en 92 registros, 1 plan, 4.182 resultados históricos, 90 registros jugados, 20 con premio, 179,00 € gastados, 50,00 € ganados, 35,00 € de premios fijos, 15,00 € automáticos, 0,00 € Joker y -129,00 € netos. Duración total: 6,543 segundos. Se confirmó que no quedó ninguna base temporal M-603.
+- **Resultado:** el simulacro es reproducible y falla ante cualquier divergencia funcional, readiness no saludable, ruta inválida o marcador ausente. Conserva el backup bajo la retención normal, identifica backup y binario por SHA-256, registra tiempos por fase y elimina la aplicación y la base temporal mediante `finally`. El binario existente se ejecutó con una conexión sobreescrita solo para su proceso; no se modificó la configuración persistente.
+- **Decisiones:** se amplía `Test-DatabaseRestore.ps1` con `-KeepDatabase` y `-Milestone` manteniendo por defecto el comportamiento M-102 de eliminación inmediata; M-603 conserva la copia únicamente durante la validación y exige el prefijo `PrimitivaRestoreTest_M603_`. En este equipo `Z:\BBDD\Backups` no estaba disponible y la carpeta predeterminada de SQL no permitía lectura al operador, por lo que la ejecución usó `artifacts\M603-backups` con permiso limitado a `NT SERVICE\MSSQL$LOCALSERVER`; el script normaliza el destino a ruta absoluta para evitar que SQL Server interprete una ruta relativa bajo su directorio de backup. Los marcadores HTML se decodifican antes de verificarlos. No se compiló, no se publicó y no se inició ningún hito de la Fase 7.
 
 ---
 

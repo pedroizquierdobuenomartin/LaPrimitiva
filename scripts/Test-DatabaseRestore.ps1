@@ -20,7 +20,14 @@ param(
 
     [Parameter()]
     [ValidateNotNullOrEmpty()]
-    [string]$SqlCmdExecutable = "sqlcmd"
+    [string]$SqlCmdExecutable = "sqlcmd",
+
+    [Parameter()]
+    [switch]$KeepDatabase,
+
+    [Parameter()]
+    [ValidateSet("M-102", "M-603")]
+    [string]$Milestone = "M-102"
 )
 
 $ErrorActionPreference = "Stop"
@@ -117,7 +124,7 @@ DBCC CHECKDB([$escapedDatabaseName]) WITH NO_INFOMSGS;
 
     $hash = (Get-FileHash -LiteralPath $resolvedBackupFile -Algorithm SHA256).Hash.ToLowerInvariant()
     $evidence = [ordered]@{
-        milestone = "M-102"
+        milestone = $Milestone
         result = "successful"
         serverInstance = $ServerInstance
         sourceBackup = $resolvedBackupFile
@@ -126,6 +133,7 @@ DBCC CHECKDB([$escapedDatabaseName]) WITH NO_INFOMSGS;
         restoreVerifyOnly = "successful"
         restoreDatabase = "successful"
         dbccCheckDb = "successful"
+        cleanup = if ($KeepDatabase) { "retained-for-functional-validation" } else { "scheduled" }
         startedAt = $startedAt.ToString("o")
         completedAt = (Get-Date).ToString("o")
     }
@@ -142,9 +150,12 @@ DBCC CHECKDB([$escapedDatabaseName]) WITH NO_INFOMSGS;
     $evidence
 }
 finally {
-    if ($restored) {
+    if ($restored -and -not $KeepDatabase) {
         $dropQuery = "IF DB_ID(N'$(ConvertTo-SqlLiteral -Value $TemporaryDatabaseName)') IS NOT NULL BEGIN ALTER DATABASE [$escapedDatabaseName] SET SINGLE_USER WITH ROLLBACK IMMEDIATE; DROP DATABASE [$escapedDatabaseName]; END;"
         Invoke-CheckedSqlCmd -Query $dropQuery | Out-Null
         Write-Host "[OK] Base temporal '$TemporaryDatabaseName' eliminada." -ForegroundColor Green
+    }
+    elseif ($restored) {
+        Write-Host "[OK] Base temporal '$TemporaryDatabaseName' conservada para validación funcional." -ForegroundColor Green
     }
 }
